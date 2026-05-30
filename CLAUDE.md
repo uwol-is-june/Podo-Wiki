@@ -7,7 +7,7 @@
 나무위키 형태이나, 수정은 회원가입된 사용자만 가능.
 
 ## 배포 URL
-배포 후 기입 예정
+https://podo-wiki.vercel.app
 
 ## 지금 할 일
 → [TASK.md](TASK.md) 참조

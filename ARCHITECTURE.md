@@ -53,4 +53,4 @@ Podo-Wiki/
 | 서비스 | 용도 | 인증 방식 |
 |--------|------|-----------|
 | Supabase | DB, Auth, Storage | NEXT_PUBLIC_SUPABASE_URL + ANON_KEY |
-| Vercel | 호스팅/배포 | GitHub 연동 |
+| Vercel | 호스팅/배포 (https://podo-wiki.vercel.app) | GitHub 연동 |
