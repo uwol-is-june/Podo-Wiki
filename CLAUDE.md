@@ -1,4 +1,4 @@
-@AGENTS.md
+@docs/AGENTS.md
 
 # Podo Wiki
 
@@ -10,10 +10,10 @@
 https://podo-wiki.vercel.app
 
 ## 지금 할 일
-→ [TASK.md](TASK.md) 참조
+→ [TASK.md](docs/TASK.md) 참조
 
 ## 아키텍처
-→ [ARCHITECTURE.md](ARCHITECTURE.md) 참조
+→ [ARCHITECTURE.md](docs/ARCHITECTURE.md) 참조
 
 ## 코딩 규칙
 - 언어: TypeScript (Node.js 24)
@@ -26,11 +26,11 @@ https://podo-wiki.vercel.app
 
 ## Claude에게
 
-- 작업 시작 전 반드시 TASK.md를 먼저 읽어
-- 새 기능 구현 완료 시 CHANGELOG.md Unreleased 섹션에 추가해
-- 태스크 완료 시 TASK.md에서 해당 항목 삭제하고 CHANGELOG.md로 이동해
-- 아이디어가 생기면 BACKLOG.md에 추가해:
+- 작업 시작 전 반드시 docs/TASK.md를 먼저 읽어
+- 새 기능 구현 완료 시 docs/CHANGELOG.md Unreleased 섹션에 추가해
+- 태스크 완료 시 docs/TASK.md에서 해당 항목 삭제하고 docs/CHANGELOG.md로 이동해
+- 아이디어가 생기면 docs/BACKLOG.md에 추가해:
   - 구현 방법이 명확하면 → **High-fi**에 추가
   - 불명확하거나 결정이 필요한 것 있으면 → **Low-fi**에 추가하고 필요한 질문을 → 로 함께 작성해
   - Low-fi 항목의 모든 질문의 답변이 달리면 → 답변 내용을 배경에 반영해서 **High-fi**로 이동해
-- ARCHITECTURE.md는 구조가 바뀔 때만 업데이트해
+- docs/ARCHITECTURE.md는 구조가 바뀔 때만 업데이트해
