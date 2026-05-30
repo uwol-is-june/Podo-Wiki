@@ -22,6 +22,13 @@ export default async function EditPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login?next=${encodeURIComponent(`/w/${encodeURIComponent(decodedSlug)}/edit`)}`)
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('status')
+    .eq('id', user.id)
+    .single()
+  if (!profile || profile.status !== 'approved') redirect('/pending')
+
   const { data: document } = await supabase
     .from('documents')
     .select('slug, title, content, author_id, created_at, updated_at')

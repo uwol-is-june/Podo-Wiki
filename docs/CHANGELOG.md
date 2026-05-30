@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-009] 회원 권한 체계 구현
+  - `supabase/migrations/20260530000001_profiles.sql` — profiles 테이블, `is_approved()` DB 함수, documents/revisions 쓰기 RLS를 approved 전용으로 교체
+  - `src/lib/supabase/types.ts` — profiles 타입 + `Profile`, `ProfileStatus` export
+  - `src/lib/supabase/admin.ts` — service_role key 기반 admin Supabase client (서버 전용)
+  - `src/lib/auth/actions.ts` — `signup()`에 이름·소속 단체 필드 + profile INSERT(pending 상태) 추가
+  - `src/app/signup/SignupForm.tsx` — 이름·소속 단체 입력 필드 추가
+  - `src/app/auth/callback/route.ts` — 이메일 인증 완료 콜백 Route Handler
+  - `src/lib/admin/actions.ts` — passcode 검증, pending 목록 조회, 승인/거부 Server Actions
+  - `src/app/admin/login/` — 관리자 passcode 입력 페이지 (`podo0607`)
+  - `src/app/admin/page.tsx` + `AdminUserTable.tsx` — 가입 신청 승인/거부 관리 대시보드
+  - `src/app/pending/page.tsx` — 로그인 됐으나 승인 대기 상태인 사용자 안내 페이지
+  - `src/app/w/[slug]/edit/page.tsx` + `src/lib/wiki/actions.ts` — approved 상태 아닌 사용자는 `/pending`으로 redirect
+  - `src/components/layout/Header.tsx` — 승인 대기 상태 시 "승인 대기" 배지 표시
+  - `middleware.ts` — Supabase 세션 토큰 자동 갱신 미들웨어 추가
 - 프로젝트 초기 세팅 (Next.js 16, TypeScript, Tailwind CSS v4)
 - Supabase 클라이언트 설정 (`src/lib/supabase/`)
 - Vercel 배포 연결

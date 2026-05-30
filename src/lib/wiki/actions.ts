@@ -11,6 +11,9 @@ export async function saveDocument(slug: string, title: string, content: string)
 
   if (!user) redirect(`/login?next=${encodeURIComponent(`/w/${encodeURIComponent(slug)}/edit`)}`)
 
+  const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).single()
+  if (!profile || profile.status !== 'approved') redirect('/pending')
+
   const docRow: Database['public']['Tables']['documents']['Insert'] = {
     slug,
     title,

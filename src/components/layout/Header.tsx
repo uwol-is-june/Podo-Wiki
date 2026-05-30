@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { logout } from '@/lib/auth/actions'
+import type { ProfileStatus } from '@/lib/supabase/types'
 
 function SearchIcon() {
   return (
@@ -67,13 +68,25 @@ function MoonIcon() {
 export default function Header() {
   const { theme, setTheme } = useTheme()
   const [user, setUser] = useState<User | null>(null)
+  const [profileStatus, setProfileStatus] = useState<ProfileStatus | null>(null)
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+    const fetchUserAndProfile = async (uid: string | undefined) => {
+      if (!uid) { setProfileStatus(null); return }
+      const { data } = await supabase.from('profiles').select('status').eq('id', uid).single()
+      setProfileStatus((data?.status as ProfileStatus) ?? null)
+    }
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+      fetchUserAndProfile(user?.id)
+    })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null)
+      const u = session?.user ?? null
+      setUser(u)
+      fetchUserAndProfile(u?.id)
     })
     return () => subscription.unsubscribe()
   }, [supabase])
@@ -127,6 +140,11 @@ export default function Header() {
               <span className="px-2 py-1 text-xs text-wiki-header-text/70 max-w-[120px] truncate hidden sm:block">
                 {user.email}
               </span>
+              {profileStatus === 'pending' && (
+                <span className="px-1.5 py-0.5 text-xs bg-yellow-500/20 text-yellow-300 rounded hidden sm:block">
+                  승인 대기
+                </span>
+              )}
               <form action={logout}>
                 <button
                   type="submit"

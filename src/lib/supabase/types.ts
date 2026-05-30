@@ -49,6 +49,28 @@ export type Database = {
         };
         Relationships: [];
       };
+      profiles: {
+        Row: {
+          id: string;
+          name: string;
+          organization: string;
+          status: 'pending' | 'approved' | 'rejected';
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          organization: string;
+          status?: 'pending' | 'approved' | 'rejected';
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          organization?: string;
+          status?: 'pending' | 'approved' | 'rejected';
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -59,3 +81,5 @@ export type Database = {
 
 export type Document = Database["public"]["Tables"]["documents"]["Row"];
 export type Revision = Database["public"]["Tables"]["revisions"]["Row"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type ProfileStatus = Profile['status'];
