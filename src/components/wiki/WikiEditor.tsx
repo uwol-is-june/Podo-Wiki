@@ -1,0 +1,255 @@
+'use client'
+
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Link from '@tiptap/extension-link'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import TurndownService from 'turndown'
+import { saveDocument } from '@/lib/wiki/actions'
+
+const td = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+  bulletListMarker: '-',
+})
+
+type Props = {
+  slug: string
+  initialTitle: string
+  initialHtml: string
+}
+
+function ToolbarBtn({
+  onClick,
+  active,
+  title,
+  children,
+}: {
+  onClick: () => void
+  active?: boolean
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onMouseDown={(e) => { e.preventDefault(); onClick() }}
+      title={title}
+      className={`px-2 py-1 rounded text-sm transition-colors ${
+        active
+          ? 'bg-wiki-accent text-white'
+          : 'text-wiki-text hover:bg-wiki-border/60'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
+  const [title, setTitle] = useState(initialTitle)
+  const [error, setError] = useState('')
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Link.configure({ openOnClick: false }),
+    ],
+    content: initialHtml,
+    editorProps: {
+      attributes: {
+        class: 'outline-none min-h-[400px] p-5',
+      },
+    },
+  })
+
+  const setLink = () => {
+    const prev = editor?.getAttributes('link').href ?? ''
+    const url = window.prompt('링크 URL을 입력하세요:', prev)
+    if (url === null) return
+    if (url === '') {
+      editor?.chain().focus().extendMarkRange('link').unsetLink().run()
+      return
+    }
+    editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  }
+
+  const handleSave = () => {
+    if (!editor) return
+    if (!title.trim()) { setError('제목을 입력해주세요.'); return }
+    setError('')
+    startTransition(async () => {
+      try {
+        const html = editor.getHTML()
+        const markdown = td.turndown(html)
+        await saveDocument(slug, title.trim(), markdown)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : '저장 중 오류가 발생했습니다.')
+      }
+    })
+  }
+
+  return (
+    <div className="max-w-[1200px] mx-auto px-4 py-6">
+      {/* 페이지 헤더 */}
+      <div className="mb-4">
+        <div className="flex items-center gap-0 border-b border-wiki-border">
+          <span className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px">
+            수정
+          </span>
+        </div>
+      </div>
+
+      <div className="bg-wiki-surface border border-wiki-border rounded-lg overflow-hidden">
+        {/* 제목 입력 */}
+        <div className="border-b border-wiki-border px-4 py-3">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="문서 제목"
+            className="w-full text-xl font-bold bg-transparent text-wiki-text placeholder:text-wiki-text-muted outline-none"
+          />
+        </div>
+
+        {/* 툴바 */}
+        <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-wiki-border bg-wiki-bg/50">
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+            active={editor?.isActive('bold')}
+            title="굵게 (Ctrl+B)"
+          >
+            <strong>B</strong>
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+            active={editor?.isActive('italic')}
+            title="기울임 (Ctrl+I)"
+          >
+            <em>I</em>
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleStrike().run()}
+            active={editor?.isActive('strike')}
+            title="취소선"
+          >
+            <s>S</s>
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleCode().run()}
+            active={editor?.isActive('code')}
+            title="인라인 코드"
+          >
+            {'<>'}
+          </ToolbarBtn>
+
+          <span className="w-px h-5 bg-wiki-border mx-1" />
+
+          {([1, 2, 3] as const).map((level) => (
+            <ToolbarBtn
+              key={level}
+              onClick={() => editor?.chain().focus().toggleHeading({ level }).run()}
+              active={editor?.isActive('heading', { level })}
+              title={`제목 ${level}`}
+            >
+              H{level}
+            </ToolbarBtn>
+          ))}
+
+          <span className="w-px h-5 bg-wiki-border mx-1" />
+
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            active={editor?.isActive('bulletList')}
+            title="글머리 기호 목록"
+          >
+            • 목록
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            active={editor?.isActive('orderedList')}
+            title="번호 매기기 목록"
+          >
+            1. 목록
+          </ToolbarBtn>
+
+          <span className="w-px h-5 bg-wiki-border mx-1" />
+
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+            active={editor?.isActive('codeBlock')}
+            title="코드 블록"
+          >
+            {'```'}
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+            active={editor?.isActive('blockquote')}
+            title="인용"
+          >
+            &ldquo;&rdquo;
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={setLink}
+            active={editor?.isActive('link')}
+            title="링크"
+          >
+            🔗
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+            active={false}
+            title="구분선"
+          >
+            ―
+          </ToolbarBtn>
+        </div>
+
+        {/* 에디터 본문 */}
+        <div className="
+          text-wiki-text
+          [&_.ProseMirror_h1]:text-2xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mt-6 [&_.ProseMirror_h1]:mb-3
+          [&_.ProseMirror_h2]:text-xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-5 [&_.ProseMirror_h2]:mb-2
+          [&_.ProseMirror_h3]:text-lg [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:mt-4 [&_.ProseMirror_h3]:mb-2
+          [&_.ProseMirror_p]:my-2 [&_.ProseMirror_p]:leading-relaxed
+          [&_.ProseMirror_a]:text-wiki-accent [&_.ProseMirror_a]:underline
+          [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-2
+          [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:my-2
+          [&_.ProseMirror_li]:my-1
+          [&_.ProseMirror_code]:bg-wiki-border/30 [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded [&_.ProseMirror_code]:text-sm [&_.ProseMirror_code]:font-mono
+          [&_.ProseMirror_pre]:bg-wiki-bg [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-wiki-border [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-3 [&_.ProseMirror_pre]:overflow-x-auto
+          [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0
+          [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-wiki-accent [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-wiki-text-muted [&_.ProseMirror_blockquote]:my-3
+          [&_.ProseMirror_hr]:border-wiki-border [&_.ProseMirror_hr]:my-4
+          [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-wiki-text-muted [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none
+        ">
+          <EditorContent editor={editor} />
+        </div>
+      </div>
+
+      {/* 하단 버튼 */}
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={isPending}
+          className="px-5 py-2 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? '저장 중…' : '저장'}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push(`/w/${encodeURIComponent(slug)}`)}
+          disabled={isPending}
+          className="px-5 py-2 border border-wiki-border text-wiki-text rounded text-sm hover:border-wiki-accent hover:text-wiki-accent transition-colors disabled:opacity-50"
+        >
+          취소
+        </button>
+        {error && <p className="text-sm text-red-500">{error}</p>}
+      </div>
+    </div>
+  )
+}

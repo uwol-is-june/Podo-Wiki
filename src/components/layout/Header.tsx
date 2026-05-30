@@ -2,6 +2,11 @@
 
 import Link from 'next/link'
 import { useTheme } from './ThemeProvider'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import type { User } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
+import { logout } from '@/lib/auth/actions'
 
 function SearchIcon() {
   return (
@@ -61,6 +66,17 @@ function MoonIcon() {
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-[50px] bg-wiki-header-bg border-b border-wiki-border/30">
@@ -74,21 +90,23 @@ export default function Header() {
         </Link>
 
         {/* 검색창 */}
-        <div className="flex-1 max-w-[500px]">
+        <form action="/search" method="GET" className="flex-1 max-w-[500px]">
           <div className="relative">
             <input
               type="text"
+              name="q"
               placeholder="문서 검색..."
               className="w-full h-8 pl-3 pr-9 rounded text-sm border border-wiki-header-text/20 bg-wiki-header-text/10 text-wiki-header-text placeholder:text-wiki-header-text/50 focus:outline-none focus:border-wiki-header-text/40 focus:bg-wiki-header-text/15 transition-colors"
             />
             <button
+              type="submit"
               aria-label="검색"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-wiki-header-text/60 hover:text-wiki-header-text transition-colors"
             >
               <SearchIcon />
             </button>
           </div>
-        </div>
+        </form>
 
         {/* 우측 네비게이션 */}
         <nav className="flex items-center gap-1 shrink-0">
@@ -104,12 +122,28 @@ export default function Header() {
           >
             임의문서
           </Link>
-          <Link
-            href="/login"
-            className="ml-1 px-3 py-1 text-sm rounded border border-wiki-header-text/30 text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
-          >
-            로그인
-          </Link>
+          {user ? (
+            <div className="ml-1 flex items-center gap-1">
+              <span className="px-2 py-1 text-xs text-wiki-header-text/70 max-w-[120px] truncate hidden sm:block">
+                {user.email}
+              </span>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="px-3 py-1 text-sm rounded border border-wiki-header-text/30 text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
+                >
+                  로그아웃
+                </button>
+              </form>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="ml-1 px-3 py-1 text-sm rounded border border-wiki-header-text/30 text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
+            >
+              로그인
+            </Link>
+          )}
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="테마 전환"
