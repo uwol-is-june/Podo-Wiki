@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-010] 대문 페이지 개편 + 초기 위키 문서 시드
+  - `src/app/page.tsx` — 나무위키 스타일 2컬럼 다단 레이아웃 (환영 배너, 공지사항, 최근 변경, 통계, 빠른 링크)
+  - `supabase/migrations/20260530000002_seed_documents.sql` — 포도위키:규칙, 포도위키:편집방침, 포도위키:도움말 초기 문서 삽입
 - [TASK-009] 회원 권한 체계 구현
   - `supabase/migrations/20260530000001_profiles.sql` — profiles 테이블, `is_approved()` DB 함수, documents/revisions 쓰기 RLS를 approved 전용으로 교체
   - `src/lib/supabase/types.ts` — profiles 타입 + `Profile`, `ProfileStatus` export
