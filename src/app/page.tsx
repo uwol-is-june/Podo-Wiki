@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Metadata } from 'next'
+import { TROUPES } from '@/data/troupes'
 
 export const metadata: Metadata = {
   title: '포도위키 — 공연단체 인수인계 위키',
@@ -36,6 +38,41 @@ export default async function HomePage() {
           공연단체의 인수인계 문서를 함께 만들어가는 위키 플랫폼
         </p>
       </div>
+
+      {/* 공연단체 바로가기 */}
+      {TROUPES.length > 0 && (
+        <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5 mb-5">
+          <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
+            공연단체
+          </h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            {TROUPES.map((troupe) => (
+              <Link
+                key={troupe.slug}
+                href={`/w/${encodeURIComponent(troupe.slug)}`}
+                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
+              >
+                {troupe.logo ? (
+                  <Image
+                    src={troupe.logo}
+                    alt={troupe.name}
+                    width={56}
+                    height={56}
+                    className="rounded-lg object-cover w-14 h-14"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
+                    {troupe.name[0]}
+                  </div>
+                )}
+                <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
+                  {troupe.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 메인 그리드 */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
