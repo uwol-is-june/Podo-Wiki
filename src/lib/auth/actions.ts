@@ -46,7 +46,11 @@ export async function signup(prevState: AuthState, formData: FormData): Promise<
 
   if (error) return { error: error.message }
 
-  if (data.user) {
+  if (!data.user) {
+    return { error: '이미 등록된 이메일입니다. 이메일 인증을 완료하거나 관리자에게 문의하세요.' }
+  }
+
+  try {
     const adminClient = createAdminClient()
     const { error: profileError } = await adminClient
       .from('profiles')
@@ -56,6 +60,9 @@ export async function signup(prevState: AuthState, formData: FormData): Promise<
       console.error('Profile insert failed:', profileError)
       return { error: '프로필 저장 중 오류가 발생했습니다.' }
     }
+  } catch (e) {
+    console.error('Admin client error:', e)
+    return { error: '서버 설정 오류가 발생했습니다. 관리자에게 문의하세요.' }
   }
 
   return {
