@@ -137,9 +137,12 @@ export default function Header() {
           </Link>
           {user ? (
             <div className="ml-1 flex items-center gap-1">
-              <span className="px-2 py-1 text-xs text-wiki-header-text/70 max-w-[120px] truncate hidden sm:block">
-                {user.email}
-              </span>
+              <Link
+                href="/mypage"
+                className="px-2 py-1 text-xs text-wiki-header-text/70 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors hidden sm:block"
+              >
+                내 정보
+              </Link>
               {profileStatus === 'pending' && (
                 <span className="px-1.5 py-0.5 text-xs bg-yellow-500/20 text-yellow-300 rounded hidden sm:block">
                   승인 대기
