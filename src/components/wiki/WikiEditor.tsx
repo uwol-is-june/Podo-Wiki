@@ -4,16 +4,29 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
-import { useRef, useState, useTransition } from 'react'
+import { useRef, useState, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
 import { saveDocument } from '@/lib/wiki/actions'
 import { createClient } from '@/lib/supabase/client'
+import LinkInsertModal from './LinkInsertModal'
 
 const td = new TurndownService({
   headingStyle: 'atx',
   codeBlockStyle: 'fenced',
   bulletListMarker: '-',
+})
+
+// width가 있는 이미지는 title 필드에 "w=숫자" 형태로 너비를 인코딩해 저장
+td.addRule('resizable-image', {
+  filter: (node) => node.nodeName === 'IMG' && !!(node as Element).getAttribute('width'),
+  replacement: (_content, node) => {
+    const el = node as HTMLImageElement
+    const src = el.getAttribute('src') ?? ''
+    const alt = el.getAttribute('alt') ?? ''
+    const width = el.getAttribute('width') ?? ''
+    return `![${alt}](${src} "w=${width}")`
+  },
 })
 
 type Props = {
@@ -54,6 +67,8 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
   const [isUploading, setIsUploading] = useState(false)
+  const [linkModalOpen, setLinkModalOpen] = useState(false)
+  const [currentLinkHref, setCurrentLinkHref] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
@@ -61,7 +76,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     extensions: [
       StarterKit,
       Link.configure({ openOnClick: false }),
-      Image.configure({ inline: false }),
+      Image.configure({ inline: false, resize: { enabled: true, alwaysPreserveAspectRatio: true, minWidth: 50 } }),
     ],
     content: initialHtml,
     editorProps: {
@@ -71,16 +86,21 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     },
   })
 
-  const setLink = () => {
-    const prev = editor?.getAttributes('link').href ?? ''
-    const url = window.prompt('링크 URL을 입력하세요:', prev)
-    if (url === null) return
-    if (url === '') {
-      editor?.chain().focus().extendMarkRange('link').unsetLink().run()
-      return
-    }
-    editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
-  }
+  const openLinkModal = useCallback(() => {
+    const href = editor?.getAttributes('link').href ?? ''
+    setCurrentLinkHref(href)
+    setLinkModalOpen(true)
+  }, [editor])
+
+  const handleLinkConfirm = useCallback((href: string) => {
+    editor?.chain().focus().extendMarkRange('link').setLink({ href }).run()
+    setLinkModalOpen(false)
+  }, [editor])
+
+  const handleLinkRemove = useCallback(() => {
+    editor?.chain().focus().extendMarkRange('link').unsetLink().run()
+    setLinkModalOpen(false)
+  }, [editor])
 
   const handleImageClick = () => {
     fileInputRef.current?.click()
@@ -235,7 +255,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             &ldquo;&rdquo;
           </ToolbarBtn>
           <ToolbarBtn
-            onClick={setLink}
+            onClick={openLinkModal}
             active={editor?.isActive('link')}
             title="링크"
           >
@@ -290,6 +310,14 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           <EditorContent editor={editor} />
         </div>
       </div>
+
+      <LinkInsertModal
+        open={linkModalOpen}
+        initialHref={currentLinkHref}
+        onClose={() => setLinkModalOpen(false)}
+        onConfirm={handleLinkConfirm}
+        onRemove={handleLinkRemove}
+      />
 
       {/* 하단 버튼 */}
       <div className="mt-4 flex items-center gap-3">

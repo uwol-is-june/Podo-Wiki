@@ -44,3 +44,23 @@ body {
   background-color: var(--wiki-bg);
   color: var(--wiki-text);
 }
+
+/* Tiptap 이미지 리사이즈 핸들 */
+[data-resize-handle] {
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border: 2px solid var(--wiki-accent);
+  border-radius: 2px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+[data-resize-container]:hover [data-resize-handle],
+[data-resize-container].ProseMirror-selectednode [data-resize-handle] {
+  opacity: 1;
+}
+[data-resize-handle="bottom-right"],
+[data-resize-handle="top-left"] { cursor: nwse-resize; }
+[data-resize-handle="bottom-left"],
+[data-resize-handle="top-right"] { cursor: nesw-resize; }

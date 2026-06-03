@@ -20,8 +20,34 @@ function H1({ children, ...props }: ComponentPropsWithoutRef<'h1'>) {
 function H3({ children, ...props }: ComponentPropsWithoutRef<'h3'>) {
   return <h3 id={slugify(extractText(children))} {...props}>{children}</h3>
 }
+function Img({ src, alt, title, ...props }: ComponentPropsWithoutRef<'img'>) {
+  let width: string | undefined
+  let displayTitle = title
+  if (title?.startsWith('w=')) {
+    width = title.slice(2)
+    displayTitle = undefined
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      title={displayTitle}
+      style={width ? { width: `${width}px`, height: 'auto', maxWidth: '100%' } : undefined}
+      {...props}
+    />
+  )
+}
 
-const bodyComponents = { h1: H1, h3: H3 }
+function A({ href, children, ...props }: ComponentPropsWithoutRef<'a'>) {
+  const isExternal = !!href && /^[a-z][a-z\d+\-.]*:/i.test(href)
+  if (isExternal) {
+    return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+  }
+  return <a href={href} {...props}>{children}</a>
+}
+
+const bodyComponents = { h1: H1, h3: H3, a: A, img: Img }
 
 type Section =
   | { type: 'intro'; body: string }
@@ -120,7 +146,7 @@ export default function MarkdownContent({ content }: { content: string }) {
           )
         )
       ) : (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ h1: H1, h3: H3 }}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
           {content}
         </ReactMarkdown>
       )}

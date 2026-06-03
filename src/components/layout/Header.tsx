@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTheme } from './ThemeProvider'
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
@@ -96,8 +97,9 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
       <header className="fixed top-0 left-0 right-0 z-50 h-[50px] bg-wiki-header-bg border-b border-wiki-border/30">
         <div className="max-w-[1200px] mx-auto h-full flex items-center justify-between px-4 gap-4">
           {/* 로고 */}
-          <Link href="/" className="text-wiki-header-text font-bold text-lg shrink-0 hover:opacity-80 transition-opacity">
-            포도위키
+          <Link href="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
+            <Image src="/wiki_logo.png" alt="포도위키" width={28} height={28} className="rounded-sm" />
+            <span className="text-wiki-header-text font-bold text-lg">포도위키</span>
           </Link>
 
           {/* 데스크탑 검색창 */}
