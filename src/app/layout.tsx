@@ -20,6 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: '포도위키',
   description: '공연단체 인수인계 위키 플랫폼',
+  icons: { icon: '/wiki_logo.png' },
 }
 
 export default async function RootLayout({

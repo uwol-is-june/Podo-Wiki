@@ -144,7 +144,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     setError('')
     startTransition(async () => {
       const html = editor.getHTML()
-      const markdown = td.turndown(html)
+      const markdown = td.turndown(html).replace(/\\\[/g, '[').replace(/\\\]/g, ']')
       const result = await saveDocument(slug, title.trim(), markdown)
       if ('error' in result) {
         setError(result.error)

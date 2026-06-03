@@ -36,6 +36,18 @@ function MoonIcon() {
   )
 }
 
+function ShuffleIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22" />
+      <path d="m18 2 4 4-4 4" />
+      <path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2" />
+      <path d="m18 22 4-4-4-4" />
+      <path d="M21.8 16.1c-.7 1.1-2 1.9-3.8 1.9h-2.5l-1.3-1.9" />
+    </svg>
+  )
+}
+
 function HamburgerIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -97,8 +109,8 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
       <header className="fixed top-0 left-0 right-0 z-50 h-[50px] bg-wiki-header-bg border-b border-wiki-border/30">
         <div className="max-w-[1200px] mx-auto h-full flex items-center justify-between px-4 gap-4">
           {/* 로고 */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
-            <Image src="/wiki_logo.png" alt="포도위키" width={28} height={28} className="rounded-sm" />
+          <Link href="/" className="flex items-center gap-1 shrink-0 hover:opacity-80 transition-opacity">
+            <Image src="/wiki_logo.png" alt="포도위키" width={32} height={32} />
             <span className="text-wiki-header-text font-bold text-lg">포도위키</span>
           </Link>
 
@@ -122,7 +134,8 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
             <Link href="/recent" className="px-2 py-1 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
               최근변경
             </Link>
-            <Link href="/random" className="px-2 py-1 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
+            <Link href="/random" className="flex items-center gap-1 px-2 py-1 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
+              <ShuffleIcon />
               임의문서
             </Link>
             {user ? (
@@ -204,7 +217,8 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
               <Link href="/recent" className="px-3 py-2.5 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
                 최근변경
               </Link>
-              <Link href="/random" className="px-3 py-2.5 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
+              <Link href="/random" className="flex items-center gap-2 px-3 py-2.5 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
+                <ShuffleIcon />
                 임의문서
               </Link>
               <div className="h-px bg-wiki-border/30 my-1" />

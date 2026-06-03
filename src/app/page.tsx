@@ -168,8 +168,7 @@ export default async function HomePage() {
                 { href: '/w/포도위키:규칙', label: '편집 규칙' },
                 { href: '/w/포도위키:편집방침', label: '편집방침' },
                 { href: '/w/포도위키:도움말', label: '도움말' },
-                { href: '/recent', label: '최근 변경 전체' },
-                { href: '/random', label: '임의 문서' },
+                { href: '/w/포도상점', label: '포도상점' },
               ].map(({ href, label }) => (
                 <Link
                   key={href}
