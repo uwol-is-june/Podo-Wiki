@@ -45,6 +45,7 @@ export default function MarkdownContent({ content }: { content: string }) {
       [&_th]:border [&_th]:border-wiki-border [&_th]:bg-wiki-border/20 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold
       [&_td]:border [&_td]:border-wiki-border [&_td]:px-3 [&_td]:py-2
       [&_hr]:border-wiki-border [&_hr]:my-6
+      [&_img]:max-w-full [&_img]:rounded [&_img]:my-3
     ">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}

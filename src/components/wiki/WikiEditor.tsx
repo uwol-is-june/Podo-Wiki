@@ -3,10 +3,12 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
-import { useState, useTransition } from 'react'
+import Image from '@tiptap/extension-image'
+import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
 import { saveDocument } from '@/lib/wiki/actions'
+import { createClient } from '@/lib/supabase/client'
 
 const td = new TurndownService({
   headingStyle: 'atx',
@@ -51,12 +53,15 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const [title, setTitle] = useState(initialTitle)
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       Link.configure({ openOnClick: false }),
+      Image.configure({ inline: false }),
     ],
     content: initialHtml,
     editorProps: {
@@ -75,6 +80,42 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       return
     }
     editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  }
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !editor) return
+
+    // 파일 초기화 (같은 파일 재선택 허용)
+    e.target.value = ''
+
+    const ext = file.name.split('.').pop() ?? 'png'
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+
+    setIsUploading(true)
+    setError('')
+    try {
+      const supabase = createClient()
+      const { data, error: uploadError } = await supabase.storage
+        .from('wiki-images')
+        .upload(filename, file, { upsert: false })
+
+      if (uploadError) throw new Error(uploadError.message)
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('wiki-images')
+        .getPublicUrl(data.path)
+
+      editor.chain().focus().setImage({ src: publicUrl, alt: file.name }).run()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '이미지 업로드 실패')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   const handleSave = () => {
@@ -207,6 +248,24 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           >
             ―
           </ToolbarBtn>
+
+          <span className="w-px h-5 bg-wiki-border mx-1" />
+
+          <ToolbarBtn
+            onClick={handleImageClick}
+            active={false}
+            title="이미지 삽입"
+          >
+            {isUploading ? '⏳' : '🖼️'}
+          </ToolbarBtn>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageFile}
+          />
         </div>
 
         {/* 에디터 본문 */}
@@ -225,6 +284,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0
           [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-wiki-accent [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-wiki-text-muted [&_.ProseMirror_blockquote]:my-3
           [&_.ProseMirror_hr]:border-wiki-border [&_.ProseMirror_hr]:my-4
+          [&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:rounded [&_.ProseMirror_img]:my-3
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-wiki-text-muted [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none
         ">
           <EditorContent editor={editor} />
@@ -236,7 +296,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         <button
           type="button"
           onClick={handleSave}
-          disabled={isPending}
+          disabled={isPending || isUploading}
           className="px-5 py-2 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? '저장 중…' : '저장'}
@@ -244,11 +304,12 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         <button
           type="button"
           onClick={() => router.push(`/w/${encodeURIComponent(slug)}`)}
-          disabled={isPending}
+          disabled={isPending || isUploading}
           className="px-5 py-2 border border-wiki-border text-wiki-text rounded text-sm hover:border-wiki-accent hover:text-wiki-accent transition-colors disabled:opacity-50"
         >
           취소
         </button>
+        {isUploading && <p className="text-sm text-wiki-text-muted">이미지 업로드 중…</p>}
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
     </div>
