@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# docs (contains sensitive info like admin codes)
+/docs
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
