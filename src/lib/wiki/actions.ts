@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import type { Database } from '@/lib/supabase/types'
 
-export async function saveDocument(slug: string, title: string, content: string) {
+export async function saveDocument(slug: string, title: string, content: string): Promise<{ error: string } | void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -21,8 +21,7 @@ export async function saveDocument(slug: string, title: string, content: string)
     author_id: user.id,
   }
   const { error } = await supabase.from('documents').upsert(docRow, { onConflict: 'slug' })
-
-  if (error) throw new Error(error.message)
+  if (error) return { error: error.message }
 
   const revRow: Database['public']['Tables']['revisions']['Insert'] = {
     document_slug: slug,
@@ -30,8 +29,7 @@ export async function saveDocument(slug: string, title: string, content: string)
     editor_id: user.id,
   }
   const { error: revError } = await supabase.from('revisions').insert(revRow)
-
-  if (revError) throw new Error(revError.message)
+  if (revError) return { error: revError.message }
 
   revalidatePath(`/w/${slug}`)
   redirect(`/w/${encodeURIComponent(slug)}`)

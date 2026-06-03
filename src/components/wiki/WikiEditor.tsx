@@ -82,13 +82,10 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     if (!title.trim()) { setError('제목을 입력해주세요.'); return }
     setError('')
     startTransition(async () => {
-      try {
-        const html = editor.getHTML()
-        const markdown = td.turndown(html)
-        await saveDocument(slug, title.trim(), markdown)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : '저장 중 오류가 발생했습니다.')
-      }
+      const html = editor.getHTML()
+      const markdown = td.turndown(html)
+      const result = await saveDocument(slug, title.trim(), markdown)
+      if (result?.error) setError(result.error)
     })
   }
 
