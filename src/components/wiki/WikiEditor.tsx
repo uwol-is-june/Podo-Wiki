@@ -85,7 +85,11 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       const html = editor.getHTML()
       const markdown = td.turndown(html)
       const result = await saveDocument(slug, title.trim(), markdown)
-      if (result?.error) setError(result.error)
+      if ('error' in result) {
+        setError(result.error)
+      } else {
+        router.push(`/w/${encodeURIComponent(slug)}`)
+      }
     })
   }
 

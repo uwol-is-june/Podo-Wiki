@@ -5,7 +5,11 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import type { Database } from '@/lib/supabase/types'
 
-export async function saveDocument(slug: string, title: string, content: string): Promise<{ error: string } | void> {
+export async function saveDocument(
+  slug: string,
+  title: string,
+  content: string,
+): Promise<{ error: string } | { ok: true }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -32,5 +36,5 @@ export async function saveDocument(slug: string, title: string, content: string)
   if (revError) return { error: revError.message }
 
   revalidatePath(`/w/${slug}`)
-  redirect(`/w/${encodeURIComponent(slug)}`)
+  return { ok: true }
 }
