@@ -6,5 +6,9 @@ export type Troupe = {
 
 // 단체 추가 요청 시 이 배열에 추가
 export const TROUPES: Troupe[] = [
-
+  {
+    name: '광운극예술연구회',
+    slug: '광운극예술연구회',
+    logo: '/logos/광운극예술연구회.png',
+  },
 ]
