@@ -75,6 +75,7 @@ export default async function RecentPage({ searchParams }: Props) {
                   </td>
                   <td className="px-4 py-3 text-wiki-text-muted whitespace-nowrap">
                     {new Date(rev.edited_at).toLocaleString('ko-KR', {
+                      timeZone: 'Asia/Seoul',
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',

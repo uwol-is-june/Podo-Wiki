@@ -125,6 +125,7 @@ export default async function HomePage() {
                     </Link>
                     <span className="text-wiki-text-muted whitespace-nowrap text-xs shrink-0">
                       {new Date(rev.edited_at).toLocaleString('ko-KR', {
+                        timeZone: 'Asia/Seoul',
                         month: '2-digit',
                         day: '2-digit',
                         hour: '2-digit',

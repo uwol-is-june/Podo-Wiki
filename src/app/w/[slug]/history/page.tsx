@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
+import RevisionList from '@/components/wiki/RevisionList'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -37,8 +38,6 @@ export default async function HistoryPage({ params }: Props) {
     ? await supabase.from('profiles').select('id, name, organization').in('id', editorIds)
     : { data: [] }
 
-  const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]))
-
   const title = document?.title ?? decodedSlug
 
   return (
@@ -64,28 +63,12 @@ export default async function HistoryPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 bg-wiki-surface border border-wiki-border rounded-lg divide-y divide-wiki-border">
-        {(revisions ?? []).length === 0 ? (
-          <p className="p-6 text-sm text-wiki-text-muted text-center">수정 역사가 없습니다.</p>
-        ) : (
-          (revisions ?? []).map((rev, index) => {
-            const profile = rev.editor_id ? profileMap.get(rev.editor_id) : null
-            const isLatest = index === 0
-            return (
-              <div key={rev.id} className="flex items-center gap-3 px-5 py-3 text-sm">
-                <span className="text-wiki-text-muted w-36 shrink-0">
-                  {new Date(rev.edited_at).toLocaleString('ko-KR')}
-                </span>
-                <span className="text-wiki-text">
-                  {profile ? `${profile.name} (${profile.organization})` : '알 수 없는 사용자'}
-                </span>
-                {isLatest && (
-                  <span className="ml-auto text-xs text-wiki-accent font-medium">최신</span>
-                )}
-              </div>
-            )
-          })
-        )}
+      <div className="mt-6">
+        <RevisionList
+          revisions={revisions ?? []}
+          profiles={profiles ?? []}
+          slug={decodedSlug}
+        />
       </div>
     </div>
   )

@@ -53,6 +53,7 @@ function UserRow({ user }: { user: Profile }) {
   }
 
   const createdAt = new Date(user.created_at).toLocaleDateString('ko-KR', {
+    timeZone: 'Asia/Seoul',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

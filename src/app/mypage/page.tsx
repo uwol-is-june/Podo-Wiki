@@ -32,7 +32,7 @@ export default async function MyPage() {
 
   const joinedAt = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString('ko-KR', {
-        year: 'numeric', month: 'long', day: 'numeric',
+        timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric',
       })
     : null
 

@@ -14,9 +14,6 @@ function extractText(node: React.ReactNode): string {
   return ''
 }
 
-function H1({ children, ...props }: ComponentPropsWithoutRef<'h1'>) {
-  return <h1 id={slugify(extractText(children))} {...props}>{children}</h1>
-}
 function H3({ children, ...props }: ComponentPropsWithoutRef<'h3'>) {
   return <h3 id={slugify(extractText(children))} {...props}>{children}</h3>
 }
@@ -47,54 +44,103 @@ function A({ href, children, ...props }: ComponentPropsWithoutRef<'a'>) {
   return <a href={href} {...props}>{children}</a>
 }
 
-const bodyComponents = { h1: H1, h3: H3, a: A, img: Img }
+const bodyComponents = { h3: H3, a: A, img: Img }
 
-type Section =
+// ── Parsing ──────────────────────────────────────────────────────────
+
+type H2Section = { heading: string; id: string; body: string }
+
+type Block =
   | { type: 'intro'; body: string }
+  | { type: 'h1'; heading: string; id: string; intro: string; h2s: H2Section[] }
   | { type: 'h2'; heading: string; id: string; body: string }
 
-function splitSections(markdown: string): Section[] {
-  const result: Section[] = []
-  const buffer: string[] = []
-  let current: { heading: string; id: string } | null = null
+function splitBlocks(markdown: string): Block[] {
+  type RawSeg =
+    | { level: 'intro'; body: string }
+    | { level: 1 | 2; heading: string; id: string; body: string }
+
+  const segs: RawSeg[] = []
+  const buf: string[] = []
+  let cur: { level: 1 | 2; heading: string; id: string } | null = null
 
   const flush = () => {
-    const body = buffer.join('\n').trim()
-    if (current === null) {
-      if (body) result.push({ type: 'intro', body })
+    const body = buf.join('\n').trim()
+    buf.length = 0
+    if (!cur) {
+      if (body) segs.push({ level: 'intro', body })
     } else {
-      result.push({ type: 'h2', heading: current.heading, id: current.id, body })
+      segs.push({ level: cur.level, heading: cur.heading, id: cur.id, body })
     }
-    buffer.length = 0
   }
 
   for (const line of markdown.split('\n')) {
-    const m = line.match(/^## (.+)/)
-    if (m) {
+    const h2m = line.match(/^## (.+)/)
+    const h1m = !h2m && line.match(/^# (.+)/)
+    if (h1m) {
       flush()
-      const heading = m[1].trim()
-      current = { heading, id: slugify(heading) }
+      const heading = h1m[1].trim()
+      cur = { level: 1, heading, id: slugify(heading) }
+    } else if (h2m) {
+      flush()
+      const heading = h2m[1].trim()
+      cur = { level: 2, heading, id: slugify(heading) }
     } else {
-      buffer.push(line)
+      buf.push(line)
     }
   }
   flush()
-  return result
+
+  const blocks: Block[] = []
+  let i = 0
+  while (i < segs.length) {
+    const seg = segs[i]
+    if (seg.level === 'intro') {
+      blocks.push({ type: 'intro', body: seg.body })
+      i++
+    } else if (seg.level === 1) {
+      const h1Block: Block & { type: 'h1' } = {
+        type: 'h1', heading: seg.heading, id: seg.id, intro: seg.body, h2s: [],
+      }
+      i++
+      while (i < segs.length && segs[i].level === 2) {
+        const s = segs[i] as { level: 2; heading: string; id: string; body: string }
+        h1Block.h2s.push({ heading: s.heading, id: s.id, body: s.body })
+        i++
+      }
+      blocks.push(h1Block)
+    } else {
+      blocks.push({ type: 'h2', heading: seg.heading, id: seg.id, body: seg.body })
+      i++
+    }
+  }
+  return blocks
 }
 
-function CollapsibleSection({ heading, id, body }: { heading: string; id: string; body: string }) {
+// ── UI Components ────────────────────────────────────────────────────
+
+function Caret({ open }: { open: boolean }) {
+  return (
+    <span
+      className="inline-block transition-transform duration-200 text-wiki-text-muted text-xs shrink-0"
+      style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}
+    >
+      ▶
+    </span>
+  )
+}
+
+function CollapsibleH2({ heading, id, body }: H2Section) {
   const [open, setOpen] = useState(true)
   return (
     <section>
-      <h2 id={id}>
+      <h2
+        id={id}
+        className="cursor-pointer select-none"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <Caret open={open} />
         <span className="flex-1">{heading}</span>
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="text-xs font-normal text-wiki-text-muted px-1.5 py-0.5 rounded border border-wiki-border/50 hover:border-wiki-accent hover:text-wiki-accent transition-colors shrink-0"
-        >
-          {open ? '접기' : '펼치기'}
-        </button>
       </h2>
       {open && (
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
@@ -105,8 +151,38 @@ function CollapsibleSection({ heading, id, body }: { heading: string; id: string
   )
 }
 
+function CollapsibleH1({ heading, id, intro, h2s }: {
+  heading: string; id: string; intro: string; h2s: H2Section[]
+}) {
+  const [open, setOpen] = useState(true)
+  return (
+    <section>
+      <h1
+        id={id}
+        className="cursor-pointer select-none"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <Caret open={open} />
+        <span className="flex-1">{heading}</span>
+      </h1>
+      {open && (
+        <>
+          {intro && (
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
+              {intro}
+            </ReactMarkdown>
+          )}
+          {h2s.map((s) => (
+            <CollapsibleH2 key={s.id} {...s} />
+          ))}
+        </>
+      )}
+    </section>
+  )
+}
+
 const PROSE = `prose max-w-none text-wiki-text
-  [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:border-b [&_h1]:border-wiki-border [&_h1]:pb-2
+  [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:border-b [&_h1]:border-wiki-border [&_h1]:pb-2 [&_h1]:flex [&_h1]:items-center [&_h1]:gap-2
   [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:border-b [&_h2]:border-wiki-border/50 [&_h2]:pb-1 [&_h2]:flex [&_h2]:items-center [&_h2]:gap-2
   [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-5 [&_h3]:mb-2
   [&_p]:my-3 [&_p]:leading-relaxed
@@ -125,26 +201,35 @@ const PROSE = `prose max-w-none text-wiki-text
   [&_img]:max-w-full [&_img]:rounded [&_img]:my-3`
 
 export default function MarkdownContent({ content }: { content: string }) {
-  const sections = splitSections(content)
-  const hasSections = sections.some((s) => s.type === 'h2')
+  const blocks = splitBlocks(content)
+  const hasSections = blocks.some((b) => b.type === 'h1' || b.type === 'h2')
 
   return (
     <div className={PROSE}>
       {hasSections ? (
-        sections.map((section, i) =>
-          section.type === 'intro' ? (
-            <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={bodyComponents}>
-              {section.body}
-            </ReactMarkdown>
-          ) : (
-            <CollapsibleSection
-              key={section.id}
-              heading={section.heading}
-              id={section.id}
-              body={section.body}
-            />
+        blocks.map((block, i) => {
+          if (block.type === 'intro') {
+            return (
+              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={bodyComponents}>
+                {block.body}
+              </ReactMarkdown>
+            )
+          }
+          if (block.type === 'h1') {
+            return (
+              <CollapsibleH1
+                key={block.id}
+                heading={block.heading}
+                id={block.id}
+                intro={block.intro}
+                h2s={block.h2s}
+              />
+            )
+          }
+          return (
+            <CollapsibleH2 key={block.id} heading={block.heading} id={block.id} body={block.body} />
           )
-        )
+        })
       ) : (
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
           {content}

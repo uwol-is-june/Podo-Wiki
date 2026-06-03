@@ -112,7 +112,7 @@ export default async function WikiPage({ params }: Props) {
 
       {/* 문서 메타 정보 */}
       <div className="mt-4 text-xs text-wiki-text-muted">
-        최종 수정: {new Date(document.updated_at).toLocaleString('ko-KR')}
+        최종 수정: {new Date(document.updated_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
       </div>
     </div>
   )
