@@ -65,10 +65,15 @@ function MoonIcon() {
   )
 }
 
-export default function Header() {
+type HeaderProps = {
+  initialUser: User | null
+  initialProfileStatus: ProfileStatus | null
+}
+
+export default function Header({ initialUser, initialProfileStatus }: HeaderProps) {
   const { theme, setTheme } = useTheme()
-  const [user, setUser] = useState<User | null>(null)
-  const [profileStatus, setProfileStatus] = useState<ProfileStatus | null>(null)
+  const [user, setUser] = useState<User | null>(initialUser)
+  const [profileStatus, setProfileStatus] = useState<ProfileStatus | null>(initialProfileStatus)
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
 
