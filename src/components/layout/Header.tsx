@@ -6,8 +6,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
-import { logout } from '@/lib/auth/actions'
 import type { ProfileStatus } from '@/lib/supabase/types'
+import LogoutButton from '@/components/auth/LogoutButton'
 
 function SearchIcon() {
   return (
@@ -148,14 +148,7 @@ export default function Header() {
                   승인 대기
                 </span>
               )}
-              <form action={logout}>
-                <button
-                  type="submit"
-                  className="px-3 py-1 text-sm rounded border border-wiki-header-text/30 text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
-                >
-                  로그아웃
-                </button>
-              </form>
+              <LogoutButton className="px-3 py-1 text-sm rounded border border-wiki-header-text/30 text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors disabled:opacity-50" />
             </div>
           ) : (
             <Link

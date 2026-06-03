@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { logout } from '@/lib/auth/actions'
 import type { ProfileStatus } from '@/lib/supabase/types'
+import LogoutButton from '@/components/auth/LogoutButton'
 
 export const metadata: Metadata = { title: '내 정보 — 포도위키' }
 
@@ -58,14 +58,7 @@ export default async function MyPage() {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <form action={logout}>
-          <button
-            type="submit"
-            className="text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
-          >
-            로그아웃
-          </button>
-        </form>
+        <LogoutButton className="text-sm text-wiki-text-muted hover:text-wiki-text transition-colors disabled:opacity-50" />
       </div>
     </main>
   )

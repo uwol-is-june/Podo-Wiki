@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { logout } from '@/lib/auth/actions'
+import LogoutButton from '@/components/auth/LogoutButton'
 
 export const metadata: Metadata = { title: '승인 대기 중 — 포도위키' }
 
@@ -25,11 +25,7 @@ export default function PendingPage() {
           >
             홈으로 이동
           </Link>
-          <form action={logout}>
-            <button type="submit" className="text-sm text-wiki-text-muted hover:text-wiki-text transition-colors">
-              로그아웃
-            </button>
-          </form>
+          <LogoutButton className="text-sm text-wiki-text-muted hover:text-wiki-text transition-colors disabled:opacity-50" />
         </div>
       </div>
     </main>
