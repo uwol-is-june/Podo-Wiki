@@ -8,17 +8,17 @@ import MarkdownContent from '@/components/wiki/MarkdownContent'
 import TableOfContents from '@/components/wiki/TableOfContents'
 
 type Props = {
-  params: Promise<{ slug: string[]; id: string }>
+  params: Promise<{ slug: string; id: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  return { title: `${slug.join('/')} 역사 — 포도위키` }
+  return { title: `${decodeURIComponent(slug)} 역사 — 포도위키` }
 }
 
 export default async function RevisionPage({ params }: Props) {
   const { slug, id } = await params
-  const decodedSlug = slug.join('/')
+  const decodedSlug = decodeURIComponent(slug)
   const supabase = await createClient()
 
   const { data: revision } = await supabase

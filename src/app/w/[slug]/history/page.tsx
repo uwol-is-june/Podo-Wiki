@@ -6,17 +6,17 @@ import { slugToHref } from '@/lib/wiki/slug'
 import RevisionList from '@/components/wiki/RevisionList'
 
 type Props = {
-  params: Promise<{ slug: string[] }>
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  return { title: `${slug.join('/')} 역사 — 포도위키` }
+  return { title: `${decodeURIComponent(slug)} 역사 — 포도위키` }
 }
 
 export default async function HistoryPage({ params }: Props) {
   const { slug } = await params
-  const decodedSlug = slug.join('/')
+  const decodedSlug = decodeURIComponent(slug)
   const supabase = await createClient()
 
   const { data: document } = await supabase

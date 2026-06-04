@@ -7,17 +7,17 @@ import { slugToHref } from '@/lib/wiki/slug'
 import WikiEditor from '@/components/wiki/WikiEditor'
 
 type Props = {
-  params: Promise<{ slug: string[] }>
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  return { title: `${slug.join('/')} 편집 — 포도위키` }
+  return { title: `${decodeURIComponent(slug)} 편집 — 포도위키` }
 }
 
 export default async function EditPage({ params }: Props) {
   const { slug } = await params
-  const decodedSlug = slug.join('/')
+  const decodedSlug = decodeURIComponent(slug)
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

@@ -8,12 +8,12 @@ import MarkdownContent from '@/components/wiki/MarkdownContent'
 import TableOfContents from '@/components/wiki/TableOfContents'
 
 type Props = {
-  params: Promise<{ slug: string[] }>
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const decodedSlug = slug.join('/')
+  const decodedSlug = decodeURIComponent(slug)
   const supabase = await createClient()
   const { data } = await supabase
     .from('documents')
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function WikiPage({ params }: Props) {
   const { slug } = await params
-  const decodedSlug = slug.join('/')
+  const decodedSlug = decodeURIComponent(slug)
   const supabase = await createClient()
 
   const { data: document } = await supabase

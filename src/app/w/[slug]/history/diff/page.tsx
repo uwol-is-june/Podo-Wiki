@@ -6,19 +6,19 @@ import { diffLines } from 'diff'
 import { slugToHref } from '@/lib/wiki/slug'
 
 type Props = {
-  params: Promise<{ slug: string[] }>
+  params: Promise<{ slug: string }>
   searchParams: Promise<{ from?: string; to?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  return { title: `${slug.join('/')} 버전 비교 — 포도위키` }
+  return { title: `${decodeURIComponent(slug)} 버전 비교 — 포도위키` }
 }
 
 export default async function DiffPage({ params, searchParams }: Props) {
   const { slug } = await params
   const { from, to } = await searchParams
-  const decodedSlug = slug.join('/')
+  const decodedSlug = decodeURIComponent(slug)
   const supabase = await createClient()
 
   if (!from || !to) {
