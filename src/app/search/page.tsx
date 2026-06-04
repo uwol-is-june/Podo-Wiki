@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
+import { slugToHref } from '@/lib/wiki/slug'
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -66,7 +67,7 @@ export default async function SearchPage({ searchParams }: Props) {
               className="bg-wiki-surface border border-wiki-border rounded-lg px-5 py-4 hover:border-wiki-accent/50 transition-colors"
             >
               <Link
-                href={`/w/${encodeURIComponent(doc.slug)}`}
+                href={slugToHref(doc.slug)}
                 className="text-wiki-accent font-semibold text-base hover:underline"
               >
                 {doc.title}
@@ -85,7 +86,7 @@ export default async function SearchPage({ searchParams }: Props) {
             <strong className="text-wiki-text">&ldquo;{query}&rdquo;</strong>와 일치하는 문서가 없습니다.
           </p>
           <Link
-            href={`/w/${encodeURIComponent(query)}/edit`}
+            href={`${slugToHref(query)}/edit`}
             className="inline-block px-4 py-2 bg-wiki-accent text-white rounded text-sm hover:bg-wiki-accent-hover transition-colors"
           >
             &ldquo;{query}&rdquo; 문서 만들기

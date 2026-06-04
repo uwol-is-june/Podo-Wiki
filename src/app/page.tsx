@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { TROUPES } from '@/data/troupes'
+import { slugToHref } from '@/lib/wiki/slug'
 
 export const metadata: Metadata = {
   title: '포도위키 — 공연단체 인수인계 위키',
@@ -49,7 +50,7 @@ export default async function HomePage() {
             {TROUPES.map((troupe) => (
               <Link
                 key={troupe.slug}
-                href={`/w/${encodeURIComponent(troupe.slug)}`}
+                href={slugToHref(troupe.slug)}
                 className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
               >
                 {troupe.logo ? (
@@ -118,7 +119,7 @@ export default async function HomePage() {
                 {recentRevisions.map((rev) => (
                   <li key={rev.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                     <Link
-                      href={`/w/${encodeURIComponent(rev.document_slug)}`}
+                      href={slugToHref(rev.document_slug)}
                       className="text-wiki-accent hover:underline truncate"
                     >
                       {rev.documents?.title ?? rev.document_slug}

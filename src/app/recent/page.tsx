@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { slugToHref } from '@/lib/wiki/slug'
 
 export const metadata: Metadata = {
   title: '최근 변경 — 포도위키',
@@ -67,7 +68,7 @@ export default async function RecentPage({ searchParams }: Props) {
                 >
                   <td className="px-4 py-3">
                     <Link
-                      href={`/w/${encodeURIComponent(rev.document_slug)}`}
+                      href={slugToHref(rev.document_slug)}
                       className="text-wiki-accent hover:underline font-medium"
                     >
                       {rev.documents?.title ?? rev.document_slug}

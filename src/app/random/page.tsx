@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { slugToHref } from '@/lib/wiki/slug'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,5 +27,5 @@ export default async function RandomPage() {
     redirect('/')
   }
 
-  redirect(`/w/${encodeURIComponent(data.slug)}`)
+  redirect(slugToHref(data.slug))
 }

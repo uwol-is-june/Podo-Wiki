@@ -8,6 +8,7 @@ import { useRef, useState, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
 import { saveDocument } from '@/lib/wiki/actions'
+import { slugToHref } from '@/lib/wiki/slug'
 import { createClient } from '@/lib/supabase/client'
 import LinkInsertModal from './LinkInsertModal'
 
@@ -149,7 +150,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       if ('error' in result) {
         setError(result.error)
       } else {
-        router.push(`/w/${encodeURIComponent(slug)}`)
+        router.push(slugToHref(slug))
       }
     })
   }
@@ -331,7 +332,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         </button>
         <button
           type="button"
-          onClick={() => router.push(`/w/${encodeURIComponent(slug)}`)}
+          onClick={() => router.push(slugToHref(slug))}
           disabled={isPending || isUploading}
           className="px-5 py-2 border border-wiki-border text-wiki-text rounded text-sm hover:border-wiki-accent hover:text-wiki-accent transition-colors disabled:opacity-50"
         >

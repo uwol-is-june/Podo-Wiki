@@ -2,20 +2,21 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
+import { slugToHref } from '@/lib/wiki/slug'
 import RevisionList from '@/components/wiki/RevisionList'
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string[] }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  return { title: `${decodeURIComponent(slug)} 역사 — 포도위키` }
+  return { title: `${slug.join('/')} 역사 — 포도위키` }
 }
 
 export default async function HistoryPage({ params }: Props) {
   const { slug } = await params
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = slug.join('/')
   const supabase = await createClient()
 
   const { data: document } = await supabase
@@ -46,13 +47,13 @@ export default async function HistoryPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-wiki-text mb-3">{title}</h1>
         <div className="flex items-center gap-0 border-b border-wiki-border">
           <Link
-            href={`/w/${encodeURIComponent(decodedSlug)}`}
+            href={slugToHref(decodedSlug)}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             보기
           </Link>
           <Link
-            href={`/w/${encodeURIComponent(decodedSlug)}/edit`}
+            href={`${slugToHref(decodedSlug)}/edit`}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             수정

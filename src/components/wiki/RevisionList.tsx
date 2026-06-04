@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { slugToHref } from '@/lib/wiki/slug'
 
 type RevisionItem = {
   id: string
@@ -37,7 +38,7 @@ export default function RevisionList({
 
   const diffHref =
     selected.length === 2
-      ? `/w/${encodeURIComponent(slug)}/history/diff?from=${selected[0]}&to=${selected[1]}`
+      ? `${slugToHref(slug)}/history/diff?from=${selected[0]}&to=${selected[1]}`
       : null
 
   return (
@@ -85,7 +86,7 @@ export default function RevisionList({
                   />
                 </label>
                 <Link
-                  href={`/w/${encodeURIComponent(slug)}/history/${rev.id}`}
+                  href={`${slugToHref(slug)}/history/${rev.id}`}
                   className="flex flex-1 items-center gap-3 pr-5 py-3 hover:bg-wiki-border/20 transition-colors"
                 >
                   <span className="text-wiki-text-muted w-36 shrink-0">

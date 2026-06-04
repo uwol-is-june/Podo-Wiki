@@ -3,21 +3,22 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
 import { diffLines } from 'diff'
+import { slugToHref } from '@/lib/wiki/slug'
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string[] }>
   searchParams: Promise<{ from?: string; to?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  return { title: `${decodeURIComponent(slug)} 버전 비교 — 포도위키` }
+  return { title: `${slug.join('/')} 버전 비교 — 포도위키` }
 }
 
 export default async function DiffPage({ params, searchParams }: Props) {
   const { slug } = await params
   const { from, to } = await searchParams
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = slug.join('/')
   const supabase = await createClient()
 
   if (!from || !to) {
@@ -82,19 +83,19 @@ export default async function DiffPage({ params, searchParams }: Props) {
         <h1 className="text-2xl font-bold text-wiki-text mb-3">{title}</h1>
         <div className="flex items-center gap-0 border-b border-wiki-border">
           <Link
-            href={`/w/${encodeURIComponent(decodedSlug)}`}
+            href={slugToHref(decodedSlug)}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             보기
           </Link>
           <Link
-            href={`/w/${encodeURIComponent(decodedSlug)}/edit`}
+            href={`${slugToHref(decodedSlug)}/edit`}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             수정
           </Link>
           <Link
-            href={`/w/${encodeURIComponent(decodedSlug)}/history`}
+            href={`${slugToHref(decodedSlug)}/history`}
             className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px"
           >
             역사

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { slugToHref } from '@/lib/wiki/slug'
 
 type Tab = 'internal' | 'external'
 type DocResult = { slug: string; title: string }
@@ -70,7 +71,7 @@ export default function LinkInsertModal({ open, initialHref, onClose, onConfirm,
   const handleConfirm = () => {
     if (tab === 'internal') {
       if (!selected) return
-      onConfirm(`/w/${encodeURIComponent(selected.slug)}`)
+      onConfirm(slugToHref(selected.slug))
     } else {
       const raw = externalUrl.trim()
       if (!raw) return
