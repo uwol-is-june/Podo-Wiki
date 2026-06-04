@@ -37,6 +37,7 @@ export default async function EditPage({ params }: Props) {
 
   const initialHtml = document?.content
     ? (marked.parse(document.content) as string)
+        .replace(/<img([^>]*?)\stitle="w=(\d+)"([^>]*)>/g, '<img$1 width="$2"$3>')
     : ''
 
   return (
