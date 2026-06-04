@@ -76,7 +76,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Link.configure({ openOnClick: false }),
+      Link.configure({ openOnClick: false, autolink: false }),
       Image.configure({ inline: false, resize: { enabled: true, alwaysPreserveAspectRatio: true, minWidth: 50 } }),
     ],
     content: initialHtml,

@@ -140,7 +140,7 @@ function CollapsibleH2({ heading, id, body }: H2Section) {
         onClick={() => setOpen((v) => !v)}
       >
         <Caret open={open} />
-        <span className="flex-1">{heading}</span>
+        <span className="flex-1">{heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}</span>
       </h2>
       {open && (
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
@@ -163,7 +163,7 @@ function CollapsibleH1({ heading, id, intro, h2s }: {
         onClick={() => setOpen((v) => !v)}
       >
         <Caret open={open} />
-        <span className="flex-1">{heading}</span>
+        <span className="flex-1">{heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}</span>
       </h1>
       {open && (
         <>
