@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import type { Database } from '@/lib/supabase/types'
 import { slugToHref } from '@/lib/wiki/slug'
@@ -37,5 +37,6 @@ export async function saveDocument(
   if (revError) return { error: revError.message }
 
   revalidatePath(`/w/${slug}`)
+  revalidateTag(`document:${slug}`, 'max')
   return { ok: true }
 }

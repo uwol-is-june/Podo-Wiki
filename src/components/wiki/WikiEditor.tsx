@@ -1,6 +1,7 @@
 'use client'
 
 import { useEditor, EditorContent } from '@tiptap/react'
+import { getMarkRange } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
@@ -70,6 +71,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const [isUploading, setIsUploading] = useState(false)
   const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [currentLinkHref, setCurrentLinkHref] = useState('')
+  const [currentLinkText, setCurrentLinkText] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
@@ -88,13 +90,35 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   })
 
   const openLinkModal = useCallback(() => {
-    const href = editor?.getAttributes('link').href ?? ''
+    if (!editor) return
+    const href = editor.getAttributes('link').href ?? ''
     setCurrentLinkHref(href)
+
+    const { from, to } = editor.state.selection
+    let text = editor.state.doc.textBetween(from, to)
+    if (!text) {
+      const markType = editor.schema.marks.link
+      const range = getMarkRange(editor.state.doc.resolve(from), markType)
+      if (range) text = editor.state.doc.textBetween(range.from, range.to)
+    }
+    setCurrentLinkText(text)
     setLinkModalOpen(true)
   }, [editor])
 
-  const handleLinkConfirm = useCallback((href: string) => {
-    editor?.chain().focus().extendMarkRange('link').setLink({ href }).run()
+  const handleLinkConfirm = useCallback((href: string, text: string) => {
+    if (!editor) return
+    const { from } = editor.state.selection
+    const markType = editor.schema.marks.link
+    const markRange = getMarkRange(editor.state.doc.resolve(from), markType)
+    const { from: selFrom, to: selTo } = editor.state.selection
+    const finalFrom = markRange?.from ?? selFrom
+    const finalTo = markRange?.to ?? selTo
+
+    editor.chain()
+      .focus()
+      .deleteRange({ from: finalFrom, to: finalTo })
+      .insertContentAt(finalFrom, { type: 'text', text, marks: [{ type: 'link', attrs: { href } }] })
+      .run()
     setLinkModalOpen(false)
   }, [editor])
 
@@ -315,6 +339,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       <LinkInsertModal
         open={linkModalOpen}
         initialHref={currentLinkHref}
+        initialText={currentLinkText}
         onClose={() => setLinkModalOpen(false)}
         onConfirm={handleLinkConfirm}
         onRemove={handleLinkRemove}

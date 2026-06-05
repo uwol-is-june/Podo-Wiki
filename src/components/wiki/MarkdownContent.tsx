@@ -121,12 +121,16 @@ function splitBlocks(markdown: string): Block[] {
 
 function Caret({ open }: { open: boolean }) {
   return (
-    <span
-      className="inline-block transition-transform duration-200 text-wiki-text-muted text-xs shrink-0"
+    <svg
+      width="8"
+      height="10"
+      viewBox="0 0 8 10"
+      className="shrink-0 transition-transform duration-200 text-wiki-text-muted"
       style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}
+      aria-hidden="true"
     >
-      ▶
-    </span>
+      <path d="M1 0.5 L7.5 5 L1 9.5 Z" fill="currentColor" />
+    </svg>
   )
 }
 

@@ -1,7 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { unstable_cache } from 'next/cache'
+import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import type { Document } from '@/lib/supabase/types'
+import type { Database, Document } from '@/lib/supabase/types'
 import { extractHeadings } from '@/lib/wiki/headings'
 import { slugToHref } from '@/lib/wiki/slug'
 import MarkdownContent from '@/components/wiki/MarkdownContent'
@@ -11,31 +12,39 @@ type Props = {
   params: Promise<{ slug: string }>
 }
 
+const fetchDocument = (slug: string) =>
+  unstable_cache(
+    async () => {
+      const supabase = createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      const { data } = await supabase
+        .from('documents')
+        .select('slug, title, content, author_id, created_at, updated_at')
+        .eq('slug', slug)
+        .single()
+      return (data as Document | null)
+    },
+    [`document`, slug],
+    { revalidate: false, tags: [`document:${slug}`] }
+  )()
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const decodedSlug = decodeURIComponent(slug)
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('documents')
-    .select('title')
-    .eq('slug', decodedSlug)
-    .single() as { data: Pick<Document, 'title'> | null }
+  const document = await fetchDocument(decodedSlug)
 
   return {
-    title: data ? `${data.title} — 포도위키` : `${decodedSlug} — 포도위키`,
+    title: document ? `${document.title} — 포도위키` : `${decodedSlug} — 포도위키`,
   }
 }
 
 export default async function WikiPage({ params }: Props) {
   const { slug } = await params
   const decodedSlug = decodeURIComponent(slug)
-  const supabase = await createClient()
 
-  const { data: document } = await supabase
-    .from('documents')
-    .select('slug, title, content, author_id, created_at, updated_at')
-    .eq('slug', decodedSlug)
-    .single() as { data: Document | null }
+  const document = await fetchDocument(decodedSlug)
 
   if (!document) {
     return (
@@ -100,7 +109,7 @@ export default async function WikiPage({ params }: Props) {
       {/* 본문 영역 */}
       <div className="flex gap-6 mt-6">
         {/* 문서 본문 */}
-        <article className="flex-1 min-w-0 bg-wiki-surface border border-wiki-border rounded-lg p-6">
+        <article className="flex-1 min-w-0 bg-wiki-surface border border-wiki-border rounded-lg p-4 sm:p-6">
           <MarkdownContent content={document.content} />
         </article>
 

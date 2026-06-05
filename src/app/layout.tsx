@@ -4,8 +4,6 @@ import './globals.css'
 import ThemeProvider from '@/components/layout/ThemeProvider'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { createClient } from '@/lib/supabase/server'
-import type { ProfileStatus } from '@/lib/supabase/types'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,20 +20,11 @@ export const metadata: Metadata = {
   description: '공연단체 인수인계 위키 플랫폼',
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  let initialProfileStatus: ProfileStatus | null = null
-  if (user) {
-    const { data } = await supabase.from('profiles').select('status').eq('id', user.id).single()
-    initialProfileStatus = (data?.status as ProfileStatus) ?? null
-  }
-
   return (
     <html
       lang="ko"
@@ -44,7 +33,7 @@ export default async function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-wiki-bg text-wiki-text antialiased">
         <ThemeProvider>
-          <Header initialUser={user} initialProfileStatus={initialProfileStatus} />
+          <Header initialUser={null} initialProfileStatus={null} />
           <main className="flex-1 pt-[50px]">{children}</main>
           <Footer />
         </ThemeProvider>

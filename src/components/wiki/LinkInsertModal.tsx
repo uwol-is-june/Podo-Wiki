@@ -10,21 +10,24 @@ type DocResult = { slug: string; title: string }
 type Props = {
   open: boolean
   initialHref: string
+  initialText: string
   onClose: () => void
-  onConfirm: (href: string) => void
+  onConfirm: (href: string, text: string) => void
   onRemove: () => void
 }
 
-export default function LinkInsertModal({ open, initialHref, onClose, onConfirm, onRemove }: Props) {
+export default function LinkInsertModal({ open, initialHref, initialText, onClose, onConfirm, onRemove }: Props) {
   const supabase = useMemo(() => createClient(), [])
 
   const isInitiallyInternal = initialHref.startsWith('/w/')
   const [tab, setTab] = useState<Tab>(isInitiallyInternal ? 'internal' : 'external')
+  const [linkText, setLinkText] = useState(initialText)
   const [search, setSearch] = useState('')
   const [results, setResults] = useState<DocResult[]>([])
   const [selected, setSelected] = useState<DocResult | null>(null)
   const [externalUrl, setExternalUrl] = useState('')
 
+  const linkTextRef = useRef<HTMLInputElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const externalRef = useRef<HTMLInputElement>(null)
 
@@ -32,6 +35,7 @@ export default function LinkInsertModal({ open, initialHref, onClose, onConfirm,
     if (!open) return
     const isInternal = initialHref.startsWith('/w/')
     setTab(isInternal ? 'internal' : 'external')
+    setLinkText(initialText)
     setSearch('')
     setResults([])
     setExternalUrl(isInternal ? '' : initialHref)
@@ -42,13 +46,12 @@ export default function LinkInsertModal({ open, initialHref, onClose, onConfirm,
     } else {
       setSelected(null)
     }
-  }, [open, initialHref, supabase])
+  }, [open, initialHref, initialText, supabase])
 
   useEffect(() => {
     if (!open) return
-    if (tab === 'internal') setTimeout(() => searchRef.current?.focus(), 0)
-    else setTimeout(() => externalRef.current?.focus(), 0)
-  }, [tab, open])
+    setTimeout(() => linkTextRef.current?.focus(), 0)
+  }, [open])
 
   useEffect(() => {
     if (tab !== 'internal' || !search.trim()) { setResults([]); return }
@@ -71,12 +74,15 @@ export default function LinkInsertModal({ open, initialHref, onClose, onConfirm,
   const handleConfirm = () => {
     if (tab === 'internal') {
       if (!selected) return
-      onConfirm(slugToHref(selected.slug))
+      const href = slugToHref(selected.slug)
+      const finalText = linkText.trim() || selected.title
+      onConfirm(href, finalText)
     } else {
       const raw = externalUrl.trim()
       if (!raw) return
       const href = /^[a-z][a-z\d+\-.]*:/i.test(raw) ? raw : `https://${raw}`
-      onConfirm(href)
+      const finalText = linkText.trim() || href
+      onConfirm(href, finalText)
     }
   }
 
@@ -109,7 +115,16 @@ export default function LinkInsertModal({ open, initialHref, onClose, onConfirm,
           </div>
 
           {/* 내용 */}
-          <div className="p-4 min-h-[120px]">
+          <div className="p-4 space-y-3 min-h-[120px]">
+            <input
+              ref={linkTextRef}
+              type="text"
+              value={linkText}
+              onChange={(e) => setLinkText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') tab === 'internal' ? searchRef.current?.focus() : externalRef.current?.focus() }}
+              placeholder="링크로 표시할 텍스트"
+              className="w-full h-9 px-3 rounded text-sm border border-wiki-border bg-wiki-bg text-wiki-text placeholder:text-wiki-text-muted focus:outline-none focus:border-wiki-accent transition-colors"
+            />
             {tab === 'internal' ? (
               <div className="space-y-2">
                 <input
