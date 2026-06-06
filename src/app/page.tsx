@@ -5,6 +5,8 @@ import type { Metadata } from 'next'
 import { TROUPES } from '@/data/troupes'
 import { slugToHref } from '@/lib/wiki/slug'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '포도위키 — 공연단체 인수인계 위키',
 }
