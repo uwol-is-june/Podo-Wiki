@@ -109,7 +109,7 @@ export default async function WikiPage({ params }: Props) {
       {/* 본문 영역 */}
       <div className="flex gap-6 mt-6">
         {/* 문서 본문 */}
-        <article className="flex-1 min-w-0 bg-wiki-surface border border-wiki-border rounded-lg p-4 sm:p-6">
+        <article className="flex-1 min-w-0 sm:bg-wiki-surface sm:border sm:border-wiki-border sm:rounded-lg sm:p-6">
           <MarkdownContent content={document.content} />
         </article>
 

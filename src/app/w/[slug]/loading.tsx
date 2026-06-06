@@ -17,7 +17,7 @@ export default function WikiPageLoading() {
 
       {/* 본문 영역 */}
       <div className="flex gap-6 mt-6">
-        <article className="flex-1 min-w-0 bg-wiki-surface border border-wiki-border rounded-lg p-6 space-y-3">
+        <article className="flex-1 min-w-0 sm:bg-wiki-surface sm:border sm:border-wiki-border sm:rounded-lg sm:p-6 space-y-3">
           <Skeleton className="h-5 w-3/4" />
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-full" />
