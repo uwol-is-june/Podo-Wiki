@@ -170,14 +170,14 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
             <button
               onClick={() => { setSearchOpen((v) => !v); setMenuOpen(false) }}
               aria-label="검색"
-              className="w-9 h-9 flex items-center justify-center rounded text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
+              className="w-11 h-11 flex items-center justify-center rounded text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
             >
               <SearchIcon />
             </button>
             <button
               onClick={() => { setMenuOpen((v) => !v); setSearchOpen(false) }}
               aria-label="메뉴"
-              className="w-9 h-9 flex items-center justify-center rounded text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
+              className="w-11 h-11 flex items-center justify-center rounded text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 transition-colors"
             >
               {menuOpen ? <XIcon /> : <HamburgerIcon />}
             </button>

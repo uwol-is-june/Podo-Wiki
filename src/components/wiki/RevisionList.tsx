@@ -102,27 +102,36 @@ export default function RevisionList({
                 </label>
                 <Link
                   href={`${slugToHref(slug)}/history/${rev.id}`}
-                  className="flex flex-1 items-center gap-3 pr-5 py-3 hover:bg-wiki-border/20 transition-colors min-w-0"
+                  className="flex flex-1 min-w-0 flex-col sm:flex-row sm:items-center sm:gap-3 pr-5 py-2.5 sm:py-3 hover:bg-wiki-border/20 transition-colors"
                 >
-                  <span className="text-wiki-text-muted w-7 shrink-0 text-xs font-mono">
-                    r{revNum}
-                  </span>
-                  <span className="text-wiki-text-muted w-36 shrink-0">
-                    {new Date(rev.edited_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
-                  </span>
-                  <span className="text-wiki-text shrink-0">
-                    {profile
-                      ? `${profile.name} (${profile.organization})`
-                      : '알 수 없는 사용자'}
-                  </span>
-                  <BytesDiff diff={rev.bytesDiff} />
-                  {rev.comment && (
-                    <span className="text-wiki-text-muted truncate text-xs">
-                      {rev.comment}
+                  {/* 모바일 1행: r번호 + 날짜 + 최신 뱃지 */}
+                  <div className="flex items-center gap-2 sm:contents">
+                    <span className="text-wiki-text-muted w-7 shrink-0 text-xs font-mono">
+                      r{revNum}
                     </span>
-                  )}
+                    <span className="text-wiki-text-muted text-xs sm:w-36 sm:shrink-0">
+                      {new Date(rev.edited_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
+                    </span>
+                    {isLatest && (
+                      <span className="ml-auto text-xs text-wiki-accent font-medium shrink-0 sm:hidden">최신</span>
+                    )}
+                  </div>
+                  {/* 모바일 2행: 편집자 + 바이트차이 + 요약 */}
+                  <div className="flex items-center gap-2 mt-0.5 pl-9 sm:contents">
+                    <span className="text-wiki-text shrink-0 text-sm">
+                      {profile
+                        ? `${profile.name} (${profile.organization})`
+                        : '알 수 없는 사용자'}
+                    </span>
+                    <BytesDiff diff={rev.bytesDiff} />
+                    {rev.comment && (
+                      <span className="text-wiki-text-muted truncate text-xs">
+                        {rev.comment}
+                      </span>
+                    )}
+                  </div>
                   {isLatest && (
-                    <span className="ml-auto text-xs text-wiki-accent font-medium shrink-0">최신</span>
+                    <span className="hidden sm:block ml-auto text-xs text-wiki-accent font-medium shrink-0">최신</span>
                   )}
                 </Link>
               </div>

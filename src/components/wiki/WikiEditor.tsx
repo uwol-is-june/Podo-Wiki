@@ -100,7 +100,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     shouldRerenderOnTransaction: true,
     editorProps: {
       attributes: {
-        class: 'outline-none min-h-[400px] p-5',
+        class: 'outline-none min-h-[200px] sm:min-h-[400px] p-5',
       },
     },
   })
@@ -233,7 +233,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
 
         {/* 툴바 */}
         <div className="sticky top-[50px] z-20">
-        <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-wiki-border bg-wiki-surface">
+        <div className="flex flex-nowrap overflow-x-auto sm:flex-wrap items-center gap-0.5 px-3 py-2 border-b border-wiki-border bg-wiki-surface">
           <ToolbarBtn
             onClick={() => editor?.chain().focus().toggleBold().run()}
             active={editor?.isActive('bold')}
@@ -355,7 +355,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
 
         {/* 표 편집 툴바 - 커서가 표 안에 있을 때만 표시 */}
         {inTable && (
-          <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-b border-wiki-border bg-wiki-accent/5 text-xs">
+          <div className="flex flex-nowrap overflow-x-auto sm:flex-wrap items-center gap-0.5 px-3 py-1.5 border-b border-wiki-border bg-wiki-accent/5 text-xs">
             <span className="text-wiki-text-muted mr-0.5">행</span>
             <ToolbarBtn onClick={() => editor?.chain().focus().addRowBefore().run()} title="위에 행 추가">↑+</ToolbarBtn>
             <ToolbarBtn onClick={() => editor?.chain().focus().addRowAfter().run()} title="아래에 행 추가">↓+</ToolbarBtn>
