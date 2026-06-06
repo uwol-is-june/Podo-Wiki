@@ -86,23 +86,24 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
   }, [pathname])
 
   useEffect(() => {
-    const fetchUserAndProfile = async (uid: string | undefined) => {
-      if (!uid) { setProfileStatus(null); return }
-      const { data } = await supabase.from('profiles').select('status').eq('id', uid).single()
-      setProfileStatus((data?.status as ProfileStatus) ?? null)
-    }
-
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      fetchUserAndProfile(user?.id)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
       const u = session?.user ?? null
       setUser(u)
-      fetchUserAndProfile(u?.id)
+      if (!u) { setProfileStatus(null); return }
+      const { data } = await supabase.from('profiles').select('status').eq('id', u.id).single()
+      setProfileStatus((data?.status as ProfileStatus) ?? null)
     })
     return () => subscription.unsubscribe()
   }, [supabase])
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      setUser(user)
+      if (!user) { setProfileStatus(null); return }
+      const { data } = await supabase.from('profiles').select('status').eq('id', user.id).single()
+      setProfileStatus((data?.status as ProfileStatus) ?? null)
+    })
+  }, [pathname, supabase])
 
   return (
     <>
