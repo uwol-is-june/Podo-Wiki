@@ -43,62 +43,60 @@ export default async function HomePage() {
         </p>
       </div>
 
-      {/* 공연단체 & 운영팀 바로가기 */}
+      {/* 공연단체 바로가기 */}
       <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5 mb-5">
-        {TROUPES.length > 0 && (
-          <>
-            <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
-              공연단체
-            </h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-              {TROUPES.map((troupe) => (
-                <Link
-                  key={troupe.slug}
-                  href={slugToHref(troupe.slug)}
-                  className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
-                >
-                  {troupe.logo ? (
-                    <Image
-                      src={troupe.logo}
-                      alt={troupe.name}
-                      width={56}
-                      height={56}
-                      className="rounded-lg object-cover w-14 h-14"
-                    />
-                  ) : (
-                    <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
-                      {troupe.name[0]}
-                    </div>
-                  )}
-                  <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
-                    {troupe.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* 운영팀 */}
-        <div className={TROUPES.length > 0 ? 'mt-4 pt-3 border-t border-wiki-border' : ''}>
-          <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
-            운영팀
-          </h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            <a
-              href="https://www.podo-store.com"
-              target="_blank"
-              rel="noopener noreferrer"
+        <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
+          공연단체
+        </h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          {TROUPES.map((troupe) => (
+            <Link
+              key={troupe.slug}
+              href={slugToHref(troupe.slug)}
               className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
             >
-              <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
-                포
-              </div>
+              {troupe.logo ? (
+                <Image
+                  src={troupe.logo}
+                  alt={troupe.name}
+                  width={56}
+                  height={56}
+                  className="rounded-lg object-cover w-14 h-14"
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
+                  {troupe.name[0]}
+                </div>
+              )}
+              <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
+                {troupe.name}
+              </span>
+            </Link>
+          ))}
+
+          {/* 포도상점 */}
+          <a
+            href="https://www.podo-store.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
+          >
+            <Image
+              src="/logos/포도상점.png"
+              alt="포도상점"
+              width={56}
+              height={56}
+              className="rounded-lg object-cover w-14 h-14"
+            />
+            <div className="flex flex-col items-center gap-1">
               <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
                 포도상점
               </span>
-            </a>
-          </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-wiki-accent/10 text-wiki-accent font-medium leading-none">
+                운영팀
+              </span>
+            </div>
+          </a>
         </div>
       </section>
 
