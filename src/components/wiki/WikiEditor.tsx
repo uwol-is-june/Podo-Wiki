@@ -206,12 +206,14 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
 
       <div className="relative bg-wiki-surface border border-wiki-border rounded-lg overflow-hidden">
         {isPending && (
-          <div className="absolute inset-0 z-10 bg-wiki-surface/70 flex flex-col items-center justify-center gap-3 backdrop-blur-[1px]">
-            <svg className="animate-spin w-7 h-7 text-wiki-accent" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-            </svg>
-            <span className="text-sm font-medium text-wiki-text">저장 중…</span>
+          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-black/20 backdrop-blur-[1px]">
+            <div className="bg-wiki-surface rounded-xl shadow-lg px-8 py-6 flex flex-col items-center gap-3">
+              <svg className="animate-spin w-7 h-7 text-wiki-accent" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+              <span className="text-sm font-medium text-wiki-text">저장 중…</span>
+            </div>
           </div>
         )}
         {/* 제목 입력 */}
