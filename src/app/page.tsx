@@ -73,30 +73,6 @@ export default async function HomePage() {
               </span>
             </Link>
           ))}
-
-          {/* 포도상점 */}
-          <a
-            href="https://www.podo-store.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
-          >
-            <div className="relative w-14 h-14">
-              <Image
-                src="/logos/포도상점.png"
-                alt="포도상점"
-                width={56}
-                height={56}
-                className="w-14 h-14 object-contain"
-              />
-              <span className="absolute bottom-0 right-0 text-[9px] px-1 py-0.5 rounded bg-wiki-accent text-white font-medium leading-none">
-                운영팀
-              </span>
-            </div>
-            <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
-              포도상점
-            </span>
-          </a>
         </div>
       </section>
 
