@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
@@ -24,7 +25,7 @@ export default async function HomePage() {
   const [{ count: docCount }, { count: memberCount }, { data: recentRevisions }] =
     await Promise.all([
       supabase.from('documents').select('slug', { count: 'exact', head: true }),
-      supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+      createAdminClient().from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
       supabase
         .from('revisions')
         .select('id, document_slug, edited_at, documents(title)')
