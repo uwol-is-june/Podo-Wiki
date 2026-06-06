@@ -204,7 +204,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         </div>
       </div>
 
-      <div className="relative bg-wiki-surface border border-wiki-border rounded-lg overflow-hidden">
+      <div className="relative bg-wiki-surface border border-wiki-border rounded-lg overflow-clip">
         {isPending && (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-black/20 backdrop-blur-[1px]">
             <div className="bg-wiki-surface rounded-xl shadow-lg px-8 py-6 flex flex-col items-center gap-3">
@@ -228,7 +228,8 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         </div>
 
         {/* 툴바 */}
-        <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-wiki-border bg-wiki-bg/50">
+        <div className="sticky top-[50px] z-20">
+        <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-wiki-border bg-wiki-surface">
           <ToolbarBtn
             onClick={() => editor?.chain().focus().toggleBold().run()}
             active={editor?.isActive('bold')}
@@ -362,6 +363,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             <ToolbarBtn onClick={() => editor?.chain().focus().deleteColumn().run()} title="열 삭제">×</ToolbarBtn>
           </div>
         )}
+        </div>
 
         {/* 에디터 본문 */}
         <div className="
