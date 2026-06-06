@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import Link from 'next/link'
 import { signup, type AuthState } from '@/lib/auth/actions'
 
@@ -11,6 +11,10 @@ const inputClass =
 
 export default function SignupForm() {
   const [state, formAction, isPending] = useActionState(signup, initialState)
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
+  const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword
 
   if (state.success) {
     return (
@@ -25,7 +29,11 @@ export default function SignupForm() {
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form
+      action={formAction}
+      onSubmit={(e) => { if (passwordMismatch) e.preventDefault() }}
+      className="flex flex-col gap-4"
+    >
       <div className="flex flex-col gap-1">
         <label htmlFor="name" className="text-sm font-medium text-wiki-text">
           이름
@@ -82,8 +90,29 @@ export default function SignupForm() {
           required
           autoComplete="new-password"
           placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className={inputClass}
         />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="confirm-password" className="text-sm font-medium text-wiki-text">
+          비밀번호 확인
+        </label>
+        <input
+          id="confirm-password"
+          type="password"
+          required
+          autoComplete="new-password"
+          placeholder="••••••••"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className={`${inputClass} ${passwordMismatch ? 'border-red-400 focus:border-red-400' : ''}`}
+        />
+        {passwordMismatch && (
+          <p className="text-xs text-red-500">비밀번호가 일치하지 않습니다.</p>
+        )}
       </div>
 
       {state.error && (
