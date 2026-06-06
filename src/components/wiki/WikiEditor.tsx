@@ -82,6 +82,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       Image.configure({ inline: false, resize: { enabled: true, alwaysPreserveAspectRatio: true, minWidth: 50 } }),
     ],
     content: initialHtml,
+    shouldRerenderOnTransaction: true,
     editorProps: {
       attributes: {
         class: 'outline-none min-h-[400px] p-5',
