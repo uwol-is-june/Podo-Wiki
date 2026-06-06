@@ -68,7 +68,7 @@ export default async function HomePage() {
                   {troupe.name[0]}
                 </div>
               )}
-              <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
+              <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight break-keep">
                 {troupe.name}
               </span>
             </Link>
