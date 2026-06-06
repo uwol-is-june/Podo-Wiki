@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
@@ -43,7 +44,7 @@ export default async function RevisionPage({ params }: Props) {
   }
 
   const { data: profile } = revision.editor_id
-    ? await supabase
+    ? await createAdminClient()
         .from('profiles')
         .select('name, organization')
         .eq('id', revision.editor_id)

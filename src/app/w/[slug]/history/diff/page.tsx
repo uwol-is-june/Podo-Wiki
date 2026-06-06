@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
@@ -64,7 +65,7 @@ export default async function DiffPage({ params, searchParams }: Props) {
 
   const editorIds = [...new Set([older.editor_id, newer.editor_id].filter((id): id is string => id !== null))]
   const { data: profiles } = editorIds.length > 0
-    ? await supabase.from('profiles').select('id, name, organization').in('id', editorIds)
+    ? await createAdminClient().from('profiles').select('id, name, organization').in('id', editorIds)
     : { data: [] }
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]))
 
