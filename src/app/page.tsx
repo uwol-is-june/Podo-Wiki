@@ -43,51 +43,64 @@ export default async function HomePage() {
         </p>
       </div>
 
-      {/* 포도상점 바로가기 */}
-      <a
-        href="https://www.podo-store.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-between px-1 py-2 mb-5 text-sm text-wiki-text-muted hover:text-wiki-accent transition-colors border-b border-wiki-border group"
-      >
-        <span>포도상점 바로가기</span>
-        <span className="text-xs group-hover:translate-x-0.5 transition-transform">→</span>
-      </a>
+      {/* 공연단체 & 운영팀 바로가기 */}
+      <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5 mb-5">
+        {TROUPES.length > 0 && (
+          <>
+            <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
+              공연단체
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              {TROUPES.map((troupe) => (
+                <Link
+                  key={troupe.slug}
+                  href={slugToHref(troupe.slug)}
+                  className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
+                >
+                  {troupe.logo ? (
+                    <Image
+                      src={troupe.logo}
+                      alt={troupe.name}
+                      width={56}
+                      height={56}
+                      className="rounded-lg object-cover w-14 h-14"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
+                      {troupe.name[0]}
+                    </div>
+                  )}
+                  <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
+                    {troupe.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
-      {/* 공연단체 바로가기 */}
-      {TROUPES.length > 0 && (
-        <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5 mb-5">
+        {/* 운영팀 */}
+        <div className={TROUPES.length > 0 ? 'mt-4 pt-3 border-t border-wiki-border' : ''}>
           <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
-            공연단체
+            운영팀
           </h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {TROUPES.map((troupe) => (
-              <Link
-                key={troupe.slug}
-                href={slugToHref(troupe.slug)}
-                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
-              >
-                {troupe.logo ? (
-                  <Image
-                    src={troupe.logo}
-                    alt={troupe.name}
-                    width={56}
-                    height={56}
-                    className="rounded-lg object-cover w-14 h-14"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
-                    {troupe.name[0]}
-                  </div>
-                )}
-                <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
-                  {troupe.name}
-                </span>
-              </Link>
-            ))}
+            <a
+              href="https://www.podo-store.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
+            >
+              <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
+                포
+              </div>
+              <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight">
+                포도상점
+              </span>
+            </a>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* 메인 그리드 */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
