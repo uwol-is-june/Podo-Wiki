@@ -2,17 +2,27 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
-import { login } from '@/lib/auth/actions'
+import { requestPasswordReset, type AuthState } from '@/lib/auth/actions'
 
-const initialState = { error: '' }
+const initialState: AuthState = { error: '' }
 
-export default function LoginForm({ next }: { next: string }) {
-  const [state, formAction, isPending] = useActionState(login, initialState)
+export default function ForgotPasswordForm() {
+  const [state, formAction, isPending] = useActionState(requestPasswordReset, initialState)
+
+  if (state.success) {
+    return (
+      <div className="text-center">
+        <p className="text-wiki-accent font-medium mb-2">✓ 이메일 발송 완료</p>
+        <p className="text-sm text-wiki-text-muted mb-6">{state.success}</p>
+        <Link href="/login" className="text-sm text-wiki-accent hover:underline">
+          로그인 페이지로 이동
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <input type="hidden" name="next" value={next} />
-
       <div className="flex flex-col gap-1">
         <label htmlFor="email" className="text-sm font-medium text-wiki-text">
           이메일
@@ -24,22 +34,6 @@ export default function LoginForm({ next }: { next: string }) {
           required
           autoComplete="email"
           placeholder="you@example.com"
-          disabled={isPending}
-          className="h-10 px-3 rounded border border-wiki-border bg-wiki-bg text-wiki-text placeholder:text-wiki-text-muted focus:outline-none focus:border-wiki-accent transition-colors text-sm disabled:opacity-50"
-        />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password" className="text-sm font-medium text-wiki-text">
-          비밀번호
-        </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          placeholder="••••••••"
           disabled={isPending}
           className="h-10 px-3 rounded border border-wiki-border bg-wiki-bg text-wiki-text placeholder:text-wiki-text-muted focus:outline-none focus:border-wiki-accent transition-colors text-sm disabled:opacity-50"
         />
@@ -62,20 +56,14 @@ export default function LoginForm({ next }: { next: string }) {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
         )}
-        {isPending ? '로그인 중…' : '로그인'}
+        {isPending ? '발송 중…' : '재설정 링크 보내기'}
       </button>
 
-      <div className="flex flex-col items-center gap-1.5">
-        <p className="text-center text-sm text-wiki-text-muted">
-          계정이 없으신가요?{' '}
-          <Link href="/signup" className="text-wiki-accent hover:underline">
-            회원가입
-          </Link>
-        </p>
-        <Link href="/forgot-password" className="text-xs text-wiki-text-muted hover:text-wiki-accent hover:underline transition-colors">
-          비밀번호를 잊으셨나요?
+      <p className="text-center text-sm text-wiki-text-muted">
+        <Link href="/login" className="text-wiki-accent hover:underline">
+          로그인으로 돌아가기
         </Link>
-      </div>
+      </p>
     </form>
   )
 }

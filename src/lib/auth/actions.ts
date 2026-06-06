@@ -77,3 +77,36 @@ export async function logout() {
   revalidatePath('/', 'layout')
   redirect('/')
 }
+
+export async function requestPasswordReset(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const email = String(formData.get('email') ?? '').trim()
+  if (!email) return { error: '이메일을 입력해주세요.' }
+
+  const supabase = await createClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
+  })
+
+  if (error) return { error: error.message }
+
+  return { error: '', success: '비밀번호 재설정 링크를 이메일로 발송했습니다. 이메일을 확인해주세요.' }
+}
+
+export async function updatePassword(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const password = String(formData.get('password') ?? '')
+  const passwordConfirm = String(formData.get('passwordConfirm') ?? '')
+
+  if (!password) return { error: '비밀번호를 입력해주세요.' }
+  if (password.length < 6) return { error: '비밀번호는 최소 6자 이상이어야 합니다.' }
+  if (password !== passwordConfirm) return { error: '비밀번호가 일치하지 않습니다.' }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
