@@ -43,6 +43,17 @@ export default async function HomePage() {
         </p>
       </div>
 
+      {/* 포도상점 바로가기 */}
+      <a
+        href="https://www.podo-store.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-between px-1 py-2 mb-5 text-sm text-wiki-text-muted hover:text-wiki-accent transition-colors border-b border-wiki-border group"
+      >
+        <span>포도상점 바로가기</span>
+        <span className="text-xs group-hover:translate-x-0.5 transition-transform">→</span>
+      </a>
+
       {/* 공연단체 바로가기 */}
       {TROUPES.length > 0 && (
         <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5 mb-5">
