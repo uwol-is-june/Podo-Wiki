@@ -5,9 +5,14 @@ import { getMarkRange } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
+import { Table } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableHeader } from '@tiptap/extension-table-header'
+import { TableCell } from '@tiptap/extension-table-cell'
 import { useRef, useState, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
+import { tables } from 'turndown-plugin-gfm'
 import { saveDocument } from '@/lib/wiki/actions'
 import { slugToHref } from '@/lib/wiki/slug'
 import { createClient } from '@/lib/supabase/client'
@@ -18,6 +23,8 @@ const td = new TurndownService({
   codeBlockStyle: 'fenced',
   bulletListMarker: '-',
 })
+
+td.use(tables)
 
 // width가 있는 이미지는 title 필드에 "w=숫자" 형태로 너비를 인코딩해 저장
 td.addRule('resizable-image', {
@@ -80,6 +87,10 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       StarterKit,
       Link.configure({ openOnClick: false, autolink: false }),
       Image.configure({ inline: false, resize: { enabled: true, alwaysPreserveAspectRatio: true, minWidth: 50 } }),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: initialHtml,
     shouldRerenderOnTransaction: true,
@@ -179,6 +190,8 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       }
     })
   }
+
+  const inTable = editor?.isActive('table') ?? false
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
@@ -314,6 +327,16 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             {isUploading ? '⏳' : '🖼️'}
           </ToolbarBtn>
 
+          <span className="w-px h-5 bg-wiki-border mx-1" />
+
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+            active={false}
+            title="표 삽입"
+          >
+            표
+          </ToolbarBtn>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -322,6 +345,21 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             onChange={handleImageFile}
           />
         </div>
+
+        {/* 표 편집 툴바 - 커서가 표 안에 있을 때만 표시 */}
+        {inTable && (
+          <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-b border-wiki-border bg-wiki-accent/5 text-xs">
+            <span className="text-wiki-text-muted mr-0.5">행</span>
+            <ToolbarBtn onClick={() => editor?.chain().focus().addRowBefore().run()} title="위에 행 추가">↑+</ToolbarBtn>
+            <ToolbarBtn onClick={() => editor?.chain().focus().addRowAfter().run()} title="아래에 행 추가">↓+</ToolbarBtn>
+            <ToolbarBtn onClick={() => editor?.chain().focus().deleteRow().run()} title="행 삭제">×</ToolbarBtn>
+            <span className="w-px h-4 bg-wiki-border mx-1" />
+            <span className="text-wiki-text-muted mr-0.5">열</span>
+            <ToolbarBtn onClick={() => editor?.chain().focus().addColumnBefore().run()} title="왼쪽에 열 추가">←+</ToolbarBtn>
+            <ToolbarBtn onClick={() => editor?.chain().focus().addColumnAfter().run()} title="오른쪽에 열 추가">+→</ToolbarBtn>
+            <ToolbarBtn onClick={() => editor?.chain().focus().deleteColumn().run()} title="열 삭제">×</ToolbarBtn>
+          </div>
+        )}
 
         {/* 에디터 본문 */}
         <div className="
@@ -340,6 +378,10 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-wiki-accent [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-wiki-text-muted [&_.ProseMirror_blockquote]:my-3
           [&_.ProseMirror_hr]:border-wiki-border [&_.ProseMirror_hr]:my-4
           [&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:rounded [&_.ProseMirror_img]:my-3
+          [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:my-3
+          [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-wiki-border [&_.ProseMirror_th]:bg-wiki-border/20 [&_.ProseMirror_th]:px-3 [&_.ProseMirror_th]:py-2 [&_.ProseMirror_th]:text-left [&_.ProseMirror_th]:font-semibold
+          [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-wiki-border [&_.ProseMirror_td]:px-3 [&_.ProseMirror_td]:py-2
+          [&_.selectedCell]:bg-wiki-accent/10
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-wiki-text-muted [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none
         ">
           <EditorContent editor={editor} />
