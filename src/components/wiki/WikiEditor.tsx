@@ -12,7 +12,6 @@ import { TableCell } from '@tiptap/extension-table-cell'
 import { useRef, useState, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
-import { tables } from 'turndown-plugin-gfm'
 import { saveDocument } from '@/lib/wiki/actions'
 import { slugToHref } from '@/lib/wiki/slug'
 import { createClient } from '@/lib/supabase/client'
@@ -24,7 +23,11 @@ const td = new TurndownService({
   bulletListMarker: '-',
 })
 
-td.use(tables)
+// GFM tables 플러그인 대신 raw HTML로 저장 — 셀 안에 리스트·단락이 있어도 깨지지 않음
+td.addRule('html-table', {
+  filter: 'table',
+  replacement: (_content, node) => '\n\n' + (node as Element).outerHTML + '\n\n',
+})
 
 // width가 있는 이미지는 title 필드에 "w=숫자" 형태로 너비를 인코딩해 저장
 td.addRule('resizable-image', {
@@ -73,6 +76,7 @@ function ToolbarBtn({
 
 export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const [title, setTitle] = useState(initialTitle)
+  const [comment, setComment] = useState('')
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
   const [isUploading, setIsUploading] = useState(false)
@@ -182,7 +186,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     startTransition(async () => {
       const html = editor.getHTML()
       const markdown = td.turndown(html).replace(/\\\[/g, '[').replace(/\\\]/g, ']').replace(/(\d+)\\\./g, '$1.')
-      const result = await saveDocument(slug, title.trim(), markdown)
+      const result = await saveDocument(slug, title.trim(), markdown, comment.trim())
       if ('error' in result) {
         setError(result.error)
       } else {
@@ -401,8 +405,20 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         onRemove={handleLinkRemove}
       />
 
+      {/* 편집 요약 */}
+      <div className="mt-3">
+        <input
+          type="text"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          maxLength={200}
+          placeholder="편집 요약 (선택) — 무엇을 수정했나요?"
+          className="w-full px-3 py-2 border border-wiki-border rounded text-sm bg-wiki-surface text-wiki-text placeholder:text-wiki-text-muted outline-none focus:border-wiki-accent transition-colors"
+        />
+      </div>
+
       {/* 하단 버튼 */}
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-3 flex items-center gap-3">
         <button
           type="button"
           onClick={handleSave}

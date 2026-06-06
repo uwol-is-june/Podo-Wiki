@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { ComponentPropsWithoutRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 import { slugify } from '@/lib/wiki/headings'
 
 function extractText(node: React.ReactNode): string {
@@ -147,7 +148,7 @@ function CollapsibleH2({ heading, id, body }: H2Section) {
         <span className="flex-1">{heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}</span>
       </h2>
       {open && (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
           {body}
         </ReactMarkdown>
       )}
@@ -172,7 +173,7 @@ function CollapsibleH1({ heading, id, intro, h2s }: {
       {open && (
         <>
           {intro && (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
               {intro}
             </ReactMarkdown>
           )}
@@ -214,7 +215,7 @@ export default function MarkdownContent({ content }: { content: string }) {
         blocks.map((block, i) => {
           if (block.type === 'intro') {
             return (
-              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={bodyComponents}>
+              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
                 {block.body}
               </ReactMarkdown>
             )
@@ -235,7 +236,7 @@ export default function MarkdownContent({ content }: { content: string }) {
           )
         })
       ) : (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={bodyComponents}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
           {content}
         </ReactMarkdown>
       )}

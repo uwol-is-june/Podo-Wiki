@@ -26,19 +26,32 @@ export default async function HistoryPage({ params }: Props) {
     .eq('slug', decodedSlug)
     .single() as { data: Pick<Document, 'title'> | null }
 
-  const { data: revisions } = await supabase
+  const { data: rawRevisions } = await supabase
     .from('revisions')
-    .select('id, edited_at, editor_id')
+    .select('id, edited_at, editor_id, comment, content')
     .eq('document_slug', decodedSlug)
     .order('edited_at', { ascending: false })
 
   const editorIds = [...new Set(
-    (revisions ?? []).map((r) => r.editor_id).filter((id): id is string => id !== null)
+    (rawRevisions ?? []).map((r) => r.editor_id).filter((id): id is string => id !== null)
   )]
 
   const { data: profiles } = editorIds.length > 0
     ? await createAdminClient().from('profiles').select('id, name, organization').in('id', editorIds)
     : { data: [] }
+
+  // content는 클라이언트에 넘기지 않고 서버에서 바이트 수만 계산
+  const contentBytes = (rawRevisions ?? []).map((r) =>
+    Buffer.byteLength(r.content, 'utf8')
+  )
+  const revisions = (rawRevisions ?? []).map((r, i) => ({
+    id: r.id,
+    edited_at: r.edited_at,
+    editor_id: r.editor_id,
+    comment: r.comment,
+    contentBytes: contentBytes[i],
+    bytesDiff: contentBytes[i] - (contentBytes[i + 1] ?? 0),
+  }))
 
   const title = document?.title ?? decodedSlug
 
@@ -67,7 +80,7 @@ export default async function HistoryPage({ params }: Props) {
 
       <div className="mt-6">
         <RevisionList
-          revisions={revisions ?? []}
+          revisions={revisions}
           profiles={profiles ?? []}
           slug={decodedSlug}
         />

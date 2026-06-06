@@ -10,6 +10,7 @@ export async function saveDocument(
   slug: string,
   title: string,
   content: string,
+  comment = '',
 ): Promise<{ error: string } | { ok: true }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -32,6 +33,7 @@ export async function saveDocument(
     document_slug: slug,
     content,
     editor_id: user.id,
+    comment,
   }
   const { error: revError } = await supabase.from('revisions').insert(revRow)
   if (revError) return { error: revError.message }

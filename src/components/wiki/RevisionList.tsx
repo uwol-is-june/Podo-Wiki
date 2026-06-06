@@ -8,12 +8,26 @@ type RevisionItem = {
   id: string
   edited_at: string
   editor_id: string | null
+  comment: string
+  contentBytes: number
+  bytesDiff: number
 }
 
 type ProfileItem = {
   id: string
   name: string
   organization: string
+}
+
+function BytesDiff({ diff }: { diff: number }) {
+  if (diff === 0) return <span className="text-wiki-text-muted text-xs w-16 shrink-0">±0</span>
+  const sign = diff > 0 ? '+' : ''
+  const color = diff > 0 ? 'text-green-600' : 'text-red-500'
+  return (
+    <span className={`${color} text-xs w-16 shrink-0 font-mono`}>
+      {sign}{diff.toLocaleString()}
+    </span>
+  )
 }
 
 export default function RevisionList({
@@ -70,6 +84,7 @@ export default function RevisionList({
             const isLatest = index === 0
             const isSelected = selected.includes(rev.id)
             const isDisabled = !isSelected && selected.length >= 2
+            const revNum = revisions.length - index
 
             return (
               <div key={rev.id} className="flex items-center text-sm">
@@ -87,18 +102,27 @@ export default function RevisionList({
                 </label>
                 <Link
                   href={`${slugToHref(slug)}/history/${rev.id}`}
-                  className="flex flex-1 items-center gap-3 pr-5 py-3 hover:bg-wiki-border/20 transition-colors"
+                  className="flex flex-1 items-center gap-3 pr-5 py-3 hover:bg-wiki-border/20 transition-colors min-w-0"
                 >
+                  <span className="text-wiki-text-muted w-7 shrink-0 text-xs font-mono">
+                    r{revNum}
+                  </span>
                   <span className="text-wiki-text-muted w-36 shrink-0">
                     {new Date(rev.edited_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
                   </span>
-                  <span className="text-wiki-text">
+                  <span className="text-wiki-text shrink-0">
                     {profile
                       ? `${profile.name} (${profile.organization})`
                       : '알 수 없는 사용자'}
                   </span>
+                  <BytesDiff diff={rev.bytesDiff} />
+                  {rev.comment && (
+                    <span className="text-wiki-text-muted truncate text-xs">
+                      {rev.comment}
+                    </span>
+                  )}
                   {isLatest && (
-                    <span className="ml-auto text-xs text-wiki-accent font-medium">최신</span>
+                    <span className="ml-auto text-xs text-wiki-accent font-medium shrink-0">최신</span>
                   )}
                 </Link>
               </div>

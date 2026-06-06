@@ -34,6 +34,7 @@ export type Database = {
           content: string;
           editor_id: string | null;
           edited_at: string;
+          comment: string;
         };
         Insert: {
           id?: string;
@@ -41,11 +42,13 @@ export type Database = {
           content: string;
           editor_id?: string | null;
           edited_at?: string;
+          comment?: string;
         };
         Update: {
           content?: string;
           editor_id?: string | null;
           edited_at?: string;
+          comment?: string;
         };
         Relationships: [];
       };

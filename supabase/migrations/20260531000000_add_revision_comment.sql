@@ -1,0 +1,1 @@
+ALTER TABLE revisions ADD COLUMN comment TEXT NOT NULL DEFAULT '';
