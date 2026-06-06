@@ -68,6 +68,7 @@ export async function approveProfile(userId: string): Promise<AdminActionState> 
 
   if (error) return { error: error.message }
   revalidatePath('/admin')
+  revalidatePath('/')
   return { error: '', success: '승인 완료' }
 }
 
@@ -80,5 +81,6 @@ export async function rejectProfile(userId: string): Promise<AdminActionState> {
 
   if (error) return { error: error.message }
   revalidatePath('/admin')
+  revalidatePath('/')
   return { error: '', success: '거부 완료' }
 }
