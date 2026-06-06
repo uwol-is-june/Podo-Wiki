@@ -52,6 +52,26 @@ export type Database = {
         };
         Relationships: [];
       };
+      edit_locks: {
+        Row: {
+          document_slug: string;
+          user_id: string;
+          acquired_at: string;
+          expires_at: string;
+        };
+        Insert: {
+          document_slug: string;
+          user_id: string;
+          acquired_at?: string;
+          expires_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          acquired_at?: string;
+          expires_at?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;

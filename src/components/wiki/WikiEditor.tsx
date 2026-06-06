@@ -9,10 +9,11 @@ import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
-import { useRef, useState, useTransition, useCallback } from 'react'
+import { useRef, useState, useTransition, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
 import { saveDocument } from '@/lib/wiki/actions'
+import { releaseLock, refreshLock } from '@/lib/wiki/lock-actions'
 import { slugToHref } from '@/lib/wiki/slug'
 import { createClient } from '@/lib/supabase/client'
 import LinkInsertModal from './LinkInsertModal'
@@ -85,6 +86,15 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const [currentLinkText, setCurrentLinkText] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+
+  // 편집 중 락 유지: 10분마다 갱신, 언마운트 시 해제
+  useEffect(() => {
+    const interval = setInterval(() => { refreshLock(slug) }, 10 * 60 * 1000)
+    return () => {
+      clearInterval(interval)
+      releaseLock(slug)
+    }
+  }, [slug])
 
   const editor = useEditor({
     extensions: [
@@ -190,6 +200,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       if ('error' in result) {
         setError(result.error)
       } else {
+        await releaseLock(slug)
         router.push(slugToHref(slug))
       }
     })
@@ -429,7 +440,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         </button>
         <button
           type="button"
-          onClick={() => router.push(slugToHref(slug))}
+          onClick={async () => { await releaseLock(slug); router.push(slugToHref(slug)) }}
           disabled={isPending || isUploading}
           className="px-5 py-2 border border-wiki-border text-wiki-text rounded text-sm hover:border-wiki-accent hover:text-wiki-accent transition-colors disabled:opacity-50"
         >
