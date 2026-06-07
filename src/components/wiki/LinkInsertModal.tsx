@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { slugToHref } from '@/lib/wiki/slug'
 
 type Tab = 'internal' | 'external'
@@ -17,7 +16,6 @@ type Props = {
 }
 
 export default function LinkInsertModal({ open, initialHref, initialText, onClose, onConfirm, onRemove }: Props) {
-  const supabaseRef = useRef(createClient())
 
   const isInitiallyInternal = initialHref.startsWith('/w/')
   const [tab, setTab] = useState<Tab>(isInitiallyInternal ? 'internal' : initialHref ? 'external' : 'internal')
@@ -43,8 +41,11 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
     setExternalUrl(isInternal ? '' : initialHref)
     if (isInternal) {
       const slug = decodeURIComponent(initialHref.slice(3))
-      supabaseRef.current.from('documents').select('slug, title').eq('slug', slug).limit(1)
-        .then(({ data }) => { setSelected(data?.[0] ?? null) })
+      fetch(`/api/wiki/search?q=${encodeURIComponent(slug)}`)
+        .then((r) => r.json())
+        .then((data: { slug: string; title: string }[]) => {
+          setSelected(data.find((d) => d.slug === slug) ?? null)
+        })
     } else {
       setSelected(null)
     }
@@ -63,30 +64,21 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
     let cancelled = false
     setLoading(true)
     setSearchError(null)
-    const q = `%${search.trim()}%`
-    const supabase = supabaseRef.current
-    Promise.all([
-      supabase.from('documents').select('slug, title').ilike('title', q).limit(8),
-      supabase.from('documents').select('slug, title').ilike('slug', q).limit(8),
-    ]).then(([{ data: byTitle, error: e1 }, { data: bySlug, error: e2 }]) => {
-      if (cancelled) return
-      if (e1) console.error('[LinkInsertModal] title query error:', e1)
-      if (e2) console.error('[LinkInsertModal] slug query error:', e2)
-      if (e1 || e2) { setSearchError('검색 중 오류가 발생했어요.'); setLoading(false); return }
-      const seen = new Set<string>()
-      const merged: DocResult[] = []
-      for (const row of [...(byTitle ?? []), ...(bySlug ?? [])]) {
-        if (!seen.has(row.slug)) { seen.add(row.slug); merged.push(row) }
-      }
-      setResults(merged.slice(0, 8))
-      setLoading(false)
-    }).catch((err) => {
-      if (!cancelled) {
-        console.error('[LinkInsertModal] search failed:', err)
-        setSearchError('검색 중 오류가 발생했어요.')
-        setLoading(false)
-      }
-    })
+    fetch(`/api/wiki/search?q=${encodeURIComponent(search.trim())}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`search API ${r.status}`)
+        return r.json()
+      })
+      .then((data: DocResult[]) => {
+        if (!cancelled) { setResults(data); setLoading(false) }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error('[LinkInsertModal] search failed:', err)
+          setSearchError('검색 중 오류가 발생했어요.')
+          setLoading(false)
+        }
+      })
     return () => { cancelled = true }
   }, [search, tab])
 
