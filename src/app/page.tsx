@@ -35,14 +35,6 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
-      {/* 환영 배너 */}
-      <div className="mb-5">
-        <h1 className="text-2xl font-bold text-wiki-text mb-1">포도위키</h1>
-        <p className="text-wiki-text-muted text-sm">
-          공연단체의 인수인계 문서를 함께 만들어가는 위키 플랫폼
-        </p>
-      </div>
-
       {/* 공연단체 바로가기 */}
       <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5 mb-5">
         <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
