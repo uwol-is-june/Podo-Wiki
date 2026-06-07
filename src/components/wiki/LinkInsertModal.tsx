@@ -20,7 +20,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
   const supabase = useMemo(() => createClient(), [])
 
   const isInitiallyInternal = initialHref.startsWith('/w/')
-  const [tab, setTab] = useState<Tab>(isInitiallyInternal ? 'internal' : 'external')
+  const [tab, setTab] = useState<Tab>(isInitiallyInternal ? 'internal' : initialHref ? 'external' : 'internal')
   const [linkText, setLinkText] = useState(initialText)
   const [search, setSearch] = useState('')
   const [results, setResults] = useState<DocResult[]>([])
@@ -34,7 +34,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
   useEffect(() => {
     if (!open) return
     const isInternal = initialHref.startsWith('/w/')
-    setTab(isInternal ? 'internal' : 'external')
+    setTab(isInternal ? 'internal' : initialHref ? 'external' : 'internal')
     setLinkText(initialText)
     setSearch('')
     setResults([])
@@ -50,16 +50,23 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
 
   useEffect(() => {
     if (!open) return
-    setTimeout(() => linkTextRef.current?.focus(), 0)
-  }, [open])
+    setTimeout(() => {
+      if (tab === 'internal') searchRef.current?.focus()
+      else linkTextRef.current?.focus()
+    }, 0)
+  }, [open, tab])
 
   useEffect(() => {
     if (tab !== 'internal' || !search.trim()) { setResults([]); return }
+    const q = search.trim()
     supabase.from('documents')
       .select('slug, title')
-      .or(`title.ilike.%${search.trim()}%,slug.ilike.%${search.trim()}%`)
+      .or(`title.ilike.%${q}%,slug.ilike.%${q}%`)
       .limit(8)
-      .then(({ data }) => setResults(data ?? []))
+      .then(({ data, error }) => {
+        if (error) console.error('[LinkSearch]', error)
+        setResults(data ?? [])
+      })
   }, [search, tab, supabase])
 
   useEffect(() => {
