@@ -23,6 +23,8 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
   const [search, setSearch] = useState('')
   const [results, setResults] = useState<DocResult[]>([])
   const [selected, setSelected] = useState<DocResult | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
   const [externalUrl, setExternalUrl] = useState('')
 
   const linkTextRef = useRef<HTMLInputElement>(null)
@@ -57,11 +59,19 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
   }, [open, tab])
 
   useEffect(() => {
-    if (tab !== 'internal' || !search.trim()) { setResults([]); return }
+    if (tab !== 'internal' || !search.trim()) { setResults([]); setSearchError(null); return }
     let cancelled = false
-    searchDocuments(search.trim()).then((data) => {
-      if (!cancelled) setResults(data)
-    })
+    setLoading(true)
+    setSearchError(null)
+    searchDocuments(search.trim())
+      .then((data) => { if (!cancelled) { setResults(data); setLoading(false) } })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error('[LinkInsertModal] searchDocuments failed:', err)
+          setSearchError('검색 중 오류가 발생했어요.')
+          setLoading(false)
+        }
+      })
     return () => { cancelled = true }
   }, [search, tab])
 
@@ -160,7 +170,9 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
                     ))}
                   </ul>
                 )}
-                {search && results.length === 0 && (
+                {loading && <p className="text-sm text-wiki-text-muted px-1">검색 중...</p>}
+                {searchError && <p className="text-sm text-red-400 px-1">{searchError}</p>}
+                {!loading && !searchError && search && results.length === 0 && (
                   <p className="text-sm text-wiki-text-muted px-1">검색 결과가 없어요.</p>
                 )}
               </div>
