@@ -59,7 +59,13 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
 
   useEffect(() => {
     if (tab !== 'internal' || !search.trim()) { setResults([]); return }
-    searchDocuments(search.trim()).then(setResults)
+    let cancelled = false
+    const timer = setTimeout(() => {
+      searchDocuments(search.trim()).then((data) => {
+        if (!cancelled) setResults(data)
+      })
+    }, 200)
+    return () => { cancelled = true; clearTimeout(timer) }
   }, [search, tab])
 
   useEffect(() => {
