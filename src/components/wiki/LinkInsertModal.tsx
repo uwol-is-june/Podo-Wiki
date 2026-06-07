@@ -59,14 +59,17 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
   useEffect(() => {
     if (tab !== 'internal' || !search.trim()) { setResults([]); return }
     const q = search.trim()
-    supabase.from('documents')
-      .select('slug, title')
-      .or(`title.ilike.%${q}%,slug.ilike.%${q}%`)
-      .limit(8)
-      .then(({ data, error }) => {
-        if (error) console.error('[LinkSearch]', error)
-        setResults(data ?? [])
-      })
+    Promise.all([
+      supabase.from('documents').select('slug, title').ilike('title', `%${q}%`).limit(8),
+      supabase.from('documents').select('slug, title').ilike('slug', `%${q}%`).limit(8),
+    ]).then(([{ data: byTitle }, { data: bySlug }]) => {
+      const seen = new Set<string>()
+      const merged: DocResult[] = []
+      for (const row of [...(byTitle ?? []), ...(bySlug ?? [])]) {
+        if (!seen.has(row.slug)) { seen.add(row.slug); merged.push(row) }
+      }
+      setResults(merged.slice(0, 8))
+    })
   }, [search, tab, supabase])
 
   useEffect(() => {
