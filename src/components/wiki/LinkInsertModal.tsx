@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { slugToHref } from '@/lib/wiki/slug'
 
@@ -17,7 +17,7 @@ type Props = {
 }
 
 export default function LinkInsertModal({ open, initialHref, initialText, onClose, onConfirm, onRemove }: Props) {
-  const supabase = useMemo(() => createClient(), [])
+  const supabaseRef = useRef(createClient())
 
   const isInitiallyInternal = initialHref.startsWith('/w/')
   const [tab, setTab] = useState<Tab>(isInitiallyInternal ? 'internal' : initialHref ? 'external' : 'internal')
@@ -43,12 +43,12 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
     setExternalUrl(isInternal ? '' : initialHref)
     if (isInternal) {
       const slug = decodeURIComponent(initialHref.slice(3))
-      supabase.from('documents').select('slug, title').eq('slug', slug).limit(1)
+      supabaseRef.current.from('documents').select('slug, title').eq('slug', slug).limit(1)
         .then(({ data }) => { setSelected(data?.[0] ?? null) })
     } else {
       setSelected(null)
     }
-  }, [open, initialHref, initialText, supabase])
+  }, [open, initialHref, initialText])
 
   useEffect(() => {
     if (!open) return
@@ -64,6 +64,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
     setLoading(true)
     setSearchError(null)
     const q = `%${search.trim()}%`
+    const supabase = supabaseRef.current
     Promise.all([
       supabase.from('documents').select('slug, title').ilike('title', q).limit(8),
       supabase.from('documents').select('slug, title').ilike('slug', q).limit(8),
@@ -87,7 +88,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
       }
     })
     return () => { cancelled = true }
-  }, [search, tab, supabase])
+  }, [search, tab])
 
   useEffect(() => {
     if (!open) return

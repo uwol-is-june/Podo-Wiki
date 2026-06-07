@@ -3,7 +3,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import { getMarkRange } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
@@ -98,8 +97,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Link.configure({ openOnClick: false, autolink: false }),
+      StarterKit.configure({ link: { openOnClick: false, autolink: false } }),
       Image.configure({ inline: false, resize: { enabled: true, alwaysPreserveAspectRatio: true, minWidth: 50 } }),
       Table.configure({ resizable: false }),
       TableRow,
