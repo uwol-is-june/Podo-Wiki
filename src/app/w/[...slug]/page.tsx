@@ -36,12 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const decodedSlug = slug.map(decodeURIComponent).join('/')
   const document = await fetchDocument(decodedSlug)
   const title = document ? `${document.title} — 포도위키` : `${decodedSlug} — 포도위키`
-  const canonicalUrl = `https://podo-wiki.vercel.app/w/${decodedSlug}`
 
   return {
     title,
-    alternates: { canonical: canonicalUrl },
-    openGraph: { title, url: canonicalUrl, siteName: '포도위키' },
+    openGraph: { title, siteName: '포도위키' },
   }
 }
 
@@ -51,9 +49,13 @@ export default async function WikiPage({ params }: Props) {
 
   const document = await fetchDocument(decodedSlug)
 
+  const ogUrl = `https://podo-wiki.vercel.app/w/${decodedSlug}`
+
   if (!document) {
     return (
       <div className="max-w-[1200px] mx-auto px-4 py-10">
+        <link rel="canonical" href={ogUrl} />
+        <meta property="og:url" content={ogUrl} />
         <UrlNormalizer />
         <div className="bg-wiki-surface border border-wiki-border rounded-lg p-10 max-w-2xl mx-auto text-center">
           <h1 className="text-2xl font-bold text-wiki-text mb-3">
@@ -78,6 +80,8 @@ export default async function WikiPage({ params }: Props) {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
+      <link rel="canonical" href={ogUrl} />
+      <meta property="og:url" content={ogUrl} />
       <UrlNormalizer />
       {/* 문서 헤더 */}
       <div className="mb-0">
