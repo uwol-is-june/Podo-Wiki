@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { searchDocuments } from '@/lib/wiki/search-actions'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { slugToHref } from '@/lib/wiki/slug'
 
 type Tab = 'internal' | 'external'
@@ -17,6 +17,7 @@ type Props = {
 }
 
 export default function LinkInsertModal({ open, initialHref, initialText, onClose, onConfirm, onRemove }: Props) {
+  const supabase = useMemo(() => createClient(), [])
 
   const isInitiallyInternal = initialHref.startsWith('/w/')
   const [tab, setTab] = useState<Tab>(isInitiallyInternal ? 'internal' : initialHref ? 'external' : 'internal')
@@ -40,14 +41,12 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
     setExternalUrl(isInternal ? '' : initialHref)
     if (isInternal) {
       const slug = decodeURIComponent(initialHref.slice(3))
-      searchDocuments(slug).then((data) => {
-        const match = data.find((d) => d.slug === slug)
-        setSelected(match ?? null)
-      })
+      supabase.from('documents').select('slug, title').eq('slug', slug).single()
+        .then(({ data }) => setSelected(data ?? null))
     } else {
       setSelected(null)
     }
-  }, [open, initialHref, initialText])
+  }, [open, initialHref, initialText, supabase])
 
   useEffect(() => {
     if (!open) return
@@ -59,14 +58,22 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
 
   useEffect(() => {
     if (tab !== 'internal' || !search.trim()) { setResults([]); return }
+    const q = search.trim()
     let cancelled = false
-    const timer = setTimeout(() => {
-      searchDocuments(search.trim()).then((data) => {
-        if (!cancelled) setResults(data)
-      })
-    }, 200)
-    return () => { cancelled = true; clearTimeout(timer) }
-  }, [search, tab])
+    Promise.all([
+      supabase.from('documents').select('slug, title').ilike('title', `%${q}%`).limit(8),
+      supabase.from('documents').select('slug, title').ilike('slug', `%${q}%`).limit(8),
+    ]).then(([{ data: byTitle }, { data: bySlug }]) => {
+      if (cancelled) return
+      const seen = new Set<string>()
+      const merged: DocResult[] = []
+      for (const row of [...(byTitle ?? []), ...(bySlug ?? [])]) {
+        if (!seen.has(row.slug)) { seen.add(row.slug); merged.push(row) }
+      }
+      setResults(merged.slice(0, 8))
+    })
+    return () => { cancelled = true }
+  }, [search, tab, supabase])
 
   useEffect(() => {
     if (!open) return
