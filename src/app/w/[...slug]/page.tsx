@@ -8,6 +8,7 @@ import { slugToHref, slugToEditHref, slugToHistoryHref } from '@/lib/wiki/slug'
 import MarkdownContent from '@/components/wiki/MarkdownContent'
 import TableOfContents from '@/components/wiki/TableOfContents'
 import UrlNormalizer from '@/components/wiki/UrlNormalizer'
+import CopyLinkButton from '@/components/wiki/CopyLinkButton'
 
 type Props = {
   params: Promise<{ slug: string[] }>
@@ -107,6 +108,7 @@ export default async function WikiPage({ params }: Props) {
           >
             역사
           </Link>
+          <CopyLinkButton />
         </div>
       </div>
 
