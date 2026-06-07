@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import type { Database } from '@/lib/supabase/types'
-import { slugToHref } from '@/lib/wiki/slug'
+import { slugToHref, slugToEditHref } from '@/lib/wiki/slug'
 
 export async function saveDocument(
   slug: string,
@@ -15,7 +15,7 @@ export async function saveDocument(
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) redirect(`/login?next=${encodeURIComponent(`${slugToHref(slug)}/edit`)}`)
+  if (!user) redirect(`/login?next=${encodeURIComponent(slugToEditHref(slug))}`)
 
   const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).single()
   if (!profile || profile.status !== 'approved') redirect('/pending')

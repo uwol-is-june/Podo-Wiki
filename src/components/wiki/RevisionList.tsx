@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { slugToHref } from '@/lib/wiki/slug'
 
 type RevisionItem = {
   id: string
@@ -33,11 +32,9 @@ function BytesDiff({ diff }: { diff: number }) {
 export default function RevisionList({
   revisions,
   profiles,
-  slug,
 }: {
   revisions: RevisionItem[]
   profiles: ProfileItem[]
-  slug: string
 }) {
   const [selected, setSelected] = useState<string[]>([])
   const profileMap = new Map(profiles.map((p) => [p.id, p]))
@@ -52,7 +49,7 @@ export default function RevisionList({
 
   const diffHref =
     selected.length === 2
-      ? `${slugToHref(slug)}/history/diff?from=${selected[0]}&to=${selected[1]}`
+      ? `/diff?from=${selected[0]}&to=${selected[1]}`
       : null
 
   return (
@@ -101,7 +98,7 @@ export default function RevisionList({
                   />
                 </label>
                 <Link
-                  href={`${slugToHref(slug)}/history/${rev.id}`}
+                  href={`/revision/${rev.id}`}
                   className="flex flex-1 min-w-0 flex-col sm:flex-row sm:items-center sm:gap-3 pr-5 py-2.5 sm:py-3 hover:bg-wiki-border/20 transition-colors"
                 >
                   {/* 모바일 1행: r번호 + 날짜 + 최신 뱃지 */}

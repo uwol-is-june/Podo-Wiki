@@ -4,12 +4,12 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Database, Document } from '@/lib/supabase/types'
 import { extractHeadings } from '@/lib/wiki/headings'
-import { slugToHref } from '@/lib/wiki/slug'
+import { slugToHref, slugToEditHref, slugToHistoryHref } from '@/lib/wiki/slug'
 import MarkdownContent from '@/components/wiki/MarkdownContent'
 import TableOfContents from '@/components/wiki/TableOfContents'
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string[] }>
 }
 
 const fetchDocument = (slug: string) =>
@@ -32,7 +32,7 @@ const fetchDocument = (slug: string) =>
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = slug.map(decodeURIComponent).join('/')
   const document = await fetchDocument(decodedSlug)
 
   return {
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function WikiPage({ params }: Props) {
   const { slug } = await params
-  const decodedSlug = decodeURIComponent(slug)
+  const decodedSlug = slug.map(decodeURIComponent).join('/')
 
   const document = await fetchDocument(decodedSlug)
 
@@ -58,7 +58,7 @@ export default async function WikiPage({ params }: Props) {
             아직 작성된 내용이 없어요. 첫 번째로 문서를 만들어보세요.
           </p>
           <Link
-            href={`${slugToHref(decodedSlug)}/edit`}
+            href={slugToEditHref(decodedSlug)}
             className="inline-block px-5 py-2 bg-wiki-accent text-white rounded hover:bg-wiki-accent-hover transition-colors text-sm font-medium"
           >
             새 문서 만들기
@@ -85,13 +85,13 @@ export default async function WikiPage({ params }: Props) {
             보기
           </Link>
           <Link
-            href={`${slugToHref(decodedSlug)}/edit`}
+            href={slugToEditHref(decodedSlug)}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             수정
           </Link>
           <Link
-            href={`${slugToHref(decodedSlug)}/history`}
+            href={slugToHistoryHref(decodedSlug)}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             역사

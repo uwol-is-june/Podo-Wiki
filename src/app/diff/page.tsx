@@ -4,22 +4,16 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
 import { diffLines } from 'diff'
-import { slugToHref } from '@/lib/wiki/slug'
+import { slugToHref, slugToEditHref, slugToHistoryHref } from '@/lib/wiki/slug'
+
+export const metadata: Metadata = { title: '버전 비교 — 포도위키' }
 
 type Props = {
-  params: Promise<{ slug: string }>
   searchParams: Promise<{ from?: string; to?: string }>
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  return { title: `${decodeURIComponent(slug)} 버전 비교 — 포도위키` }
-}
-
-export default async function DiffPage({ params, searchParams }: Props) {
-  const { slug } = await params
+export default async function DiffPage({ searchParams }: Props) {
   const { from, to } = await searchParams
-  const decodedSlug = decodeURIComponent(slug)
   const supabase = await createClient()
 
   if (!from || !to) {
@@ -30,24 +24,16 @@ export default async function DiffPage({ params, searchParams }: Props) {
     )
   }
 
-  const { data: document } = await supabase
-    .from('documents')
-    .select('title')
-    .eq('slug', decodedSlug)
-    .single() as { data: Pick<Document, 'title'> | null }
-
   const { data: revA } = await supabase
     .from('revisions')
-    .select('id, content, edited_at, editor_id')
+    .select('id, content, edited_at, editor_id, document_slug')
     .eq('id', from)
-    .eq('document_slug', decodedSlug)
     .single()
 
   const { data: revB } = await supabase
     .from('revisions')
-    .select('id, content, edited_at, editor_id')
+    .select('id, content, edited_at, editor_id, document_slug')
     .eq('id', to)
-    .eq('document_slug', decodedSlug)
     .single()
 
   if (!revA || !revB) {
@@ -57,6 +43,14 @@ export default async function DiffPage({ params, searchParams }: Props) {
       </div>
     )
   }
+
+  const slug = revA.document_slug
+
+  const { data: document } = await supabase
+    .from('documents')
+    .select('title')
+    .eq('slug', slug)
+    .single() as { data: Pick<Document, 'title'> | null }
 
   // 시간순 정렬: older → newer
   const [older, newer] = new Date(revA.edited_at) <= new Date(revB.edited_at)
@@ -76,7 +70,7 @@ export default async function DiffPage({ params, searchParams }: Props) {
     new Date(dateStr).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
 
   const changes = diffLines(older.content, newer.content)
-  const title = document?.title ?? decodedSlug
+  const title = document?.title ?? slug
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
@@ -84,19 +78,19 @@ export default async function DiffPage({ params, searchParams }: Props) {
         <h1 className="text-2xl font-bold text-wiki-text mb-3">{title}</h1>
         <div className="flex items-center gap-0 border-b border-wiki-border">
           <Link
-            href={slugToHref(decodedSlug)}
+            href={slugToHref(slug)}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             보기
           </Link>
           <Link
-            href={`${slugToHref(decodedSlug)}/edit`}
+            href={slugToEditHref(slug)}
             className="px-4 py-2 text-sm text-wiki-text-muted hover:text-wiki-text transition-colors"
           >
             수정
           </Link>
           <Link
-            href={`${slugToHref(decodedSlug)}/history`}
+            href={slugToHistoryHref(slug)}
             className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px"
           >
             역사
