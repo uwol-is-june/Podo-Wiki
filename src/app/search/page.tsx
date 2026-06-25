@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
-import { slugToHref } from '@/lib/wiki/slug'
+import { slugToHref, slugToEditHref } from '@/lib/wiki/slug'
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -16,12 +16,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 function extractSnippet(content: string, query: string, maxLen = 150): string {
-  const lower = content.toLowerCase()
+  const plain = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  const lower = plain.toLowerCase()
   const idx = lower.indexOf(query.toLowerCase())
-  if (idx === -1) return content.slice(0, maxLen) + (content.length > maxLen ? '…' : '')
+  if (idx === -1) return plain.slice(0, maxLen) + (plain.length > maxLen ? '…' : '')
   const start = Math.max(0, idx - 60)
-  const end = Math.min(content.length, idx + query.length + 90)
-  return (start > 0 ? '…' : '') + content.slice(start, end) + (end < content.length ? '…' : '')
+  const end = Math.min(plain.length, idx + query.length + 90)
+  return (start > 0 ? '…' : '') + plain.slice(start, end) + (end < plain.length ? '…' : '')
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -86,7 +87,7 @@ export default async function SearchPage({ searchParams }: Props) {
             <strong className="text-wiki-text">&ldquo;{query}&rdquo;</strong>와 일치하는 문서가 없습니다.
           </p>
           <Link
-            href={`${slugToHref(query)}/edit`}
+            href={slugToEditHref(query)}
             className="inline-block px-4 py-2 bg-wiki-accent text-white rounded text-sm hover:bg-wiki-accent-hover transition-colors"
           >
             &ldquo;{query}&rdquo; 문서 만들기

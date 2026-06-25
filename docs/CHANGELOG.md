@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [TASK-001] 문서 삭제 신청 및 관리자 승인 기능
+  - `supabase/migrations/20260624000000_deletion_requests.sql` — `deletion_requests` 테이블 생성. 문서 삭제 시 CASCADE로 자동 삭제. 승인된 사용자만 INSERT 가능한 RLS 정책 적용
+  - `src/lib/supabase/types.ts` — `DeletionRequest` 타입 추가
+  - `src/lib/wiki/actions.ts` — `requestDocumentDeletion(slug, reason)` 서버 액션 추가. 이미 대기 중인 신청이 있으면 중복 신청 차단
+  - `src/lib/admin/actions.ts` — `getDeletionRequests()`, `approveDeletion(documentSlug)`, `rejectDeletion(requestId)` 추가. 승인 시 문서 삭제(CASCADE), 거부 시 신청 상태를 rejected로 변경. 역링크 수(ILIKE 검색) 포함 반환
+  - `src/components/wiki/DeletionRequestButton.tsx` — 신규 클라이언트 컴포넌트. 모달에서 사유 입력 후 신청
+  - `src/app/w/[...slug]/page.tsx` — 승인된 사용자에게 탭바에 "삭제 신청" 버튼 표시
+  - `src/app/admin/AdminDeletionTable.tsx` — 삭제 신청 목록 테이블. 역링크 수 경고 포함. 승인 시 confirm 다이얼로그에서 역링크 수 안내
+  - `src/app/admin/page.tsx` — "회원 관리" / "삭제 신청" 섹션 탭 추가. 대기 중인 삭제 신청 수 뱃지 표시
+- [TASK-029] 어드민 전체 사용자 목록 조회
+  - `src/lib/admin/actions.ts` — `getAllProfiles()` 서버 액션 추가. 전체 사용자를 가입일 내림차순으로 조회
+  - `src/app/admin/page.tsx` — URL searchParams(`?filter=`) 기반 탭 필터(전체/대기/승인/거절) 추가. 대기 탭에 미처리 건수 뱃지 표시
+  - `src/app/admin/AdminUserTable.tsx` — 상태 컬럼 추가 및 색상 뱃지(대기/승인/거절) 표시. 이미 승인된 사용자는 승인 버튼 숨김, 이미 거절된 사용자는 거부 버튼 숨김
+- [TASK-028] 열람 페이지 상위 페이지 브레드크럼
+  - `src/components/wiki/Breadcrumb.tsx` — 신규 컴포넌트. 브레드크럼 항목 배열을 받아 `›` 구분자로 링크 렌더링
+  - `src/app/w/[...slug]/page.tsx` — `fetchExistingSlugs()` 추가. 슬러그를 `/` 기준 분리해 상위 슬러그 목록 추출, DB에서 실제 존재하는 것만 필터링해 `<Breadcrumb>` 표시. 최상위 페이지(분리 결과 없음)는 브레드크럼 미표시
+
 ### Fixed
 - 링크 삽입 모달 내부 문서 검색 복원
   - `src/lib/wiki/search-actions.ts` — `searchDocuments` 서버 액션 재도입. 클라이언트 Supabase에서 documents SELECT가 동작하지 않는 문제 우회

@@ -94,6 +94,31 @@ export type Database = {
         };
         Relationships: [];
       };
+      deletion_requests: {
+        Row: {
+          id: string;
+          document_slug: string;
+          requester_id: string;
+          reason: string;
+          status: 'pending' | 'approved' | 'rejected';
+          created_at: string;
+          reviewed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          document_slug: string;
+          requester_id: string;
+          reason: string;
+          status?: 'pending' | 'approved' | 'rejected';
+          created_at?: string;
+          reviewed_at?: string | null;
+        };
+        Update: {
+          status?: 'pending' | 'approved' | 'rejected';
+          reviewed_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -106,3 +131,4 @@ export type Document = Database["public"]["Tables"]["documents"]["Row"];
 export type Revision = Database["public"]["Tables"]["revisions"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileStatus = Profile['status'];
+export type DeletionRequest = Database["public"]["Tables"]["deletion_requests"]["Row"];

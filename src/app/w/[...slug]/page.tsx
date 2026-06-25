@@ -8,6 +8,9 @@ import { slugToHref, slugToEditHref, slugToHistoryHref } from '@/lib/wiki/slug'
 import MarkdownContent from '@/components/wiki/MarkdownContent'
 import TableOfContents from '@/components/wiki/TableOfContents'
 import UrlNormalizer from '@/components/wiki/UrlNormalizer'
+import Breadcrumb from '@/components/wiki/Breadcrumb'
+import DeletionRequestButton from '@/components/wiki/DeletionRequestButton'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 type Props = {
   params: Promise<{ slug: string[] }>
@@ -43,11 +46,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+async function fetchExistingSlugs(slugs: string[]): Promise<Set<string>> {
+  if (slugs.length === 0) return new Set()
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+  const { data } = await supabase
+    .from('documents')
+    .select('slug')
+    .in('slug', slugs)
+  return new Set((data ?? []).map((r) => r.slug))
+}
+
 export default async function WikiPage({ params }: Props) {
   const { slug } = await params
   const decodedSlug = slug.map(decodeURIComponent).join('/')
 
   const document = await fetchDocument(decodedSlug)
+
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  let isApprovedUser = false
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).single()
+    isApprovedUser = profile?.status === 'approved'
+  }
+
+  const segments = decodedSlug.split('/')
+  const parentSlugs = segments.slice(0, -1).map((_, i) => segments.slice(0, i + 1).join('/'))
+  const existingSlugs = await fetchExistingSlugs(parentSlugs)
+  const breadcrumbs = parentSlugs
+    .map((s, i) => ({ slug: s, label: segments[i], exists: existingSlugs.has(s) }))
+    .filter((b) => b.exists)
 
   const ogUrl = `https://podo-wiki.vercel.app/w/${decodedSlug}`
 
@@ -85,6 +116,7 @@ export default async function WikiPage({ params }: Props) {
       <UrlNormalizer />
       {/* 문서 헤더 */}
       <div className="mb-0">
+        {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
         <h1 className="text-2xl font-bold text-wiki-text mb-3">
           {document.title}
         </h1>
@@ -107,6 +139,7 @@ export default async function WikiPage({ params }: Props) {
           >
             역사
           </Link>
+          {isApprovedUser && <DeletionRequestButton slug={decodedSlug} />}
         </div>
       </div>
 
