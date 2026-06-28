@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-003] 탭바 삭제 신청 버튼 오른쪽 끝 배치
+  - `src/app/w/[...slug]/page.tsx` — `<DeletionRequestButton>`을 `<div className="ml-auto">`로 감싸 보기/수정/역사 탭과 시각적으로 분리
+- [TASK-002] 테이블 서브 툴바 배경 불투명 처리
+  - `src/components/wiki/WikiEditor.tsx` — 표 편집 서브 툴바 배경을 `bg-wiki-accent/5` → `bg-wiki-surface`로 변경해 뒤 배경이 비치는 문제 해결
+- [TASK-001] 에디터 텍스트 색상 변경 기능 (5색)
+  - `@tiptap/extension-color@3.23.6` + `@tiptap/extension-text-style@3.23.6` 패키지 추가
+  - `src/components/wiki/WikiEditor.tsx` — `TextStyle`, `Color` 익스텐션 등록. 툴바에 빨강/파랑/초록/주황/보라 5색 팔레트 + 초기화 버튼 추가. color span을 Markdown 내 HTML로 보존하는 Turndown 커스텀 규칙(`color-span`) 추가
+  - 읽기 모드(`MarkdownContent.tsx`)는 기존 `rehype-raw`로 HTML span을 그대로 렌더링하므로 별도 변경 없음
 - [TASK-001] 문서 삭제 신청 및 관리자 승인 기능
   - `supabase/migrations/20260624000000_deletion_requests.sql` — `deletion_requests` 테이블 생성. 문서 삭제 시 CASCADE로 자동 삭제. 승인된 사용자만 INSERT 가능한 RLS 정책 적용
   - `src/lib/supabase/types.ts` — `DeletionRequest` 타입 추가

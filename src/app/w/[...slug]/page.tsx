@@ -139,7 +139,7 @@ export default async function WikiPage({ params }: Props) {
           >
             역사
           </Link>
-          {isApprovedUser && <DeletionRequestButton slug={decodedSlug} />}
+          {isApprovedUser && <div className="ml-auto"><DeletionRequestButton slug={decodedSlug} /></div>}
         </div>
       </div>
 

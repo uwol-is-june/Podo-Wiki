@@ -8,6 +8,8 @@ import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Color } from '@tiptap/extension-color'
 import { useRef, useState, useTransition, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
@@ -27,6 +29,12 @@ const td = new TurndownService({
 td.addRule('html-table', {
   filter: 'table',
   replacement: (_content, node) => '\n\n' + (node as Element).outerHTML + '\n\n',
+})
+
+// 텍스트 색상 span은 HTML 그대로 보존 — rehype-raw가 읽기 모드에서 렌더링함
+td.addRule('color-span', {
+  filter: (node) => node.nodeName === 'SPAN' && !!(node as HTMLElement).style.color,
+  replacement: (_content, node) => (node as HTMLElement).outerHTML,
 })
 
 // width가 있는 이미지는 title 필드에 "w=숫자" 형태로 너비를 인코딩해 저장
@@ -103,6 +111,8 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       TableRow,
       TableHeader,
       TableCell,
+      TextStyle,
+      Color,
     ],
     content: initialHtml,
     shouldRerenderOnTransaction: true,
@@ -345,6 +355,35 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
 
           <span className="w-px h-5 bg-wiki-border mx-1" />
 
+          {[
+            { color: '#e53e3e', label: '빨강' },
+            { color: '#3182ce', label: '파랑' },
+            { color: '#38a169', label: '초록' },
+            { color: '#dd6b20', label: '주황' },
+            { color: '#805ad5', label: '보라' },
+          ].map(({ color, label }) => (
+            <button
+              key={color}
+              type="button"
+              onMouseDown={(e) => { e.preventDefault(); editor?.chain().focus().setColor(color).run() }}
+              title={`글자색: ${label}`}
+              className={`w-5 h-5 rounded-full border-2 transition-all ${
+                editor?.isActive('textStyle', { color }) ? 'border-wiki-text scale-110' : 'border-wiki-border/60 hover:border-wiki-text/60'
+              }`}
+              style={{ backgroundColor: color }}
+            />
+          ))}
+          <button
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); editor?.chain().focus().unsetColor().run() }}
+            title="글자색 초기화"
+            className="w-5 h-5 rounded-full border-2 border-wiki-border/60 hover:border-wiki-text/60 bg-wiki-surface flex items-center justify-center text-[9px] text-wiki-text-muted transition-all"
+          >
+            ✕
+          </button>
+
+          <span className="w-px h-5 bg-wiki-border mx-1" />
+
           <ToolbarBtn
             onClick={() => editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
             active={false}
@@ -364,7 +403,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
 
         {/* 표 편집 툴바 - 커서가 표 안에 있을 때만 표시 */}
         {inTable && (
-          <div className="flex flex-nowrap overflow-x-auto sm:flex-wrap items-center gap-0.5 px-3 py-1.5 border-b border-wiki-border bg-wiki-accent/5 text-xs">
+          <div className="flex flex-nowrap overflow-x-auto sm:flex-wrap items-center gap-0.5 px-3 py-1.5 border-b border-wiki-border bg-wiki-surface text-xs">
             <span className="text-wiki-text-muted mr-0.5">행</span>
             <ToolbarBtn onClick={() => editor?.chain().focus().addRowBefore().run()} title="위에 행 추가">↑+</ToolbarBtn>
             <ToolbarBtn onClick={() => editor?.chain().focus().addRowAfter().run()} title="아래에 행 추가">↓+</ToolbarBtn>
