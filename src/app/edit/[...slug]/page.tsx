@@ -91,8 +91,10 @@ export default async function EditPage({ params }: Props) {
     .eq('slug', decodedSlug)
     .single() as { data: Document | null }
 
-  const initialHtml = document?.content
-    ? (marked.parse(document.content) as string)
+  // [^N] 패턴이 marked의 reference-style 링크로 잘못 파싱되는 것을 방지
+  const safeContent = (document?.content ?? '').replace(/\[\^/g, '&#91;^')
+  const initialHtml = safeContent
+    ? (marked.parse(safeContent) as string)
         .replace(/<img([^>]*?)\stitle="w=(\d+)"([^>]*)>/g, '<img$1 width="$2"$3>')
     : ''
 

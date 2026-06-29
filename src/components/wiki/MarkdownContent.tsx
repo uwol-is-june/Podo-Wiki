@@ -47,6 +47,49 @@ function A({ href, children, ...props }: ComponentPropsWithoutRef<'a'>) {
 
 const bodyComponents = { h3: H3, a: A, img: Img }
 
+// ── Footnotes ────────────────────────────────────────────────────────
+
+type FootnoteDef = { label: string; content: string; num: number }
+
+function processFootnotes(markdown: string): { processed: string; defs: FootnoteDef[] } {
+  const defMap = new Map<string, string>()
+  const cleanedLines: string[] = []
+
+  for (const line of markdown.split('\n')) {
+    const m = line.match(/^\[\^([^\]]+)\]:\s*(.+)$/)
+    if (m) {
+      if (!defMap.has(m[1])) defMap.set(m[1], m[2])
+    } else {
+      cleanedLines.push(line)
+    }
+  }
+
+  if (defMap.size === 0) return { processed: markdown, defs: [] }
+
+  const labelOrder: string[] = []
+  const labelToNum = new Map<string, number>()
+  for (const line of cleanedLines) {
+    for (const m of line.matchAll(/\[\^([^\]]+)\]/g)) {
+      if (!labelToNum.has(m[1])) {
+        labelOrder.push(m[1])
+        labelToNum.set(m[1], labelOrder.length)
+      }
+    }
+  }
+
+  const processed = cleanedLines.join('\n').replace(/\[\^([^\]]+)\]/g, (_, label) => {
+    const num = labelToNum.get(label)
+    if (!num) return `[^${label}]`
+    return `<sup><a id="fnref-${label}" href="#fn-${label}" class="footnote-ref">[${num}]</a></sup>`
+  })
+
+  const defs = labelOrder
+    .filter(label => defMap.has(label))
+    .map((label, i) => ({ label, content: defMap.get(label)!, num: i + 1 }))
+
+  return { processed, defs }
+}
+
 // ── Parsing ──────────────────────────────────────────────────────────
 
 type H2Section = { heading: string; id: string; body: string }
@@ -207,10 +250,12 @@ const PROSE = `prose max-w-none text-wiki-text
   [&_th]:border [&_th]:border-wiki-border [&_th]:bg-wiki-border/20 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold
   [&_td]:border [&_td]:border-wiki-border [&_td]:px-3 [&_td]:py-2
   [&_hr]:border-wiki-border [&_hr]:my-6
-  [&_img]:max-w-full [&_img]:rounded [&_img]:my-3`
+  [&_img]:max-w-full [&_img]:rounded [&_img]:my-3
+  [&_sup]:text-xs [&_sup]:leading-none [&_.footnote-ref]:text-wiki-accent [&_.footnote-ref]:no-underline [&_.footnote-ref]:hover:underline`
 
 export default function MarkdownContent({ content }: { content: string }) {
-  const blocks = splitBlocks(content)
+  const { processed, defs } = processFootnotes(content)
+  const blocks = splitBlocks(processed)
   const hasSections = blocks.some((b) => b.type === 'h1' || b.type === 'h2')
 
   return (
@@ -243,6 +288,20 @@ export default function MarkdownContent({ content }: { content: string }) {
         <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
           {content}
         </ReactMarkdown>
+      )}
+      {defs.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-wiki-border">
+          <ol className="list-decimal pl-5 space-y-1 text-sm text-wiki-text-muted">
+            {defs.map(({ label, content, num }) => (
+              <li key={label} id={`fn-${label}`} value={num}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
+                  {content}
+                </ReactMarkdown>
+                <a href={`#fnref-${label}`} className="ml-1 text-wiki-accent hover:underline text-xs">↩</a>
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
     </div>
   )

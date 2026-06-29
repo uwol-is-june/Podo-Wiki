@@ -86,7 +86,7 @@ export default function TableOfContents({
   return (
     <div className="sticky top-[66px] bg-wiki-surface border border-wiki-border rounded-lg p-4">
       <p className="text-xs font-semibold text-wiki-text mb-3 uppercase tracking-wide">목차</p>
-      <div className="overflow-y-auto max-h-[calc(100vh-130px)]">
+      <div className="overflow-y-auto max-h-[calc(100vh-130px)] scrollbar-thin">
         <TocList headings={headings} activeId={activeId} />
       </div>
     </div>

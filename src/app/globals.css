@@ -45,6 +45,27 @@ body {
   color: var(--wiki-text);
 }
 
+/* 얇은 스크롤바 — 목차 등 사이드 패널에서 내용을 가리지 않도록 */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--wiki-border) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--wiki-border);
+  border-radius: 9999px;
+}
+
+/* 에디터 selection 반투명 처리 — 텍스트 색상이 선택 중에도 보이도록 */
+.ProseMirror ::selection {
+  background-color: rgba(106, 57, 192, 0.25);
+}
+
 /* Tiptap 이미지 리사이즈 핸들 */
 [data-resize-handle] {
   width: 10px;

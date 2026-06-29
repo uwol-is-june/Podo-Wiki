@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-004] 각주(footnote) 기능 추가
+  - `src/components/wiki/FootnoteInsertModal.tsx` — 각주 내용 입력 모달 신규 생성
+  - `src/components/wiki/WikiEditor.tsx` — 툴바에 `[^]` 각주 버튼 추가. 모달 확인 시 커서 위치에 `[^N]` 삽입, 문서 맨 끝에 `[^N]: 내용` 정의 자동 추가. N은 기존 정의 수+1 자동 부여
+  - `src/app/edit/[...slug]/page.tsx` — `[^` 패턴을 `&#91;^`로 이스케이프한 뒤 `marked.parse()` 적용. marked v18이 단어 1개짜리 정의를 reference-style 링크로 잘못 파싱하는 문제 방지
+  - `src/components/wiki/MarkdownContent.tsx` — `processFootnotes()` 함수 추가: 정의부 추출 → 인라인 `[^N]`을 `<sup>` HTML로 치환(cross-section 지원) → 문서 맨 끝 구분선 아래 번호 목록 렌더링 + `↩` 역참조 링크
+
+### Fixed
+- [TASK-003] 본문 목차 스크롤바 크기 축소
+  - `src/app/globals.css` — `.scrollbar-thin` 유틸리티 추가 (width 4px, Firefox `scrollbar-width: thin`)
+  - `src/components/wiki/TableOfContents.tsx` — 스크롤 컨테이너에 `scrollbar-thin` 적용
+- [TASK-002] 에디터 드래그 중 색 변경 즉시 반영
+  - `src/app/globals.css` — `.ProseMirror ::selection` 배경을 반투명(`rgba(106,57,192,0.25)`)으로 지정. 기존엔 불투명한 selection 하이라이트가 텍스트 색을 가려 드래그 해제 후에야 색상이 보이던 문제 수정
+
+### Changed
+- [TASK-001] 에디터 툴바 주황색 색상값 교체
+  - `src/components/wiki/WikiEditor.tsx` — 주황색 스와치를 `#dd6b20` → `#f59e0b`(amber)로 변경해 빨강(`#e53e3e`)과의 색상 계열 분리
+
+### Added
 - [TASK-003] 탭바 삭제 신청 버튼 오른쪽 끝 배치
   - `src/app/w/[...slug]/page.tsx` — `<DeletionRequestButton>`을 `<div className="ml-auto">`로 감싸 보기/수정/역사 탭과 시각적으로 분리
 - [TASK-002] 테이블 서브 툴바 배경 불투명 처리

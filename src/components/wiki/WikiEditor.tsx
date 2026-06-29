@@ -18,6 +18,7 @@ import { releaseLock, refreshLock } from '@/lib/wiki/lock-actions'
 import { slugToHref } from '@/lib/wiki/slug'
 import { createClient } from '@/lib/supabase/client'
 import LinkInsertModal from './LinkInsertModal'
+import FootnoteInsertModal from './FootnoteInsertModal'
 
 const td = new TurndownService({
   headingStyle: 'atx',
@@ -91,6 +92,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
   const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [currentLinkHref, setCurrentLinkHref] = useState('')
   const [currentLinkText, setCurrentLinkText] = useState('')
+  const [footnoteModalOpen, setFootnoteModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
@@ -154,6 +156,19 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       .insertContentAt(finalFrom, { type: 'text', text, marks: [{ type: 'link', attrs: { href } }] })
       .run()
     setLinkModalOpen(false)
+  }, [editor])
+
+  const handleFootnoteConfirm = useCallback((content: string) => {
+    if (!editor) return
+    const text = editor.state.doc.textContent
+    const existingNums = [...text.matchAll(/\[\^(\d+)\]:/g)].map(m => parseInt(m[1], 10))
+    const N = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
+    editor.chain().focus().insertContent(`[^${N}]`).run()
+    const endPos = editor.state.doc.content.size
+    editor.chain()
+      .insertContentAt(endPos, { type: 'paragraph', content: [{ type: 'text', text: `[^${N}]: ${content}` }] })
+      .run()
+    setFootnoteModalOpen(false)
   }, [editor])
 
   const handleLinkRemove = useCallback(() => {
@@ -342,6 +357,13 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           >
             ―
           </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => setFootnoteModalOpen(true)}
+            active={false}
+            title="각주 삽입"
+          >
+            [^]
+          </ToolbarBtn>
 
           <span className="w-px h-5 bg-wiki-border mx-1" />
 
@@ -359,7 +381,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             { color: '#e53e3e', label: '빨강' },
             { color: '#3182ce', label: '파랑' },
             { color: '#38a169', label: '초록' },
-            { color: '#dd6b20', label: '주황' },
+            { color: '#f59e0b', label: '주황' },
             { color: '#805ad5', label: '보라' },
           ].map(({ color, label }) => (
             <button
@@ -444,6 +466,11 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         </div>
       </div>
 
+      <FootnoteInsertModal
+        open={footnoteModalOpen}
+        onClose={() => setFootnoteModalOpen(false)}
+        onConfirm={handleFootnoteConfirm}
+      />
       <LinkInsertModal
         open={linkModalOpen}
         initialHref={currentLinkHref}
