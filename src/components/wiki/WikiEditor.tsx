@@ -10,6 +10,9 @@ import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { TextStyle } from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color'
+import { Extension } from '@tiptap/core'
+import { Plugin, PluginKey } from 'prosemirror-state'
+import { Decoration, DecorationSet } from 'prosemirror-view'
 import { useRef, useState, useTransition, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TurndownService from 'turndown'
@@ -47,6 +50,51 @@ td.addRule('resizable-image', {
     const alt = el.getAttribute('alt') ?? ''
     const width = el.getAttribute('width') ?? ''
     return `![${alt}](${src} "w=${width}")`
+  },
+})
+
+// 에디터 내 각주 정의 단락과 본문 내 [^n] 참조를 시각적으로 강조
+const FootnoteDecorator = Extension.create({
+  name: 'footnoteDecorator',
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey('footnoteDecorator'),
+        props: {
+          decorations(state) {
+            const decorations: Decoration[] = []
+            let prevWasFootnoteDef = false
+
+            state.doc.forEach((node, pos) => {
+              if (node.type.name === 'paragraph') {
+                const text = node.textContent
+                const isDefPara = /^\[\^[^\]]+\]:/.test(text)
+
+                if (isDefPara) {
+                  const cls = prevWasFootnoteDef ? 'fn-def' : 'fn-def fn-def-first'
+                  decorations.push(Decoration.node(pos, pos + node.nodeSize, { class: cls }))
+                  prevWasFootnoteDef = true
+                } else {
+                  prevWasFootnoteDef = false
+                  node.descendants((child, relPos) => {
+                    if (child.isText && child.text) {
+                      for (const m of child.text.matchAll(/\[\^[^\]]+\]/g)) {
+                        const from = pos + 1 + relPos + (m.index ?? 0)
+                        decorations.push(Decoration.inline(from, from + m[0].length, { class: 'fn-ref' }))
+                      }
+                    }
+                  })
+                }
+              } else {
+                prevWasFootnoteDef = false
+              }
+            })
+
+            return DecorationSet.create(state.doc, decorations)
+          },
+        },
+      }),
+    ]
   },
 })
 
@@ -115,6 +163,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       TableCell,
       TextStyle,
       Color,
+      FootnoteDecorator,
     ],
     content: initialHtml,
     shouldRerenderOnTransaction: true,
@@ -362,7 +411,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             active={false}
             title="각주 삽입"
           >
-            [^]
+            각주[¹]
           </ToolbarBtn>
 
           <span className="w-px h-5 bg-wiki-border mx-1" />

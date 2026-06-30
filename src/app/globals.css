@@ -66,6 +66,35 @@ body {
   background-color: rgba(106, 57, 192, 0.25);
 }
 
+/* 에디터 각주 정의 단락 시각 구분 */
+.ProseMirror p.fn-def {
+  background-color: rgba(106, 57, 192, 0.05);
+  border-radius: 3px;
+  padding-left: 8px;
+  padding-right: 4px;
+  font-size: 0.875em;
+  color: var(--wiki-text-muted);
+}
+.ProseMirror p.fn-def-first {
+  border-top: 1px solid var(--wiki-border);
+  margin-top: 8px;
+  padding-top: 4px;
+}
+.dark .ProseMirror p.fn-def {
+  background-color: rgba(155, 109, 224, 0.08);
+}
+
+/* 에디터 본문 내 각주 참조 [^n] 강조 */
+.fn-ref {
+  color: var(--wiki-accent);
+  background-color: rgba(106, 57, 192, 0.1);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+.dark .fn-ref {
+  background-color: rgba(155, 109, 224, 0.15);
+}
+
 /* Tiptap 이미지 리사이즈 핸들 */
 [data-resize-handle] {
   width: 10px;

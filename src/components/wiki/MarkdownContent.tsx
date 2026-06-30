@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ComponentPropsWithoutRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import { slugify } from '@/lib/wiki/headings'
+
+type MarkdownComponents = React.ComponentProps<typeof ReactMarkdown>['components']
 
 function extractText(node: React.ReactNode): string {
   if (typeof node === 'string') return node
@@ -37,15 +39,34 @@ function Img({ src, alt, title, ...props }: ComponentPropsWithoutRef<'img'>) {
   )
 }
 
-function A({ href, children, ...props }: ComponentPropsWithoutRef<'a'>) {
-  const isExternal = !!href && /^[a-z][a-z\d+\-.]*:/i.test(href)
-  if (isExternal) {
-    return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
-  }
-  return <a href={href} {...props}>{children}</a>
-}
+// ── Footnote tooltip ─────────────────────────────────────────────────
 
-const bodyComponents = { h3: H3, a: A, img: Img }
+function FootnoteTooltip({ label, num, content, href }: {
+  label: string; num: number; content: string; href: string
+}) {
+  const [visible, setVisible] = useState(false)
+  return (
+    <sup className="relative inline-block">
+      <a
+        id={`fnref-${label}`}
+        href={href}
+        className="text-wiki-accent no-underline hover:underline"
+        onMouseEnter={() => setVisible(true)}
+        onMouseLeave={() => setVisible(false)}
+      >
+        [{num}]
+      </a>
+      {visible && (
+        <span
+          role="tooltip"
+          className="absolute bottom-full left-0 z-50 w-max max-w-[260px] bg-wiki-surface border border-wiki-border rounded shadow-lg px-3 py-2 text-xs text-wiki-text pointer-events-none whitespace-normal leading-relaxed"
+        >
+          {content}
+        </span>
+      )}
+    </sup>
+  )
+}
 
 // ── Footnotes ────────────────────────────────────────────────────────
 
@@ -178,7 +199,7 @@ function Caret({ open }: { open: boolean }) {
   )
 }
 
-function CollapsibleH2({ heading, id, body }: H2Section) {
+function CollapsibleH2({ heading, id, body, components }: H2Section & { components: MarkdownComponents }) {
   const [open, setOpen] = useState(true)
   return (
     <section>
@@ -191,7 +212,7 @@ function CollapsibleH2({ heading, id, body }: H2Section) {
         <span className="flex-1">{heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}</span>
       </h2>
       {open && (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
           {body}
         </ReactMarkdown>
       )}
@@ -199,8 +220,8 @@ function CollapsibleH2({ heading, id, body }: H2Section) {
   )
 }
 
-function CollapsibleH1({ heading, id, intro, h2s }: {
-  heading: string; id: string; intro: string; h2s: H2Section[]
+function CollapsibleH1({ heading, id, intro, h2s, components }: {
+  heading: string; id: string; intro: string; h2s: H2Section[]; components: MarkdownComponents
 }) {
   const [open, setOpen] = useState(true)
   return (
@@ -216,12 +237,12 @@ function CollapsibleH1({ heading, id, intro, h2s }: {
       {open && (
         <>
           {intro && (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
               {intro}
             </ReactMarkdown>
           )}
           {h2s.map((s) => (
-            <CollapsibleH2 key={s.id} {...s} />
+            <CollapsibleH2 key={s.id} {...s} components={components} />
           ))}
         </>
       )}
@@ -254,7 +275,26 @@ const PROSE = `prose max-w-none text-wiki-text
   [&_sup]:text-xs [&_sup]:leading-none [&_.footnote-ref]:text-wiki-accent [&_.footnote-ref]:no-underline [&_.footnote-ref]:hover:underline`
 
 export default function MarkdownContent({ content }: { content: string }) {
-  const { processed, defs } = processFootnotes(content)
+  const { processed, defs } = useMemo(() => processFootnotes(content), [content])
+  const fnMap = useMemo(() => new Map(defs.map(d => [d.label, d])), [defs])
+
+  const components: MarkdownComponents = useMemo(() => ({
+    h3: H3,
+    img: Img,
+    a: ({ href, children, className, ...props }: ComponentPropsWithoutRef<'a'>) => {
+      if (className === 'footnote-ref') {
+        const label = href?.replace('#fn-', '') ?? ''
+        const fn = fnMap.get(label)
+        if (fn) return <FootnoteTooltip label={label} num={fn.num} content={fn.content} href={href ?? ''} />
+      }
+      const isExternal = !!href && /^[a-z][a-z\d+\-.]*:/i.test(href)
+      if (isExternal) {
+        return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+      }
+      return <a href={href} {...props}>{children}</a>
+    },
+  }), [fnMap])
+
   const blocks = splitBlocks(processed)
   const hasSections = blocks.some((b) => b.type === 'h1' || b.type === 'h2')
 
@@ -264,7 +304,7 @@ export default function MarkdownContent({ content }: { content: string }) {
         blocks.map((block, i) => {
           if (block.type === 'intro') {
             return (
-              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
+              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
                 {block.body}
               </ReactMarkdown>
             )
@@ -277,25 +317,26 @@ export default function MarkdownContent({ content }: { content: string }) {
                 id={block.id}
                 intro={block.intro}
                 h2s={block.h2s}
+                components={components}
               />
             )
           }
           return (
-            <CollapsibleH2 key={block.id} heading={block.heading} id={block.id} body={block.body} />
+            <CollapsibleH2 key={block.id} heading={block.heading} id={block.id} body={block.body} components={components} />
           )
         })
       ) : (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
-          {content}
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+          {processed}
         </ReactMarkdown>
       )}
       {defs.length > 0 && (
         <div className="mt-6 pt-4 border-t border-wiki-border">
           <ol className="list-decimal pl-5 space-y-1 text-sm text-wiki-text-muted">
-            {defs.map(({ label, content, num }) => (
+            {defs.map(({ label, content: fnContent, num }) => (
               <li key={label} id={`fn-${label}`} value={num}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={bodyComponents}>
-                  {content}
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+                  {fnContent}
                 </ReactMarkdown>
                 <a href={`#fnref-${label}`} className="ml-1 text-wiki-accent hover:underline text-xs">↩</a>
               </li>

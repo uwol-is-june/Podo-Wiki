@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-001] 뷰어 각주 호버 툴팁
+  - `src/components/wiki/MarkdownContent.tsx` — 각주 번호(`[N]`)에 마우스 오버 시 내용이 팝업 툴팁으로 표시. `FootnoteTooltip` 컴포넌트 추가. `components` 객체를 `MarkdownContent` 내부에서 `useMemo`로 생성해 `fnMap` 기반 접근 가능하도록 구조 개선. `CollapsibleH1/H2`에 `components` prop 전달로 섹션 내 각주도 동작
+  - `src/components/wiki/MarkdownContent.tsx` — 섹션이 없는 문서에서 `content` 대신 `processed`를 렌더링하도록 버그 수정 (각주 refs HTML 미적용 문제)
+
+- [TASK-002] 에디터 본문/각주 영역 구분 시각화
+  - `src/components/wiki/WikiEditor.tsx` — TipTap `FootnoteDecorator` extension 추가. ProseMirror 플러그인으로 `[^N]:` 패턴 단락에 `fn-def` / `fn-def-first` CSS 클래스를 decoration으로 부여
+  - `src/app/globals.css` — `.ProseMirror p.fn-def` (연보라 배경, 작은 글자, muted 색상), `.fn-def-first` (상단 구분선) 스타일 추가
+
+- [TASK-003] 에디터 내 각주 참조 텍스트 강조
+  - `src/components/wiki/WikiEditor.tsx` — `FootnoteDecorator`에서 본문 단락 내 `[^N]` 패턴에 `fn-ref` inline decoration 부여
+  - `src/app/globals.css` — `.fn-ref` (보라 색상 + 연보라 배경) 스타일 추가
+
+### Changed
+- [TASK-004] 에디터 툴바 각주 버튼 명확화
+  - `src/components/wiki/WikiEditor.tsx` — 각주 삽입 버튼 레이블을 `[^]` → `각주[¹]`로 변경해 기능을 한눈에 인식 가능하도록 개선
+
+### Added
 - [TASK-004] 각주(footnote) 기능 추가
   - `src/components/wiki/FootnoteInsertModal.tsx` — 각주 내용 입력 모달 신규 생성
   - `src/components/wiki/WikiEditor.tsx` — 툴바에 `[^]` 각주 버튼 추가. 모달 확인 시 커서 위치에 `[^N]` 삽입, 문서 맨 끝에 `[^N]: 내용` 정의 자동 추가. N은 기존 정의 수+1 자동 부여
