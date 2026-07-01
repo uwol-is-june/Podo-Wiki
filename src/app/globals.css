@@ -66,22 +66,10 @@ body {
   background-color: rgba(106, 57, 192, 0.25);
 }
 
-/* 에디터 각주 정의 단락 시각 구분 */
+/* 에디터 각주 정의 단락 — 본문 참조([^N]) 클릭 시 뜨는 팝오버로 보기/수정/삭제가 가능하므로
+   본문 하단에 원본 텍스트를 그대로 노출하지 않고 숨김. 문서 데이터·저장·뷰어 렌더링에는 영향 없음 */
 .ProseMirror p.fn-def {
-  background-color: rgba(106, 57, 192, 0.05);
-  border-radius: 3px;
-  padding-left: 8px;
-  padding-right: 4px;
-  font-size: 0.875em;
-  color: var(--wiki-text-muted);
-}
-.ProseMirror p.fn-def-first {
-  border-top: 1px solid var(--wiki-border);
-  margin-top: 8px;
-  padding-top: 4px;
-}
-.dark .ProseMirror p.fn-def {
-  background-color: rgba(155, 109, 224, 0.08);
+  display: none;
 }
 
 /* 에디터 본문 내 각주 참조 [^n] 강조 — 배지 형태로 눈에 띄게 표시 (다른 UI 요소와 통일된 radius) */

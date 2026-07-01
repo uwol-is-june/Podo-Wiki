@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/app/globals.css` — `.fn-ref` (보라 색상 + 연보라 배경) 스타일 추가
 
 ### Changed
+- [TASK-033] 에디터 각주 정의 단락을 본문에서 숨김
+  - `src/app/globals.css` — `.ProseMirror p.fn-def`를 배경색 강조 스타일에서 `display: none`으로 변경. `[^N]` 참조 클릭 시 뜨는 팝오버로 보기/수정/삭제가 모두 가능해져, 본문 하단에 `[^N]: 내용` 원본 텍스트를 그대로 노출할 필요가 없어짐(TASK-002가 추가했던 시각 강조 스타일을 대체). 문서 데이터·저장·뷰어 렌더링에는 영향 없음
+  - `src/components/wiki/WikiEditor.tsx` — 더 이상 의미 없어진 `fn-def-first`(연속 정의 단락 중 첫 번째 구분) 클래스 부여 로직 제거
 - [TASK-031] 에디터 본문 내 각주 참조 마커 배지 스타일로 강화
   - `src/app/globals.css` — `.fn-ref`를 연보라 배경의 텍스트 강조에서 보라색 배경 + 흰 글씨(다크모드는 배경색 유지, 텍스트를 `--wiki-bg`로) 알약형 배지(`border-radius: 9999px`)로 변경, `font-weight: 600` 추가해 본문 텍스트와의 구분을 강화
 - [TASK-030] 페이지 하단 각주 목록 클릭 이동 방식 변경

@@ -191,11 +191,8 @@ const FootnoteDecorator = Extension.create<FootnoteDecoratorOptions>({
             const decorations: Decoration[] = []
             const { defs, refs } = collectFootnotes(state.doc)
 
-            let prevDefEnd = -1
             for (const d of defs) {
-              const cls = d.pos === prevDefEnd ? 'fn-def' : 'fn-def fn-def-first'
-              decorations.push(Decoration.node(d.pos, d.pos + d.nodeSize, { class: cls }))
-              prevDefEnd = d.pos + d.nodeSize
+              decorations.push(Decoration.node(d.pos, d.pos + d.nodeSize, { class: 'fn-def' }))
             }
             for (const r of refs) {
               decorations.push(Decoration.inline(r.from, r.to, { class: 'fn-ref' }))
