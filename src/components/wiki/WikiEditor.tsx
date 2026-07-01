@@ -370,13 +370,22 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
     const text = editor.state.doc.textContent
     const existingNums = [...text.matchAll(/\[\^(\d+)\]:/g)].map(m => parseInt(m[1], 10))
     const N = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-    const endPos = editor.state.doc.content.size
     // 참조([^N])와 정의(문서 맨 끝)를 한 트랜잭션에서 함께 삽입 — 두 트랜잭션으로 나누면
-    // 정의가 아직 없는 순간에 FootnoteDecorator의 재넘버링이 참조를 고아로 보고 지워버림
+    // 정의가 아직 없는 순간에 FootnoteDecorator의 재넘버링이 참조를 고아로 보고 지워버림.
+    // 참조를 먼저 넣어야 하는 이유: insertContentAt은 삽입 후 커서를 삽입된 내용 뒤로 옮기므로,
+    // 정의를 먼저 넣으면 뒤이은 참조 삽입이 원래 커서 위치가 아니라 문서 맨 끝(정의 옆)에 들어가버림.
+    // 정의는 참조 삽입 이후 시점의 문서 끝 위치(tr.doc.content.size)에 직접 삽입해 커서를 건드리지 않음.
     editor.chain()
       .focus()
-      .insertContentAt(endPos, { type: 'paragraph', content: [{ type: 'text', text: `[^${N}]: ${content}` }] })
       .insertContent(`[^${N}]`)
+      .command(({ tr, dispatch }) => {
+        if (dispatch) {
+          const pos = tr.doc.content.size
+          const defParagraph = editor.schema.nodes.paragraph.create(null, editor.schema.text(`[^${N}]: ${content}`))
+          tr.insert(pos, defParagraph)
+        }
+        return true
+      })
       .run()
     setFootnoteModalOpen(false)
   }, [editor])

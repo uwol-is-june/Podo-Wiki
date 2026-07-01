@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/components/wiki/WikiEditor.tsx` — 본문의 `[^N]` 마커 클릭 시 `handleClick`으로 감지해 내용 미리보기 + 수정/삭제 팝오버(`FootnoteRefPopover`)를 표시. 리액트 state 갱신은 `useMemo`로 만든 안정된 `EventTarget` 인스턴스를 통해 플러그인 → 컴포넌트로 이벤트 전달(React Compiler의 ref 불변성 규칙 때문에 `useRef` 콜백 패턴 대신 채택)
   - `src/components/wiki/FootnoteRefPopover.tsx` — 신규. 각주 클릭 팝오버(내용 보기/수정/삭제)
   - `src/components/wiki/FootnoteDeleteConfirmModal.tsx` — 신규. "이 각주를 삭제할까요?" 확인 모달 — 팝오버의 삭제 버튼과 백스페이스 차단 시 양쪽에서 공용으로 사용
-  - `src/components/wiki/WikiEditor.tsx` — `handleFootnoteConfirm`(각주 삽입)을 참조·정의 두 번의 `.run()` 호출에서 하나의 체인으로 합침. 두 트랜잭션으로 나뉘어 있으면 정의가 아직 없는 첫 트랜잭션 직후 재넘버링 로직이 방금 삽입한 참조를 고아로 보고 지워버리는 문제가 있어 수정 (ProseMirror 시뮬레이션 스크립트로 검증)
+  - `src/components/wiki/WikiEditor.tsx` — `handleFootnoteConfirm`(각주 삽입)을 참조·정의 두 번의 `.run()` 호출에서 하나의 체인으로 합침. 두 트랜잭션으로 나뉘어 있으면 정의가 아직 없는 첫 트랜잭션 직후 재넘버링 로직이 방금 삽입한 참조를 고아로 보고 지워버리는 문제가 있어 수정. 체인 내 순서는 참조(`insertContent`)를 먼저 넣고, 정의는 `.command()` 콜백에서 그 시점의 `tr.doc.content.size`에 직접 `tr.insert`로 추가 — `insertContentAt`은 기본적으로 삽입 후 커서를 삽입된 내용 뒤로 옮기므로(`updateSelection: true`), 정의를 먼저 넣으면 뒤이은 참조 삽입이 원래 커서 위치 대신 정의 문단 안에 들어가버려 각주가 추가되지 않는 것처럼 보이는 문제가 있었음 (ProseMirror 시뮬레이션 스크립트로 재현·검증)
 
 - [TASK-001] 뷰어 각주 호버 툴팁
   - `src/components/wiki/MarkdownContent.tsx` — 각주 번호(`[N]`)에 마우스 오버 시 내용이 팝업 툴팁으로 표시. `FootnoteTooltip` 컴포넌트 추가. `components` 객체를 `MarkdownContent` 내부에서 `useMemo`로 생성해 `fnMap` 기반 접근 가능하도록 구조 개선. `CollapsibleH1/H2`에 `components` prop 전달로 섹션 내 각주도 동작
