@@ -61,29 +61,32 @@ td.addRule('resizable-image', {
 type FootnoteRef = { label: string; from: number; to: number }
 type FootnoteDef = { label: string; content: string; pos: number; nodeSize: number; labelFrom: number; labelTo: number }
 
-// 문서를 훑어서 각주 정의 단락([^N]: 내용)과 본문 참조([^N])의 위치를 수집
+// 문서를 훑어서 각주 정의 단락([^N]: 내용)과 본문 참조([^N])의 위치를 수집.
+// 정의는 항상 문서 맨 끝에 최상위 단락으로만 생성되므로 최상위 단락만 검사하지만,
+// 참조는 목록/표 등 어디에나 있을 수 있어 문서 전체를 재귀적으로 훑어야 함
 function collectFootnotes(doc: PMNode): { defs: FootnoteDef[]; refs: FootnoteRef[] } {
   const defs: FootnoteDef[] = []
-  const refs: FootnoteRef[] = []
+  const defRanges: { from: number; to: number }[] = []
 
   doc.forEach((node, pos) => {
     if (node.type.name !== 'paragraph') return
     const text = node.textContent
     const defMatch = text.match(/^\[\^([^\]]+)\]:\s*([\s\S]*)$/)
-
     if (defMatch) {
       const label = defMatch[1]
       const labelFrom = pos + 3 // paragraph 내용 시작(pos+1) + "[^" 길이(2)
       defs.push({ label, content: defMatch[2], pos, nodeSize: node.nodeSize, labelFrom, labelTo: labelFrom + label.length })
-    } else {
-      node.descendants((child, relPos) => {
-        if (child.isText && child.text) {
-          for (const m of child.text.matchAll(/\[\^([^\]]+)\]/g)) {
-            const from = pos + 1 + relPos + (m.index ?? 0)
-            refs.push({ label: m[1], from, to: from + m[0].length })
-          }
-        }
-      })
+      defRanges.push({ from: pos, to: pos + node.nodeSize })
+    }
+  })
+
+  const refs: FootnoteRef[] = []
+  doc.descendants((node, pos) => {
+    if (!node.isText || !node.text) return
+    if (defRanges.some((r) => pos >= r.from && pos < r.to)) return // 정의 단락 자신의 [^N]: 은 참조로 세지 않음
+    for (const m of node.text.matchAll(/\[\^([^\]]+)\]/g)) {
+      const from = pos + (m.index ?? 0)
+      refs.push({ label: m[1], from, to: from + m[0].length })
     }
   })
 
@@ -186,32 +189,17 @@ const FootnoteDecorator = Extension.create<FootnoteDecoratorOptions>({
         props: {
           decorations(state) {
             const decorations: Decoration[] = []
-            let prevWasFootnoteDef = false
+            const { defs, refs } = collectFootnotes(state.doc)
 
-            state.doc.forEach((node, pos) => {
-              if (node.type.name === 'paragraph') {
-                const text = node.textContent
-                const isDefPara = /^\[\^[^\]]+\]:/.test(text)
-
-                if (isDefPara) {
-                  const cls = prevWasFootnoteDef ? 'fn-def' : 'fn-def fn-def-first'
-                  decorations.push(Decoration.node(pos, pos + node.nodeSize, { class: cls }))
-                  prevWasFootnoteDef = true
-                } else {
-                  prevWasFootnoteDef = false
-                  node.descendants((child, relPos) => {
-                    if (child.isText && child.text) {
-                      for (const m of child.text.matchAll(/\[\^[^\]]+\]/g)) {
-                        const from = pos + 1 + relPos + (m.index ?? 0)
-                        decorations.push(Decoration.inline(from, from + m[0].length, { class: 'fn-ref' }))
-                      }
-                    }
-                  })
-                }
-              } else {
-                prevWasFootnoteDef = false
-              }
-            })
+            let prevDefEnd = -1
+            for (const d of defs) {
+              const cls = d.pos === prevDefEnd ? 'fn-def' : 'fn-def fn-def-first'
+              decorations.push(Decoration.node(d.pos, d.pos + d.nodeSize, { class: cls }))
+              prevDefEnd = d.pos + d.nodeSize
+            }
+            for (const r of refs) {
+              decorations.push(Decoration.inline(r.from, r.to, { class: 'fn-ref' }))
+            }
 
             return DecorationSet.create(state.doc, decorations)
           },

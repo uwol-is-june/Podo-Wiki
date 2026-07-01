@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - [TASK-032] 각주 삭제 확인 모달 + 자동 재넘버링
-  - `src/components/wiki/WikiEditor.tsx` — `FootnoteDecorator`에 `filterTransaction`/`appendTransaction`을 추가. `collectFootnotes()`로 문서 내 각주 참조/정의 위치를 스캔하고, `applyFootnoteRenumber()`로 정의 없는 참조·참조 없는 정의를 정리한 뒤 남은 각주를 본문 등장 순서대로 1..n 재넘버링
+  - `src/components/wiki/WikiEditor.tsx` — `FootnoteDecorator`에 `filterTransaction`/`appendTransaction`을 추가. `collectFootnotes()`로 문서 내 각주 참조/정의 위치를 스캔하고, `applyFootnoteRenumber()`로 정의 없는 참조·참조 없는 정의를 정리한 뒤 남은 각주를 본문 등장 순서대로 1..n 재넘버링. 정의는 항상 최상위 단락으로만 생성되므로 최상위만 검사하지만, 참조는 목록·표 등 어디에나 있을 수 있어 `doc.descendants`로 문서 전체를 재귀 스캔하도록 함 — 처음엔 참조도 최상위 단락만 검사해서, 목록(`<ul><li>`) 안에 있는 실제 각주 참조(예: 광운극예술연구회 문서의 각주)를 못 찾고 "참조 없는 고아 정의"로 오인해 아무 편집에서나 삭제해버리는 심각한 버그가 있었음 (jsdom + 실제 TipTap Editor로 재현·검증)
   - `src/components/wiki/WikiEditor.tsx` — 본문 참조(`[^N]`)는 그대로인 채 정의만 사라지는 경우는 자동 허용(캐스케이드 삭제), 정의는 남았는데 참조만 사라지려는 트랜잭션(백스페이스/선택 삭제 포함)은 `filterTransaction`이 차단하고 삭제 확인 모달을 띄우도록 분기
   - `src/components/wiki/WikiEditor.tsx` — 본문의 `[^N]` 마커 클릭 시 `handleClick`으로 감지해 내용 미리보기 + 수정/삭제 팝오버(`FootnoteRefPopover`)를 표시. 리액트 state 갱신은 `useMemo`로 만든 안정된 `EventTarget` 인스턴스를 통해 플러그인 → 컴포넌트로 이벤트 전달(React Compiler의 ref 불변성 규칙 때문에 `useRef` 콜백 패턴 대신 채택)
   - `src/components/wiki/FootnoteRefPopover.tsx` — 신규. 각주 클릭 팝오버(내용 보기/수정/삭제)
