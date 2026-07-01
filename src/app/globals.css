@@ -84,11 +84,11 @@ body {
   background-color: rgba(155, 109, 224, 0.08);
 }
 
-/* 에디터 본문 내 각주 참조 [^n] 강조 — 배지 형태로 눈에 띄게 표시 */
+/* 에디터 본문 내 각주 참조 [^n] 강조 — 배지 형태로 눈에 띄게 표시 (다른 UI 요소와 통일된 radius) */
 .fn-ref {
   color: #fff;
   background-color: var(--wiki-accent);
-  border-radius: 9999px;
+  border-radius: 3px;
   padding: 0 6px;
   font-weight: 600;
   font-size: 0.85em;
