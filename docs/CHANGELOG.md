@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-032] 각주 삭제 확인 모달 + 자동 재넘버링
+  - `src/components/wiki/WikiEditor.tsx` — `FootnoteDecorator`에 `filterTransaction`/`appendTransaction`을 추가. `collectFootnotes()`로 문서 내 각주 참조/정의 위치를 스캔하고, `applyFootnoteRenumber()`로 정의 없는 참조·참조 없는 정의를 정리한 뒤 남은 각주를 본문 등장 순서대로 1..n 재넘버링
+  - `src/components/wiki/WikiEditor.tsx` — 본문 참조(`[^N]`)는 그대로인 채 정의만 사라지는 경우는 자동 허용(캐스케이드 삭제), 정의는 남았는데 참조만 사라지려는 트랜잭션(백스페이스/선택 삭제 포함)은 `filterTransaction`이 차단하고 삭제 확인 모달을 띄우도록 분기
+  - `src/components/wiki/WikiEditor.tsx` — 본문의 `[^N]` 마커 클릭 시 `handleClick`으로 감지해 내용 미리보기 + 수정/삭제 팝오버(`FootnoteRefPopover`)를 표시. 리액트 state 갱신은 `useMemo`로 만든 안정된 `EventTarget` 인스턴스를 통해 플러그인 → 컴포넌트로 이벤트 전달(React Compiler의 ref 불변성 규칙 때문에 `useRef` 콜백 패턴 대신 채택)
+  - `src/components/wiki/FootnoteRefPopover.tsx` — 신규. 각주 클릭 팝오버(내용 보기/수정/삭제)
+  - `src/components/wiki/FootnoteDeleteConfirmModal.tsx` — 신규. "이 각주를 삭제할까요?" 확인 모달 — 팝오버의 삭제 버튼과 백스페이스 차단 시 양쪽에서 공용으로 사용
+  - `src/components/wiki/WikiEditor.tsx` — `handleFootnoteConfirm`(각주 삽입)을 참조·정의 두 번의 `.run()` 호출에서 하나의 체인으로 합침. 두 트랜잭션으로 나뉘어 있으면 정의가 아직 없는 첫 트랜잭션 직후 재넘버링 로직이 방금 삽입한 참조를 고아로 보고 지워버리는 문제가 있어 수정 (ProseMirror 시뮬레이션 스크립트로 검증)
+
 - [TASK-001] 뷰어 각주 호버 툴팁
   - `src/components/wiki/MarkdownContent.tsx` — 각주 번호(`[N]`)에 마우스 오버 시 내용이 팝업 툴팁으로 표시. `FootnoteTooltip` 컴포넌트 추가. `components` 객체를 `MarkdownContent` 내부에서 `useMemo`로 생성해 `fnMap` 기반 접근 가능하도록 구조 개선. `CollapsibleH1/H2`에 `components` prop 전달로 섹션 내 각주도 동작
   - `src/components/wiki/MarkdownContent.tsx` — 섹션이 없는 문서에서 `content` 대신 `processed`를 렌더링하도록 버그 수정 (각주 refs HTML 미적용 문제)
@@ -22,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/app/globals.css` — `.fn-ref` (보라 색상 + 연보라 배경) 스타일 추가
 
 ### Changed
+- [TASK-031] 에디터 본문 내 각주 참조 마커 배지 스타일로 강화
+  - `src/app/globals.css` — `.fn-ref`를 연보라 배경의 텍스트 강조에서 보라색 배경 + 흰 글씨(다크모드는 배경색 유지, 텍스트를 `--wiki-bg`로) 알약형 배지(`border-radius: 9999px`)로 변경, `font-weight: 600` 추가해 본문 텍스트와의 구분을 강화
+- [TASK-030] 페이지 하단 각주 목록 클릭 이동 방식 변경
+  - `src/components/wiki/MarkdownContent.tsx` — 각주 목록을 `<ol class="list-decimal"><li value>` 네이티브 넘버링 + `↩` 역참조 링크 방식에서, `<ol class="list-none">` 기반으로 각 항목 앞에 `[N]` 텍스트를 `<a href="#fnref-${label}">`로 감싸 렌더링하는 방식으로 변경. `↩` 화살표 제거, `[N]` 클릭 시 해당 각주가 참조된 본문 위치로 스크롤 이동
 - [TASK-004] 에디터 툴바 각주 버튼 명확화
   - `src/components/wiki/WikiEditor.tsx` — 각주 삽입 버튼 레이블을 `[^]` → `각주[¹]`로 변경해 기능을 한눈에 인식 가능하도록 개선
 

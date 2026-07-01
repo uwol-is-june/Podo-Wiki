@@ -332,13 +332,17 @@ export default function MarkdownContent({ content }: { content: string }) {
       )}
       {defs.length > 0 && (
         <div className="mt-6 pt-4 border-t border-wiki-border">
-          <ol className="list-decimal pl-5 space-y-1 text-sm text-wiki-text-muted">
+          <ol className="list-none pl-0 space-y-1 text-sm text-wiki-text-muted">
             {defs.map(({ label, content: fnContent, num }) => (
-              <li key={label} id={`fn-${label}`} value={num}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
-                  {fnContent}
-                </ReactMarkdown>
-                <a href={`#fnref-${label}`} className="ml-1 text-wiki-accent hover:underline text-xs">↩</a>
+              <li key={label} id={`fn-${label}`} className="flex gap-1.5">
+                <a href={`#fnref-${label}`} className="text-wiki-accent hover:underline shrink-0">
+                  [{num}]
+                </a>
+                <span className="[&_p]:inline [&_p]:m-0">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+                    {fnContent}
+                  </ReactMarkdown>
+                </span>
               </li>
             ))}
           </ol>

@@ -84,15 +84,17 @@ body {
   background-color: rgba(155, 109, 224, 0.08);
 }
 
-/* 에디터 본문 내 각주 참조 [^n] 강조 */
+/* 에디터 본문 내 각주 참조 [^n] 강조 — 배지 형태로 눈에 띄게 표시 */
 .fn-ref {
-  color: var(--wiki-accent);
-  background-color: rgba(106, 57, 192, 0.1);
-  border-radius: 2px;
-  padding: 0 2px;
+  color: #fff;
+  background-color: var(--wiki-accent);
+  border-radius: 9999px;
+  padding: 0 6px;
+  font-weight: 600;
+  font-size: 0.85em;
 }
 .dark .fn-ref {
-  background-color: rgba(155, 109, 224, 0.15);
+  color: var(--wiki-bg);
 }
 
 /* Tiptap 이미지 리사이즈 핸들 */
