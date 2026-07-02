@@ -118,9 +118,14 @@ export default async function WikiPage({ params }: Props) {
       {/* 문서 헤더 */}
       <div className="mb-0">
         {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
-        <h1 className="text-2xl font-bold text-wiki-text mb-3">
-          {document.title}
-        </h1>
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <h1 className="text-2xl font-bold text-wiki-text">
+            {document.title}
+          </h1>
+          <div className="flex-shrink-0 pt-0.5">
+            <ShareButton title={document.title} url={ogUrl} />
+          </div>
+        </div>
         <div className="flex items-center gap-0 border-b border-wiki-border">
           <Link
             href={slugToHref(decodedSlug)}
@@ -140,10 +145,11 @@ export default async function WikiPage({ params }: Props) {
           >
             역사
           </Link>
-          <div className="ml-auto flex items-center">
-            <ShareButton title={document.title} url={ogUrl} />
-            {isApprovedUser && <DeletionRequestButton slug={decodedSlug} />}
-          </div>
+          {isApprovedUser && (
+            <div className="ml-auto flex items-center">
+              <DeletionRequestButton slug={decodedSlug} />
+            </div>
+          )}
         </div>
       </div>
 

@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- [TASK-035] 공유 버튼을 탭 텍스트에서 아이콘 형태로 재배치
+  - `src/components/wiki/ShareButton.tsx` — 트리거를 "공유" 텍스트 버튼에서 공유 아이콘(share SVG) 버튼으로 교체. `aria-label`/`title`/`aria-haspopup`/`aria-expanded` 접근성 속성과 hover 배경·포커스 링 추가. 드롭다운(링크 복사/공유하기) 로직은 그대로 유지
+  - `src/app/w/[...slug]/page.tsx` — `ShareButton`을 보기/수정/역사 탭 바에서 분리해 문서 제목(h1) 우측 액션 영역으로 이동(`flex items-start justify-between`). 삭제 신청 버튼은 탭 바 우측에 그대로 유지
+- [TASK-036] 포도위키:규칙 문서를 편집방침 하나로 통합
+  - `supabase/migrations/20260702010000_merge_rules_into_policy.sql` — 신규. `포도위키:편집방침` content를 이용 목적·시작하기(가입/승인)·문서 작성 규칙·에디터 사용법·인수인계 예시 구조·위반 시 조치·문의를 아우르는 통합본으로 교체(기존 규칙 문서의 편집 규칙/편집 방법 + 편집방침의 목적/작성 지침 중복 제거 후 병합). 중복되던 `포도위키:규칙` 문서는 DELETE(revisions/edit_locks/deletion_requests는 ON DELETE CASCADE). 도움말 문서에 남아 있던 `포도위키:규칙` 예시 링크는 편집방침으로 치환
+  - `src/app/page.tsx` — 빠른 링크에서 "편집 규칙"(`/w/포도위키:규칙`) 항목 제거, "편집방침" 링크만 유지
+
 ### Added
 - [TASK-004] 스켈레톤 로딩 shimmer 애니메이션
   - `src/components/ui/Skeleton.tsx` — 신규 공용 스켈레톤 컴포넌트. `relative overflow-hidden bg-wiki-border/40 rounded` 위에 `.skeleton` 클래스를 얹어 shimmer 오버레이 적용

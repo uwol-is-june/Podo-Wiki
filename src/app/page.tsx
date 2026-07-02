@@ -159,7 +159,6 @@ export default async function HomePage() {
             </h2>
             <nav className="space-y-0.5">
               {[
-                { href: '/w/포도위키:규칙', label: '편집 규칙' },
                 { href: '/w/포도위키:편집방침', label: '편집방침' },
                 { href: '/w/포도위키:도움말', label: '도움말' },
                 { href: '/w/포도상점', label: '포도상점' },
