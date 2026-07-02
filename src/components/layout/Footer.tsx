@@ -14,6 +14,14 @@ export default function Footer() {
           >
             CC BY-NC-SA 2.0 KR
           </a>
+          <span className="mx-2">·</span>
+          문의:{' '}
+          <a
+            href="mailto:podostore1111@gmail.com"
+            className="text-wiki-accent hover:underline whitespace-nowrap"
+          >
+            podostore1111@gmail.com
+          </a>
         </p>
       </div>
     </footer>

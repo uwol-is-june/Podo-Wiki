@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-004] 스켈레톤 로딩 shimmer 애니메이션
+  - `src/components/ui/Skeleton.tsx` — 신규 공용 스켈레톤 컴포넌트. `relative overflow-hidden bg-wiki-border/40 rounded` 위에 `.skeleton` 클래스를 얹어 shimmer 오버레이 적용
+  - `src/app/globals.css` — `.skeleton::after`에 좌→우로 흐르는 `linear-gradient` 하이라이트 + `@keyframes shimmer`(translateX -100%→100%) 추가. 하이라이트 색은 `--wiki-shimmer` 변수로 라이트(흰색 0.7)/다크(흰색 0.07) 각각 정의. `prefers-reduced-motion: reduce` 시 애니메이션 비활성
+  - `src/app/loading.tsx`, `src/app/search/loading.tsx`, `src/app/mypage/loading.tsx`, `src/app/recent/loading.tsx`, `src/app/edit/[...slug]/loading.tsx`, `src/app/w/[...slug]/loading.tsx` — 각 파일에 중복 정의돼 있던 로컬 `Skeleton`(`animate-pulse`)을 제거하고 공용 컴포넌트 import로 교체
+- [TASK-003] 전역 Footer에 문의 이메일 노출
+  - `src/components/layout/Footer.tsx` — 기존 저작권·CC 라이선스 줄에 이어 "문의: podostore1111@gmail.com" (mailto: 링크) 추가. Footer는 `src/app/layout.tsx`에서 공통 렌더되므로 대문 포함 전체 페이지 하단에 노출
+- [TASK-002] 문서 열람 페이지 공유하기 버튼
+  - `src/components/wiki/ShareButton.tsx` — 신규. 툴바 "공유" 버튼 클릭 시 드롭다운 팝오버 표시. "링크 복사"(Clipboard API로 문서 URL 복사 후 "복사됨!" 피드백, 2초 후 원복)와 "공유하기"(`navigator.share()` Web Share API — 모바일 OS 공유 시트에 카카오톡 등 자동 노출) 제공. `navigator.share` 미지원 환경(대부분의 데스크탑)에서는 마운트 후 `canNativeShare` 판별로 "공유하기" 항목을 숨겨 "링크 복사"만 노출. 바깥 클릭 시 팝오버 닫힘(`mousedown` 리스너)
+  - `src/app/w/[...slug]/page.tsx` — 툴바 우측(`ml-auto`) 영역에 `ShareButton` 배치, 삭제 신청 버튼과 나란히 정렬. URL은 기존 `ogUrl`(`https://podo-wiki.vercel.app/w/${slug}`) 재사용
+- [TASK-034] 문서 제목 자동 넘버링 (나무위키 스타일)
+  - `src/lib/wiki/headings.ts` — `extractHeadings()`가 반환하는 각 헤딩에 `number` 필드 추가. 신규 `numberHeadings()`가 레벨을 스택 기반으로 추적해 상위 레벨이 중간에 생략돼도(예: h1 다음 바로 h3) `1.0.1`이 아닌 `1.1`처럼 부모의 실제 자식 순번을 이어받는 번호를 매김
+  - `src/components/wiki/TableOfContents.tsx` — 목차 각 항목 앞에 번호 표시
+  - `src/components/wiki/MarkdownContent.tsx` — 기존에는 h3만 react-markdown이 본문을 파싱하며 그때그때 렌더링했는데, 번호를 안전하게 매기기 위해 h1/h2처럼 `splitH3()`로 문서 파싱 단계에서 h3도 미리 구조화된 트리(h1 → h2 → h3)로 뽑아낸 뒤 번호를 부여하도록 변경. 렌더 중 상태를 공유하는 카운터 대신 파싱 단계의 순수 함수로 번호를 계산해 React StrictMode의 이중 렌더에도 번호가 어긋나지 않도록 함. 이 과정에서 더 이상 쓰이지 않게 된 범용 `H3`/`extractText` 컴포넌트는 제거
+  - 번호 매김 시 h1 섹션의 intro(첫 h2 이전)에 h3가 먼저 나오는 경우, 그 h3가 형제 순번 한 칸을 이미 차지한 것으로 보고 이어지는 h2의 카운터를 그만큼 이어받게 해 번호 중복(예: h3와 h2가 똑같이 "1.1"이 되는 문제)을 방지
+  - 문서 최상단 h1 제목(`src/app/w/[...slug]/page.tsx` 문서 타이틀)에는 번호를 붙이지 않고, 본문 내부 제목에만 적용
 - [TASK-032] 각주 삭제 확인 모달 + 자동 재넘버링
   - `src/components/wiki/WikiEditor.tsx` — `FootnoteDecorator`에 `filterTransaction`/`appendTransaction`을 추가. `collectFootnotes()`로 문서 내 각주 참조/정의 위치를 스캔하고, `applyFootnoteRenumber()`로 정의 없는 참조·참조 없는 정의를 정리한 뒤 남은 각주를 본문 등장 순서대로 1..n 재넘버링. 정의는 항상 최상위 단락으로만 생성되므로 최상위만 검사하지만, 참조는 목록·표 등 어디에나 있을 수 있어 `doc.descendants`로 문서 전체를 재귀 스캔하도록 함 — 처음엔 참조도 최상위 단락만 검사해서, 목록(`<ul><li>`) 안에 있는 실제 각주 참조(예: 광운극예술연구회 문서의 각주)를 못 찾고 "참조 없는 고아 정의"로 오인해 아무 편집에서나 삭제해버리는 심각한 버그가 있었음 (jsdom + 실제 TipTap Editor로 재현·검증)
   - `src/components/wiki/WikiEditor.tsx` — 본문 참조(`[^N]`)는 그대로인 채 정의만 사라지는 경우는 자동 허용(캐스케이드 삭제), 정의는 남았는데 참조만 사라지려는 트랜잭션(백스페이스/선택 삭제 포함)은 `filterTransaction`이 차단하고 삭제 확인 모달을 띄우도록 분기
@@ -30,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/app/globals.css` — `.fn-ref` (보라 색상 + 연보라 배경) 스타일 추가
 
 ### Changed
+- 위키 `포도위키:규칙` 문서를 현재 툴바 기반 WYSIWYG 편집기 구조에 맞게 갱신
+  - `supabase/migrations/20260702000000_update_rules_doc.sql` — 신규. 이미 시드가 적용된 DB에도 반영되도록 `포도위키:규칙` 문서 content를 UPDATE. 기존 콘텐츠 정책(사실 기반·비하 금지·개인정보·저작권)은 유지하고, 실제 툴바 기능(글자 서식·글자색, 제목/목차 자동 번호, 목록·인용·코드블록·구분선, 링크·이미지 업로드·표, 각주 자동 넘버링, 편집 요약·편집 잠금·역사 되돌리기)을 반영한 "편집 방법" 섹션 추가. 마크다운 직접 입력을 전제하던 서술을 걷어냄
+  - `supabase/migrations/20260530000002_seed_documents.sql` — 신규 설치 DB에도 동일 내용이 시드되도록 `포도위키:규칙` 시드 본문 동기화
 - [TASK-033] 에디터 각주 정의 단락을 본문에서 숨김
   - `src/app/globals.css` — `.ProseMirror p.fn-def`를 배경색 강조 스타일에서 `display: none`으로 변경. `[^N]` 참조 클릭 시 뜨는 팝오버로 보기/수정/삭제가 모두 가능해져, 본문 하단에 `[^N]: 내용` 원본 텍스트를 그대로 노출할 필요가 없어짐(TASK-002가 추가했던 시각 강조 스타일을 대체). 문서 데이터·저장·뷰어 렌더링에는 영향 없음
   - `src/components/wiki/WikiEditor.tsx` — 더 이상 의미 없어진 `fn-def-first`(연속 정의 단락 중 첫 번째 구분) 클래스 부여 로직 제거

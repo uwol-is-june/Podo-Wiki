@@ -12,6 +12,7 @@
   --wiki-border: #ddd5f0;
   --wiki-header-bg: #6a39c0;
   --wiki-header-text: #ffffff;
+  --wiki-shimmer: rgba(255, 255, 255, 0.7);
 }
 
 .dark {
@@ -24,6 +25,7 @@
   --wiki-border: #352558;
   --wiki-header-bg: #1e1530;
   --wiki-header-text: #e5dff5;
+  --wiki-shimmer: rgba(255, 255, 255, 0.07);
 }
 
 @theme inline {
@@ -104,3 +106,32 @@ body {
 [data-resize-handle="top-left"] { cursor: nwse-resize; }
 [data-resize-handle="bottom-left"],
 [data-resize-handle="top-right"] { cursor: nesw-resize; }
+
+/* 스켈레톤 로딩 shimmer — 좌→우로 흐르는 하이라이트 오버레이.
+   요소에 relative/overflow-hidden을 함께 주면 ::after가 클립되어 모서리 radius를 따름 */
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--wiki-shimmer),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 모션 최소화 설정 사용자에게는 흐르는 애니메이션을 끄고 정적 블록으로 표시 */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}

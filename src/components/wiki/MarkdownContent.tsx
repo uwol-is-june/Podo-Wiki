@@ -9,17 +9,6 @@ import { slugify } from '@/lib/wiki/headings'
 
 type MarkdownComponents = React.ComponentProps<typeof ReactMarkdown>['components']
 
-function extractText(node: React.ReactNode): string {
-  if (typeof node === 'string') return node
-  if (Array.isArray(node)) return node.map(extractText).join('')
-  if (node && typeof node === 'object' && 'props' in node)
-    return extractText((node as React.ReactElement<{ children?: React.ReactNode }>).props.children)
-  return ''
-}
-
-function H3({ children, ...props }: ComponentPropsWithoutRef<'h3'>) {
-  return <h3 id={slugify(extractText(children))} {...props}>{children}</h3>
-}
 function Img({ src, alt, title, ...props }: ComponentPropsWithoutRef<'img'>) {
   let width: string | undefined
   let displayTitle = title
@@ -113,12 +102,45 @@ function processFootnotes(markdown: string): { processed: string; defs: Footnote
 
 // ── Parsing ──────────────────────────────────────────────────────────
 
-type H2Section = { heading: string; id: string; body: string }
+type H3Item = { heading: string; id: string; number: string; body: string }
+type H2Section = { heading: string; id: string; number: string; intro: string; h3s: H3Item[] }
 
 type Block =
-  | { type: 'intro'; body: string }
-  | { type: 'h1'; heading: string; id: string; intro: string; h2s: H2Section[] }
-  | { type: 'h2'; heading: string; id: string; body: string }
+  | { type: 'intro'; body: string; h3s: H3Item[] }
+  | { type: 'h1'; heading: string; id: string; number: string; intro: string; h3s: H3Item[]; h2s: H2Section[] }
+  | { type: 'h2'; heading: string; id: string; number: string; intro: string; h3s: H3Item[] }
+
+// h3(###) 줄을 기준으로 본문을 분리한다. h1/h2 헤딩 줄은 이미 걸러진 상태로 들어온다.
+function splitH3(text: string): { intro: string; h3s: Omit<H3Item, 'number'>[] } {
+  const introLines: string[] = []
+  const h3s: Omit<H3Item, 'number'>[] = []
+  let cur: { heading: string; id: string; buf: string[] } | null = null
+
+  const flush = () => {
+    if (cur) h3s.push({ heading: cur.heading, id: cur.id, body: cur.buf.join('\n').trim() })
+    cur = null
+  }
+
+  for (const line of text.split('\n')) {
+    const h3m = line.match(/^### (.+)/)
+    if (h3m) {
+      flush()
+      const heading = h3m[1].trim()
+      cur = { heading, id: slugify(heading), buf: [] }
+    } else if (cur) {
+      cur.buf.push(line)
+    } else {
+      introLines.push(line)
+    }
+  }
+  flush()
+
+  return { intro: introLines.join('\n').trim(), h3s }
+}
+
+function numberH3s(h3s: Omit<H3Item, 'number'>[], parentNumber: string): H3Item[] {
+  return h3s.map((h, i) => ({ ...h, number: parentNumber ? `${parentNumber}.${i + 1}` : `${i + 1}` }))
+}
 
 function splitBlocks(markdown: string): Block[] {
   type RawSeg =
@@ -156,26 +178,42 @@ function splitBlocks(markdown: string): Block[] {
   }
   flush()
 
+  // 나무위키 스타일 계층 번호(1 / 1.1 / 1.1.1)를 매기며 h1 > h2 > h3 트리로 조립한다.
+  // 상위 섹션의 intro에 h2/h3보다 먼저 나온 h3가 있으면, 그 h3가 형제 순번 한 칸을
+  // 이미 차지한 것으로 보고 다음 카운터를 그만큼 이어받는다 (번호 중복 방지).
+  let c1 = 0
   const blocks: Block[] = []
   let i = 0
   while (i < segs.length) {
     const seg = segs[i]
     if (seg.level === 'intro') {
-      blocks.push({ type: 'intro', body: seg.body })
+      const { intro, h3s } = splitH3(seg.body)
+      blocks.push({ type: 'intro', body: intro, h3s: numberH3s(h3s, '') })
+      c1 = h3s.length
       i++
     } else if (seg.level === 1) {
+      c1++
+      const number = `${c1}`
+      const { intro, h3s } = splitH3(seg.body)
       const h1Block: Block & { type: 'h1' } = {
-        type: 'h1', heading: seg.heading, id: seg.id, intro: seg.body, h2s: [],
+        type: 'h1', heading: seg.heading, id: seg.id, number, intro, h3s: numberH3s(h3s, number), h2s: [],
       }
       i++
+      let c2 = h3s.length
       while (i < segs.length && segs[i].level === 2) {
         const s = segs[i] as { level: 2; heading: string; id: string; body: string }
-        h1Block.h2s.push({ heading: s.heading, id: s.id, body: s.body })
+        c2++
+        const h2Number = `${number}.${c2}`
+        const sub = splitH3(s.body)
+        h1Block.h2s.push({ heading: s.heading, id: s.id, number: h2Number, intro: sub.intro, h3s: numberH3s(sub.h3s, h2Number) })
         i++
       }
       blocks.push(h1Block)
     } else {
-      blocks.push({ type: 'h2', heading: seg.heading, id: seg.id, body: seg.body })
+      c1++
+      const number = `${c1}`
+      const { intro, h3s } = splitH3(seg.body)
+      blocks.push({ type: 'h2', heading: seg.heading, id: seg.id, number, intro, h3s: numberH3s(h3s, number) })
       i++
     }
   }
@@ -199,7 +237,42 @@ function Caret({ open }: { open: boolean }) {
   )
 }
 
-function CollapsibleH2({ heading, id, body, components }: H2Section & { components: MarkdownComponents }) {
+function HeadingNumber({ number }: { number: string }) {
+  return <span className="text-wiki-text-muted mr-1.5">{number}.</span>
+}
+
+function H3Block({ heading, id, number, body, components }: H3Item & { components: MarkdownComponents }) {
+  return (
+    <section>
+      <h3 id={id}>
+        <HeadingNumber number={number} />
+        {heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}
+      </h3>
+      {body && (
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+          {body}
+        </ReactMarkdown>
+      )}
+    </section>
+  )
+}
+
+function IntroBlock({ body, h3s, components }: { body: string; h3s: H3Item[]; components: MarkdownComponents }) {
+  return (
+    <>
+      {body && (
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+          {body}
+        </ReactMarkdown>
+      )}
+      {h3s.map((h) => (
+        <H3Block key={h.id} {...h} components={components} />
+      ))}
+    </>
+  )
+}
+
+function CollapsibleH2({ heading, id, number, intro, h3s, components }: H2Section & { components: MarkdownComponents }) {
   const [open, setOpen] = useState(true)
   return (
     <section>
@@ -209,19 +282,29 @@ function CollapsibleH2({ heading, id, body, components }: H2Section & { componen
         onClick={() => setOpen((v) => !v)}
       >
         <Caret open={open} />
-        <span className="flex-1">{heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}</span>
+        <span className="flex-1">
+          <HeadingNumber number={number} />
+          {heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}
+        </span>
       </h2>
       {open && (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
-          {body}
-        </ReactMarkdown>
+        <>
+          {intro && (
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+              {intro}
+            </ReactMarkdown>
+          )}
+          {h3s.map((h) => (
+            <H3Block key={h.id} {...h} components={components} />
+          ))}
+        </>
       )}
     </section>
   )
 }
 
-function CollapsibleH1({ heading, id, intro, h2s, components }: {
-  heading: string; id: string; intro: string; h2s: H2Section[]; components: MarkdownComponents
+function CollapsibleH1({ heading, id, number, intro, h3s, h2s, components }: {
+  heading: string; id: string; number: string; intro: string; h3s: H3Item[]; h2s: H2Section[]; components: MarkdownComponents
 }) {
   const [open, setOpen] = useState(true)
   return (
@@ -232,7 +315,10 @@ function CollapsibleH1({ heading, id, intro, h2s, components }: {
         onClick={() => setOpen((v) => !v)}
       >
         <Caret open={open} />
-        <span className="flex-1">{heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}</span>
+        <span className="flex-1">
+          <HeadingNumber number={number} />
+          {heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}
+        </span>
       </h1>
       {open && (
         <>
@@ -241,6 +327,9 @@ function CollapsibleH1({ heading, id, intro, h2s, components }: {
               {intro}
             </ReactMarkdown>
           )}
+          {h3s.map((h) => (
+            <H3Block key={h.id} {...h} components={components} />
+          ))}
           {h2s.map((s) => (
             <CollapsibleH2 key={s.id} {...s} components={components} />
           ))}
@@ -279,7 +368,6 @@ export default function MarkdownContent({ content }: { content: string }) {
   const fnMap = useMemo(() => new Map(defs.map(d => [d.label, d])), [defs])
 
   const components: MarkdownComponents = useMemo(() => ({
-    h3: H3,
     img: Img,
     a: ({ href, children, className, ...props }: ComponentPropsWithoutRef<'a'>) => {
       if (className === 'footnote-ref') {
@@ -296,40 +384,39 @@ export default function MarkdownContent({ content }: { content: string }) {
   }), [fnMap])
 
   const blocks = splitBlocks(processed)
-  const hasSections = blocks.some((b) => b.type === 'h1' || b.type === 'h2')
 
   return (
     <div className={PROSE}>
-      {hasSections ? (
-        blocks.map((block, i) => {
-          if (block.type === 'intro') {
-            return (
-              <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
-                {block.body}
-              </ReactMarkdown>
-            )
-          }
-          if (block.type === 'h1') {
-            return (
-              <CollapsibleH1
-                key={block.id}
-                heading={block.heading}
-                id={block.id}
-                intro={block.intro}
-                h2s={block.h2s}
-                components={components}
-              />
-            )
-          }
+      {blocks.map((block, i) => {
+        if (block.type === 'intro') {
+          return <IntroBlock key={i} body={block.body} h3s={block.h3s} components={components} />
+        }
+        if (block.type === 'h1') {
           return (
-            <CollapsibleH2 key={block.id} heading={block.heading} id={block.id} body={block.body} components={components} />
+            <CollapsibleH1
+              key={block.id}
+              heading={block.heading}
+              id={block.id}
+              number={block.number}
+              intro={block.intro}
+              h3s={block.h3s}
+              h2s={block.h2s}
+              components={components}
+            />
           )
-        })
-      ) : (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
-          {processed}
-        </ReactMarkdown>
-      )}
+        }
+        return (
+          <CollapsibleH2
+            key={block.id}
+            heading={block.heading}
+            id={block.id}
+            number={block.number}
+            intro={block.intro}
+            h3s={block.h3s}
+            components={components}
+          />
+        )
+      })}
       {defs.length > 0 && (
         <div className="mt-6 pt-4 border-t border-wiki-border">
           <ol className="list-none pl-0 space-y-1 text-sm text-wiki-text-muted">

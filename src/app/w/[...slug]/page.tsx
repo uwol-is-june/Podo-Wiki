@@ -10,6 +10,7 @@ import TableOfContents from '@/components/wiki/TableOfContents'
 import UrlNormalizer from '@/components/wiki/UrlNormalizer'
 import Breadcrumb from '@/components/wiki/Breadcrumb'
 import DeletionRequestButton from '@/components/wiki/DeletionRequestButton'
+import ShareButton from '@/components/wiki/ShareButton'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 
 type Props = {
@@ -139,7 +140,10 @@ export default async function WikiPage({ params }: Props) {
           >
             역사
           </Link>
-          {isApprovedUser && <div className="ml-auto"><DeletionRequestButton slug={decodedSlug} /></div>}
+          <div className="ml-auto flex items-center">
+            <ShareButton title={document.title} url={ogUrl} />
+            {isApprovedUser && <DeletionRequestButton slug={decodedSlug} />}
+          </div>
         </div>
       </div>
 

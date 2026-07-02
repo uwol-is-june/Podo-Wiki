@@ -1,6 +1,4 @@
-const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`bg-wiki-border/40 rounded animate-pulse ${className ?? ''}`} />
-)
+import Skeleton from '@/components/ui/Skeleton'
 
 export default function RecentLoading() {
   return (

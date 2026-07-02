@@ -14,7 +14,7 @@ function TocList({
 }) {
   return (
     <ul className="space-y-0.5 text-sm">
-      {headings.map(({ level, text, id }) => (
+      {headings.map(({ level, text, id, number }) => (
         <li key={id} style={{ paddingLeft: `${(level - 1) * 12}px` }}>
           <a
             href={`#${id}`}
@@ -23,6 +23,7 @@ function TocList({
               activeId === id ? 'text-wiki-accent font-medium' : 'text-wiki-text-muted'
             }`}
           >
+            <span className="text-wiki-text-muted/70 mr-1">{number}.</span>
             {text}
           </a>
         </li>
