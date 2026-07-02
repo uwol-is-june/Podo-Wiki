@@ -227,23 +227,28 @@ type Props = {
 function ToolbarBtn({
   onClick,
   active,
+  disabled,
   title,
   children,
 }: {
   onClick: () => void
   active?: boolean
+  disabled?: boolean
   title: string
   children: React.ReactNode
 }) {
   return (
     <button
       type="button"
-      onMouseDown={(e) => { e.preventDefault(); onClick() }}
+      disabled={disabled}
+      onMouseDown={(e) => { e.preventDefault(); if (!disabled) onClick() }}
       title={title}
       className={`px-2 py-1 rounded text-sm transition-colors ${
-        active
-          ? 'bg-wiki-accent text-white'
-          : 'text-wiki-text hover:bg-wiki-border/60'
+        disabled
+          ? 'text-wiki-text-muted/40 cursor-not-allowed'
+          : active
+            ? 'bg-wiki-accent text-white'
+            : 'text-wiki-text hover:bg-wiki-border/60'
       }`}
     >
       {children}
@@ -558,6 +563,20 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           >
             1. 목록
           </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().liftListItem('listItem').run()}
+            disabled={!editor?.can().liftListItem('listItem')}
+            title="내어쓰기 — 상위 목록으로 (Shift+Tab)"
+          >
+            ⇤
+          </ToolbarBtn>
+          <ToolbarBtn
+            onClick={() => editor?.chain().focus().sinkListItem('listItem').run()}
+            disabled={!editor?.can().sinkListItem('listItem')}
+            title="들여쓰기 — 하위 목록으로 (Tab)"
+          >
+            ⇥
+          </ToolbarBtn>
 
           <span className="w-px h-5 bg-wiki-border mx-1" />
 
@@ -680,7 +699,9 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           [&_.ProseMirror_p]:my-2 [&_.ProseMirror_p]:leading-relaxed
           [&_.ProseMirror_a]:text-wiki-accent [&_.ProseMirror_a]:underline
           [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-2
+          [&_.ProseMirror_ul_ul]:list-[circle] [&_.ProseMirror_ul_ul_ul]:list-[square] [&_.ProseMirror_ul_ul_ul_ul]:list-disc
           [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:my-2
+          [&_.ProseMirror_ol_ol]:list-[lower-alpha] [&_.ProseMirror_ol_ol_ol]:list-[lower-roman] [&_.ProseMirror_ol_ol_ol_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
           [&_.ProseMirror_code]:bg-wiki-border/30 [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded [&_.ProseMirror_code]:text-sm [&_.ProseMirror_code]:font-mono
           [&_.ProseMirror_pre]:bg-wiki-bg [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-wiki-border [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-3 [&_.ProseMirror_pre]:overflow-x-auto

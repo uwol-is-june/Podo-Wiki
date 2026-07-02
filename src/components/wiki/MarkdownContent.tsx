@@ -350,7 +350,9 @@ const PROSE = `prose max-w-none text-wiki-text
   sm:[&_p]:my-3
   [&_a]:text-wiki-accent [&_a]:hover:underline
   [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
+  [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_ul_ul_ul_ul]:list-disc
   [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-3
+  [&_ol_ol]:list-[lower-alpha] [&_ol_ol_ol]:list-[lower-roman] [&_ol_ol_ol_ol]:list-decimal
   [&_li]:my-1
   [&_code]:bg-wiki-border/30 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono
   [&_pre]:bg-wiki-surface [&_pre]:border [&_pre]:border-wiki-border [&_pre]:rounded [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4

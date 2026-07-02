@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- [TASK-037] 목록 깊이별 마커 스타일 구분
+  - `src/components/wiki/WikiEditor.tsx` — ProseMirror 목록 스타일에 중첩 깊이별 `list-style-type` 추가. 순서 목록은 1단계 `decimal` → 2단계 `lower-alpha` → 3단계 `lower-roman` → 4단계 이후 `decimal`, 순서 없는 목록은 `disc` → `circle` → `square` → `disc`. 기존에는 모든 깊이가 `1. 2. 3.`(ol) / `•`(ul)로 동일해 Tab으로 만든 하위 목록의 계층 구분이 안 됐음
+  - `src/components/wiki/MarkdownContent.tsx` — 뷰어 `PROSE` 스타일에 동일한 깊이별 규칙 적용. 편집 화면과 열람 화면의 마커가 동일하게 표시됨
 - [TASK-035] 공유 버튼을 탭 텍스트에서 아이콘 형태로 재배치
   - `src/components/wiki/ShareButton.tsx` — 트리거를 "공유" 텍스트 버튼에서 공유 아이콘(share SVG) 버튼으로 교체. `aria-label`/`title`/`aria-haspopup`/`aria-expanded` 접근성 속성과 hover 배경·포커스 링 추가. 드롭다운(링크 복사/공유하기) 로직은 그대로 유지
   - `src/app/w/[...slug]/page.tsx` — `ShareButton`을 보기/수정/역사 탭 바에서 분리해 문서 제목(h1) 우측 액션 영역으로 이동(`flex items-start justify-between`). 삭제 신청 버튼은 탭 바 우측에 그대로 유지
@@ -17,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `src/app/page.tsx` — 빠른 링크에서 "편집 규칙"(`/w/포도위키:규칙`) 항목 제거, "편집방침" 링크만 유지
 
 ### Added
+- [TASK-038] 툴바에 목록 들여쓰기/내어쓰기 버튼 추가 (노션 스타일)
+  - `src/components/wiki/WikiEditor.tsx` — 번호 목록 버튼 옆에 내어쓰기(⇤)·들여쓰기(⇥) 버튼 추가. Tiptap `liftListItem('listItem')` / `sinkListItem('listItem')` 커맨드를 사용하고, `editor.can()` 판별로 실행 불가능한 상태(목록 밖이거나 더 이동할 수 없는 깊이)에서는 버튼 비활성화. 기존 Tab/Shift+Tab 키보드 조작은 그대로 유지(툴팁에 단축키 안내 병기)
+  - `ToolbarBtn` 컴포넌트에 `disabled` prop 추가 — 비활성 시 흐린 색상 + `cursor-not-allowed` 처리, 클릭 무시
 - [TASK-004] 스켈레톤 로딩 shimmer 애니메이션
   - `src/components/ui/Skeleton.tsx` — 신규 공용 스켈레톤 컴포넌트. `relative overflow-hidden bg-wiki-border/40 rounded` 위에 `.skeleton` 클래스를 얹어 shimmer 오버레이 적용
   - `src/app/globals.css` — `.skeleton::after`에 좌→우로 흐르는 `linear-gradient` 하이라이트 + `@keyframes shimmer`(translateX -100%→100%) 추가. 하이라이트 색은 `--wiki-shimmer` 변수로 라이트(흰색 0.7)/다크(흰색 0.07) 각각 정의. `prefers-reduced-motion: reduce` 시 애니메이션 비활성
