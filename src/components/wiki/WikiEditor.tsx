@@ -686,6 +686,8 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
             <ToolbarBtn onClick={() => editor?.chain().focus().addColumnBefore().run()} title="왼쪽에 열 추가">←+</ToolbarBtn>
             <ToolbarBtn onClick={() => editor?.chain().focus().addColumnAfter().run()} title="오른쪽에 열 추가">+→</ToolbarBtn>
             <ToolbarBtn onClick={() => editor?.chain().focus().deleteColumn().run()} title="열 삭제">×</ToolbarBtn>
+            <span className="w-px h-4 bg-wiki-border mx-1" />
+            <ToolbarBtn onClick={() => editor?.chain().focus().deleteTable().run()} title="표 삭제">표 ×</ToolbarBtn>
           </div>
         )}
         </div>
