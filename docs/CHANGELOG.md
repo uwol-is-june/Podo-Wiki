@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [TASK-039] 에디터 빈 줄(연속 Enter)이 저장 시 유실되는 문제 수정
+  - `src/components/wiki/WikiEditor.tsx` — turndown 생성 옵션에 `blankReplacement` 추가. TipTap의 빈 단락(`<p></p>`)은 turndown이 blank 노드로 분류해 일반 규칙(addRule)보다 먼저 `\n\n`으로 치환하는데, 이게 인접 단락 구분과 합쳐지며 빈 줄이 통째로 유실됐음(본문·인용 모두). 마크다운 자체도 연속 빈 줄을 하나로 접기 때문에 빈 `<p>`를 렌더링에서 살아남는 `&nbsp;` 단독 줄로 저장하도록 변경. 검증: 본문/인용/연속 빈 줄 모두 보존, 재편집 라운드트립(마크다운 → marked.parse → TipTap → turndown) 안정(재로드된 `<p>&nbsp;</p>`도 blank 노드로 동일 처리), micromark(react-markdown) 렌더링에서 빈 문단 유지, 리스트·표·이미지 변환 회귀 없음
+
 ### Changed
 - 포도위키:편집방침 문서를 도움말 하나로 통합
   - `supabase/migrations/20260704000000_merge_policy_into_help.sql` — 신규. `포도위키:도움말` content를 편집방침 통합본(이용 목적·시작하기·문서 작성 규칙·에디터 사용법·인수인계 예시 구조·위반 시 조치·문의) 기반에 도움말 고유의 "자주 묻는 질문" 섹션을 더한 통합본으로 교체. 도움말의 원시 마크다운 문법 안내 섹션은 툴바 기반 에디터 설명과 충돌하여 제외. 다른 문서에 남은 편집방침 링크(`[포도위키:편집방침]`, `/w/포도위키:편집방침`)는 도움말로 치환하고, 중복되던 `포도위키:편집방침` 문서는 DELETE(revisions/edit_locks/deletion_requests는 ON DELETE CASCADE)

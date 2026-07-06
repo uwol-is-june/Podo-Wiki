@@ -30,6 +30,11 @@ const td = new TurndownService({
   headingStyle: 'atx',
   codeBlockStyle: 'fenced',
   bulletListMarker: '-',
+  // 빈 단락(연속 Enter로 만든 빈 줄)은 기본 처리(\n\n)로는 인접 단락 구분과 합쳐져 유실됨.
+  // 마크다운도 연속 빈 줄을 하나로 접기 때문에 렌더링에서 살아남는 &nbsp; 줄로 저장.
+  // 빈 노드는 일반 규칙(addRule)보다 먼저 blankReplacement로 처리되므로 여기서 잡아야 함
+  blankReplacement: (_content, node) =>
+    node.nodeName === 'P' ? '\n\n&nbsp;\n\n' : (node as HTMLElement & { isBlock?: boolean }).isBlock ? '\n\n' : '',
 })
 
 // GFM tables 플러그인 대신 raw HTML로 저장 — 셀 안에 리스트·단락이 있어도 깨지지 않음
