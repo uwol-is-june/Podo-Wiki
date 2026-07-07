@@ -1,6 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { marked } from 'marked'
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+// CommonMark flanking 규칙상 **'000'**을 처럼 따옴표+한글 조사가 붙으면 강조가 안 먹는 문제 해결.
+// 읽기 화면(MarkdownContent)과 같은 remark 계열로 맞춰야 저장 문서가 에디터에서도 동일하게 파싱됨
+import remarkCjkFriendly from 'remark-cjk-friendly'
+import remarkCjkFriendlyGfmStrikethrough from 'remark-cjk-friendly-gfm-strikethrough'
+import remarkRehype from 'remark-rehype'
+import rehypeRaw from 'rehype-raw'
+import rehypeStringify from 'rehype-stringify'
 import type { Metadata } from 'next'
 import type { Document } from '@/lib/supabase/types'
 import { slugToHref, slugToEditHref } from '@/lib/wiki/slug'
@@ -91,11 +100,21 @@ export default async function EditPage({ params }: Props) {
     .eq('slug', decodedSlug)
     .single() as { data: Document | null }
 
-  // [^N] 패턴이 marked의 reference-style 링크로 잘못 파싱되는 것을 방지
+  // [^N] 패턴이 각주/reference-style 링크로 잘못 파싱되는 것을 방지
   const safeContent = (document?.content ?? '').replace(/\[\^/g, '&#91;^')
   const initialHtml = safeContent
-    ? (marked.parse(safeContent) as string)
-        .replace(/<img([^>]*?)\stitle="w=(\d+)"([^>]*)>/g, '<img$1 width="$2"$3>')
+    ? String(
+        await unified()
+          .use(remarkParse)
+          .use(remarkGfm)
+          .use(remarkCjkFriendly)
+          .use(remarkCjkFriendlyGfmStrikethrough)
+          // 표·색상 span 등 turndown이 raw HTML로 저장한 조각을 에디터 HTML에 살려야 함
+          .use(remarkRehype, { allowDangerousHtml: true })
+          .use(rehypeRaw)
+          .use(rehypeStringify)
+          .process(safeContent)
+      ).replace(/<img([^>]*?)\stitle="w=(\d+)"([^>]*)>/g, '<img$1 width="$2"$3>')
     : ''
 
   return (

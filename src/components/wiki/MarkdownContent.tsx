@@ -4,8 +4,13 @@ import { useState, useMemo } from 'react'
 import type { ComponentPropsWithoutRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+// CommonMark flanking 규칙상 **'000'**을 처럼 따옴표+한글 조사가 붙으면 강조가 안 먹는 문제 해결
+import remarkCjkFriendly from 'remark-cjk-friendly'
+import remarkCjkFriendlyGfmStrikethrough from 'remark-cjk-friendly-gfm-strikethrough'
 import rehypeRaw from 'rehype-raw'
 import { slugify } from '@/lib/wiki/headings'
+
+const remarkPlugins = [remarkGfm, remarkCjkFriendly, remarkCjkFriendlyGfmStrikethrough]
 
 type MarkdownComponents = React.ComponentProps<typeof ReactMarkdown>['components']
 
@@ -249,7 +254,7 @@ function H3Block({ heading, id, number, body, components }: H3Item & { component
         {heading.replace(/\[(.+?)\]\(.+?\)/g, '$1')}
       </h3>
       {body && (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+        <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={[rehypeRaw]} components={components}>
           {body}
         </ReactMarkdown>
       )}
@@ -261,7 +266,7 @@ function IntroBlock({ body, h3s, components }: { body: string; h3s: H3Item[]; co
   return (
     <>
       {body && (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+        <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={[rehypeRaw]} components={components}>
           {body}
         </ReactMarkdown>
       )}
@@ -290,7 +295,7 @@ function CollapsibleH2({ heading, id, number, intro, h3s, components }: H2Sectio
       {open && (
         <>
           {intro && (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+            <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={[rehypeRaw]} components={components}>
               {intro}
             </ReactMarkdown>
           )}
@@ -323,7 +328,7 @@ function CollapsibleH1({ heading, id, number, intro, h3s, h2s, components }: {
       {open && (
         <>
           {intro && (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+            <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={[rehypeRaw]} components={components}>
               {intro}
             </ReactMarkdown>
           )}
@@ -355,7 +360,7 @@ const PROSE = `prose max-w-none text-wiki-text
   [&_ol_ol]:list-[lower-alpha] [&_ol_ol_ol]:list-[lower-roman] [&_ol_ol_ol_ol]:list-decimal
   [&_li]:my-1
   [&_code]:bg-wiki-border/30 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono
-  [&_pre]:bg-wiki-surface [&_pre]:border [&_pre]:border-wiki-border [&_pre]:rounded [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4
+  [&_pre]:bg-wiki-surface [&_pre]:border [&_pre]:border-wiki-border [&_pre]:rounded [&_pre]:p-4 [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_pre]:my-4
   [&_pre_code]:bg-transparent [&_pre_code]:p-0
   [&_blockquote]:border-l-4 [&_blockquote]:border-wiki-accent [&_blockquote]:pl-4 [&_blockquote]:text-wiki-text-muted [&_blockquote]:my-4
   [&_table]:w-full [&_table]:border-collapse [&_table]:my-4
@@ -428,7 +433,7 @@ export default function MarkdownContent({ content }: { content: string }) {
                   [{num}]
                 </a>
                 <span className="[&_p]:inline [&_p]:m-0">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={components}>
+                  <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={[rehypeRaw]} components={components}>
                     {fnContent}
                   </ReactMarkdown>
                 </span>

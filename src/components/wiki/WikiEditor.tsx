@@ -711,7 +711,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           [&_.ProseMirror_ol_ol]:list-[lower-alpha] [&_.ProseMirror_ol_ol_ol]:list-[lower-roman] [&_.ProseMirror_ol_ol_ol_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
           [&_.ProseMirror_code]:bg-wiki-border/30 [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded [&_.ProseMirror_code]:text-sm [&_.ProseMirror_code]:font-mono
-          [&_.ProseMirror_pre]:bg-wiki-bg [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-wiki-border [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-3 [&_.ProseMirror_pre]:overflow-x-auto
+          [&_.ProseMirror_pre]:bg-wiki-bg [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-wiki-border [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-3 [&_.ProseMirror_pre]:whitespace-pre-wrap [&_.ProseMirror_pre]:break-words
           [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0
           [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-wiki-accent [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-wiki-text-muted [&_.ProseMirror_blockquote]:my-3
           [&_.ProseMirror_hr]:border-wiki-border [&_.ProseMirror_hr]:my-4

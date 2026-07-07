@@ -9,11 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [TASK-001] 볼드+작은따옴표(`**'000'**`) 렌더링 깨짐 수정
+  - **원인**: 코드 버그가 아닌 CommonMark flanking delimiter 규칙 — `**` 안쪽이 문장부호(`'`)이고 바깥쪽이 글자면 강조로 인식 안 됨. 한국어는 조사가 붙어(`**'000'**을`) 대부분 이 조건에 걸림. 읽기 화면(react-markdown/micromark)과 에디터 로드(marked) 모두 실패
+  - `src/components/wiki/MarkdownContent.tsx` — remarkPlugins에 `remark-cjk-friendly`(볼드/이탤릭) + `remark-cjk-friendly-gfm-strikethrough`(취소선) 추가, 5곳 반복되던 배열을 공용 상수로 정리. 렌더 측 수정이라 기존 저장 문서도 함께 복구됨
+  - `src/app/edit/[...slug]/page.tsx` — 에디터 로드용 md→HTML 변환을 marked에서 unified 파이프라인(remark-parse → remark-gfm → cjk-friendly ×2 → remark-rehype `allowDangerousHtml` → rehype-raw → rehype-stringify)으로 교체. marked에는 CJK 확장이 없고, 방치 시 재편집에서 리터럴 `**`가 turndown에 `\*\*`로 이스케이프돼 문서가 영구 손상되므로 필수. 기존 후처리(`[^`→`&#91;^`, img `title="w=N"`→width)는 유지. `marked` 의존성 제거
+  - 검증: 볼드/이탤릭/취소선 + 조사 케이스 렌더링 확인, 빈 줄(`&nbsp;` 단락)·각주 리터럴·raw HTML 표·색상 span·이미지 width 라운드트립 회귀 없음, `npm run build` 통과
 - [TASK-039] 에디터 빈 줄(연속 Enter)이 저장 시 유실되는 문제 수정
   - `src/components/wiki/WikiEditor.tsx` — turndown 생성 옵션에 `blankReplacement` 추가. TipTap의 빈 단락(`<p></p>`)은 turndown이 blank 노드로 분류해 일반 규칙(addRule)보다 먼저 `\n\n`으로 치환하는데, 이게 인접 단락 구분과 합쳐지며 빈 줄이 통째로 유실됐음(본문·인용 모두). 마크다운 자체도 연속 빈 줄을 하나로 접기 때문에 빈 `<p>`를 렌더링에서 살아남는 `&nbsp;` 단독 줄로 저장하도록 변경. 검증: 본문/인용/연속 빈 줄 모두 보존, 재편집 라운드트립(마크다운 → marked.parse → TipTap → turndown) 안정(재로드된 `<p>&nbsp;</p>`도 blank 노드로 동일 처리), micromark(react-markdown) 렌더링에서 빈 문단 유지, 리스트·표·이미지 변환 회귀 없음
 
 ### Changed
-- 포도위키:편집방침 문서를 도움말 하나로 통합
+- [TASK-002] 코드블록 가로 스크롤 → 자동 줄바꿈으로 변경
+  - `src/components/wiki/WikiEditor.tsx` — 에디터 ProseMirror `pre` 스타일에서 `overflow-x-auto`를 `whitespace-pre-wrap` + `break-words`로 교체. 긴 코드가 좌우 스크롤 대신 컨테이너 너비에 맞춰 자동 줄바꿈됨(공백 없는 긴 토큰도 `overflow-wrap`으로 강제 줄바꿈)
+  - `src/components/wiki/MarkdownContent.tsx` — 읽기 화면 `pre` 스타일에도 동일 규칙 적용해 편집/열람 화면 일관성 유지. 검증: 빌드 후 생성 CSS에 `white-space:pre-wrap`·`overflow-wrap:break-word` 규칙 포함 확인, `npm run build` 통과
   - `supabase/migrations/20260704000000_merge_policy_into_help.sql` — 신규. `포도위키:도움말` content를 편집방침 통합본(이용 목적·시작하기·문서 작성 규칙·에디터 사용법·인수인계 예시 구조·위반 시 조치·문의) 기반에 도움말 고유의 "자주 묻는 질문" 섹션을 더한 통합본으로 교체. 도움말의 원시 마크다운 문법 안내 섹션은 툴바 기반 에디터 설명과 충돌하여 제외. 다른 문서에 남은 편집방침 링크(`[포도위키:편집방침]`, `/w/포도위키:편집방침`)는 도움말로 치환하고, 중복되던 `포도위키:편집방침` 문서는 DELETE(revisions/edit_locks/deletion_requests는 ON DELETE CASCADE)
   - `src/app/page.tsx` — 빠른 링크에서 "편집방침" 항목 제거, "도움말" 링크만 유지
 - [TASK-037] 목록 깊이별 마커 스타일 구분
