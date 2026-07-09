@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [TASK-003] profiles에 role 컬럼 추가 + admin 페이지에서 관리자 권한 부여/해제
+  - `supabase/migrations/20260709000000_profiles_role.sql` — 신규. `profiles.role`(`member`|`admin`, 기본 `member`) 컬럼 + RLS용 `is_admin()` SECURITY DEFINER 함수(`is_approved()` 패턴, approved 상태도 함께 요구)
+  - `src/lib/admin/actions.ts` — `setProfileRole(userId, role)` 추가. 권한 부여는 민감 작업이라 다른 액션들과 달리 `checkAdminSession()` 통과를 요구
+  - `src/app/admin/AdminUserTable.tsx` — 권한 컬럼(관리자 배지) + 승인된 회원에 "관리자 지정/해제" 버튼(confirm 후 실행)
+  - `src/lib/supabase/types.ts` — profiles Row/Insert/Update에 role, `ProfileRole` 타입 export
+- [TASK-004] 보호 문서 메커니즘 — protected 문서는 관리자(role='admin')만 편집 가능
+  - `supabase/migrations/20260709000001_protected_documents.sql` — 신규. `documents.protected`(기본 false) 컬럼. documents INSERT/UPDATE/DELETE·revisions INSERT RLS 정책을 "protected면 `is_admin()` 필요"로 교체. `포도위키:도움말`·`포도상점`을 protected=true로 지정
+  - `src/app/edit/[...slug]/page.tsx` — 문서 조회를 락 체크 앞으로 이동, protected && 비관리자면 락을 잡지 않고 잠금 안내 화면 렌더(락 잠김 화면과 동일 스타일)
+  - `src/lib/wiki/actions.ts` — `saveDocument`는 보호 문서 저장 거부, `requestDocumentDeletion`은 보호 문서 삭제 신청 거부 (RLS와 이중 방어)
+  - `src/app/w/[...slug]/page.tsx` — 보호 문서면 비관리자에게 수정 탭 대신 잠금 아이콘 표시, 삭제 신청 버튼 숨김. 캐시된 문서 select에 protected 포함
+- [TASK-005] `포도위키:FAQ` 문서 시드
+  - `supabase/migrations/20260709000002_seed_faq.sql` — 신규. `## 질문` 헤딩 형식의 FAQ 6문항(공연권 허락·회원가입/승인·수정 권한·인수인계 작성·편집 되돌리기·기타 문의)을 protected=true로 시드. `포도상점` 문서도 없으면 빈 틀로 시드하고 둘 다 protected 보장(멱등)
+- [TASK-006] 메인 페이지 "자주 묻는 질문" 섹션
+  - `src/app/page.tsx` — `포도위키:FAQ` content를 조회해 `extractHeadings()`로 h2만 파싱, 공지사항과 최근 변경 사이에 질문 링크 리스트 카드 렌더(문서 없거나 h2 없으면 섹션 자체 숨김). 각 질문은 `/w/포도위키:FAQ#<앵커>`로 이동(문서 목차와 동일한 `slugify` id 규칙). 빠른 링크에 "자주 묻는 질문" 추가
+  - 검증: 마이그레이션 3건 원격 적용 후 REST로 protected 3건 확인, `next start`로 메인 질문 6개 앵커 링크·FAQ 문서 페이지 잠금 표시·헤딩 id 일치 확인, `npm run build` 통과
+
 ### Fixed
 - [TASK-001] 볼드+작은따옴표(`**'000'**`) 렌더링 깨짐 수정
   - **원인**: 코드 버그가 아닌 CommonMark flanking delimiter 규칙 — `**` 안쪽이 문장부호(`'`)이고 바깥쪽이 글자면 강조로 인식 안 됨. 한국어는 조사가 붙어(`**'000'**을`) 대부분 이 조건에 걸림. 읽기 화면(react-markdown/micromark)과 에디터 로드(marked) 모두 실패

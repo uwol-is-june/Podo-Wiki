@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
-import type { Profile } from '@/lib/supabase/types'
+import type { Profile, ProfileRole } from '@/lib/supabase/types'
 
 export type DeletionRequestWithDetails = {
   id: string
@@ -105,6 +105,21 @@ export async function rejectProfile(userId: string): Promise<AdminActionState> {
   revalidatePath('/admin')
   revalidatePath('/')
   return { error: '', success: '거부 완료' }
+}
+
+export async function setProfileRole(userId: string, role: ProfileRole): Promise<AdminActionState> {
+  // 권한 부여는 민감 작업이므로 서버 액션 호출 자체를 admin 세션으로 제한
+  if (!(await checkAdminSession())) return { error: '관리자 인증이 필요합니다.' }
+
+  const adminClient = createAdminClient()
+  const { error } = await adminClient
+    .from('profiles')
+    .update({ role })
+    .eq('id', userId)
+
+  if (error) return { error: error.message }
+  revalidatePath('/admin')
+  return { error: '', success: role === 'admin' ? '관리자로 지정했습니다.' : '관리자 권한을 해제했습니다.' }
 }
 
 export async function getDeletionRequests(): Promise<DeletionRequestWithDetails[]> {

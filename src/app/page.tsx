@@ -5,6 +5,9 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { TROUPES } from '@/data/troupes'
 import { slugToHref } from '@/lib/wiki/slug'
+import { extractHeadings } from '@/lib/wiki/headings'
+
+const FAQ_SLUG = '포도위키:FAQ'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +25,7 @@ type RevisionRow = {
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const [{ count: docCount }, { count: memberCount }, { data: recentRevisions }] =
+  const [{ count: docCount }, { count: memberCount }, { data: recentRevisions }, { data: faqDoc }] =
     await Promise.all([
       supabase.from('documents').select('slug', { count: 'exact', head: true }),
       createAdminClient().from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
@@ -31,7 +34,13 @@ export default async function HomePage() {
         .select('id, document_slug, edited_at, documents(title)')
         .order('edited_at', { ascending: false })
         .limit(5) as unknown as Promise<{ data: RevisionRow[] | null }>,
+      supabase.from('documents').select('content').eq('slug', FAQ_SLUG).maybeSingle(),
     ])
+
+  // FAQ 문서의 ## 헤딩이 곧 질문 목록 — 문서 페이지 목차와 같은 앵커 id 규칙 사용
+  const faqItems = faqDoc?.content
+    ? extractHeadings(faqDoc.content).filter((h) => h.level === 2)
+    : []
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
@@ -94,6 +103,33 @@ export default async function HomePage() {
               </p>
             </div>
           </section>
+
+          {/* 자주 묻는 질문 */}
+          {faqItems.length > 0 && (
+            <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-wiki-border">
+                <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide">
+                  자주 묻는 질문
+                </h2>
+                <Link href={slugToHref(FAQ_SLUG)} className="text-xs text-wiki-accent hover:underline">
+                  전체 보기
+                </Link>
+              </div>
+              <ul className="space-y-0.5">
+                {faqItems.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={`${slugToHref(FAQ_SLUG)}#${item.id}`}
+                      className="flex items-start gap-2 text-sm text-wiki-text hover:text-wiki-accent transition-colors py-1.5"
+                    >
+                      <span className="text-wiki-accent font-semibold shrink-0">Q.</span>
+                      {item.text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {/* 최근 변경 */}
           <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5">
@@ -160,6 +196,7 @@ export default async function HomePage() {
             <nav className="space-y-0.5">
               {[
                 { href: '/w/포도위키:도움말', label: '도움말' },
+                { href: '/w/포도위키:FAQ', label: '자주 묻는 질문' },
                 { href: '/w/포도상점', label: '포도상점' },
               ].map(({ href, label }) => (
                 <Link

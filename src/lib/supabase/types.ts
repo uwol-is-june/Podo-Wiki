@@ -7,6 +7,7 @@ export type Database = {
           title: string;
           content: string;
           author_id: string | null;
+          protected: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -15,6 +16,7 @@ export type Database = {
           title: string;
           content?: string;
           author_id?: string | null;
+          protected?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -23,6 +25,7 @@ export type Database = {
           title?: string;
           content?: string;
           author_id?: string | null;
+          protected?: boolean;
           updated_at?: string;
         };
         Relationships: [];
@@ -78,6 +81,7 @@ export type Database = {
           name: string;
           organization: string;
           status: 'pending' | 'approved' | 'rejected';
+          role: 'member' | 'admin';
           created_at: string;
         };
         Insert: {
@@ -85,12 +89,14 @@ export type Database = {
           name: string;
           organization: string;
           status?: 'pending' | 'approved' | 'rejected';
+          role?: 'member' | 'admin';
           created_at?: string;
         };
         Update: {
           name?: string;
           organization?: string;
           status?: 'pending' | 'approved' | 'rejected';
+          role?: 'member' | 'admin';
         };
         Relationships: [];
       };
@@ -131,4 +137,5 @@ export type Document = Database["public"]["Tables"]["documents"]["Row"];
 export type Revision = Database["public"]["Tables"]["revisions"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileStatus = Profile['status'];
+export type ProfileRole = Profile['role'];
 export type DeletionRequest = Database["public"]["Tables"]["deletion_requests"]["Row"];

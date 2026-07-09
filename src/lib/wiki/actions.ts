@@ -17,8 +17,18 @@ export async function saveDocument(
 
   if (!user) redirect(`/login?next=${encodeURIComponent(slugToEditHref(slug))}`)
 
-  const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('status, role').eq('id', user.id).single()
   if (!profile || profile.status !== 'approved') redirect('/pending')
+
+  // 보호 문서는 관리자만 저장 가능 (RLS와 이중 방어)
+  const { data: existingDoc } = await supabase
+    .from('documents')
+    .select('protected')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (existingDoc?.protected && profile.role !== 'admin') {
+    return { error: '관리자만 수정할 수 있는 보호 문서입니다.' }
+  }
 
   const docRow: Database['public']['Tables']['documents']['Insert'] = {
     slug,
@@ -51,8 +61,17 @@ export async function requestDocumentDeletion(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: '로그인이 필요합니다.' }
 
-  const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('status, role').eq('id', user.id).single()
   if (!profile || profile.status !== 'approved') return { error: '승인된 회원만 삭제 신청이 가능합니다.' }
+
+  const { data: targetDoc } = await supabase
+    .from('documents')
+    .select('protected')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (targetDoc?.protected && profile.role !== 'admin') {
+    return { error: '보호 문서는 삭제 신청할 수 없습니다.' }
+  }
 
   const { data: existing } = await supabase
     .from('deletion_requests')
