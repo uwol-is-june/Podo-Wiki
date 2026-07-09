@@ -1,4 +1,5 @@
 import { unstable_cache } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -63,6 +64,9 @@ async function fetchExistingSlugs(slugs: string[]): Promise<Set<string>> {
 export default async function WikiPage({ params }: Props) {
   const { slug } = await params
   const decodedSlug = slug.map(decodeURIComponent).join('/')
+
+  // FAQ는 전용 페이지 UI로 단일화 (에디터 저장/취소 후 복귀 흐름 포함)
+  if (decodedSlug === '포도위키:FAQ') redirect('/faq')
 
   const document = await fetchDocument(decodedSlug)
 

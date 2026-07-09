@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-007] FAQ 전용 페이지 `/faq` 신설 + FAQ 파싱 유틸
+  - `src/lib/wiki/faq.ts` — 신규. `parseFaqItems(content)`: `## ` 헤딩=질문, 다음 헤딩 전까지=답변(마크다운)으로 분리. id는 기존 `slugify()` 재사용이라 앵커 규칙이 문서 목차와 동일
+  - `src/app/faq/page.tsx` — 신규. force-dynamic 서버 컴포넌트, 위키 탭·목차 없는 전용 UI(max-w-3xl). 질문별 `<details open>` 카드(기본 펼침이라 앵커 딥링크 진입 시 답변 바로 보임, JS 불필요) + `id` 앵커 + `scroll-mt-20`. 답변은 ReactMarkdown을 RSC에서 직접 렌더(remarkGfm+cjk-friendly ×2+rehypeRaw — MarkdownContent의 플러그인 상수는 'use client' 모듈이라 서버 import 불가해 자체 구성), 경량 prose 스타일. 하단에 관리자(status+role 판정)만 "FAQ 문서 수정" 버튼, 그 외에는 문의 안내
+- [TASK-008] 메인 FAQ 섹션을 대표 질문 4개 + /faq 앵커 링크로 변경
+  - `src/app/page.tsx` — extractHeadings 대신 `parseFaqItems().slice(0, 4)`, 질문 링크를 `/faq#앵커`로, "전체 보기"·빠른 링크도 `/faq`로. 대표 4개 = 문서상 앞 4개 (관리자가 FAQ 문서 내 질문 순서로 노출 제어)
+- [TASK-009] `/w/포도위키:FAQ` → `/faq` 리다이렉트
+  - `src/app/w/[...slug]/page.tsx` — FAQ UI 단일화. 에디터 저장/취소 후 `/w/포도위키:FAQ`로 복귀하는 기존 흐름도 자동으로 /faq 안착. 편집(/edit)·역사(/history) 라우트는 그대로
+  - 검증: `next start`로 메인 앵커 링크 4개·/faq 카드 6개(id 일치)·답변 마크다운 렌더·비로그인 수정 버튼 미노출·리다이렉트(NEXT_REDIRECT 307) 확인, `npm run build` 통과
 - [TASK-003] profiles에 role 컬럼 추가 + admin 페이지에서 관리자 권한 부여/해제
   - `supabase/migrations/20260709000000_profiles_role.sql` — 신규. `profiles.role`(`member`|`admin`, 기본 `member`) 컬럼 + RLS용 `is_admin()` SECURITY DEFINER 함수(`is_approved()` 패턴, approved 상태도 함께 요구)
   - `src/lib/admin/actions.ts` — `setProfileRole(userId, role)` 추가. 권한 부여는 민감 작업이라 다른 액션들과 달리 `checkAdminSession()` 통과를 요구

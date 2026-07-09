@@ -5,9 +5,10 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { TROUPES } from '@/data/troupes'
 import { slugToHref } from '@/lib/wiki/slug'
-import { extractHeadings } from '@/lib/wiki/headings'
+import { parseFaqItems } from '@/lib/wiki/faq'
 
 const FAQ_SLUG = '포도위키:FAQ'
+const FAQ_PREVIEW_COUNT = 4
 
 export const dynamic = 'force-dynamic'
 
@@ -37,9 +38,9 @@ export default async function HomePage() {
       supabase.from('documents').select('content').eq('slug', FAQ_SLUG).maybeSingle(),
     ])
 
-  // FAQ 문서의 ## 헤딩이 곧 질문 목록 — 문서 페이지 목차와 같은 앵커 id 규칙 사용
+  // FAQ 문서의 ## 헤딩이 곧 질문 목록 — 대표 질문은 문서상 앞의 4개 (문서 내 순서로 노출 제어)
   const faqItems = faqDoc?.content
-    ? extractHeadings(faqDoc.content).filter((h) => h.level === 2)
+    ? parseFaqItems(faqDoc.content).slice(0, FAQ_PREVIEW_COUNT)
     : []
 
   return (
@@ -111,7 +112,7 @@ export default async function HomePage() {
                 <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide">
                   자주 묻는 질문
                 </h2>
-                <Link href={slugToHref(FAQ_SLUG)} className="text-xs text-wiki-accent hover:underline">
+                <Link href="/faq" className="text-xs text-wiki-accent hover:underline">
                   전체 보기
                 </Link>
               </div>
@@ -119,11 +120,11 @@ export default async function HomePage() {
                 {faqItems.map((item) => (
                   <li key={item.id}>
                     <Link
-                      href={`${slugToHref(FAQ_SLUG)}#${item.id}`}
+                      href={`/faq#${item.id}`}
                       className="flex items-start gap-2 text-sm text-wiki-text hover:text-wiki-accent transition-colors py-1.5"
                     >
                       <span className="text-wiki-accent font-semibold shrink-0">Q.</span>
-                      {item.text}
+                      {item.question}
                     </Link>
                   </li>
                 ))}
@@ -196,7 +197,7 @@ export default async function HomePage() {
             <nav className="space-y-0.5">
               {[
                 { href: '/w/포도위키:도움말', label: '도움말' },
-                { href: '/w/포도위키:FAQ', label: '자주 묻는 질문' },
+                { href: '/faq', label: '자주 묻는 질문' },
                 { href: '/w/포도상점', label: '포도상점' },
               ].map(({ href, label }) => (
                 <Link
