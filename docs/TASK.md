@@ -18,7 +18,6 @@ _없음_
 
 > 모바일 앱(읽기 전용 v1, Expo) 출시 트랙 — TASK-040부터 순서대로 진행. 상세 계획은 승인된 플랜 참조.
 
-- [ ] [TASK-041] (S) `mobile/` Expo 프로젝트 스캐폴드 → `npx create-expo-app@latest mobile`(TS + expo-router), 하단 탭 4개(홈/검색/최근 변경/더보기) + 문서 스택 뼈대, `globals.css`의 `--wiki-*` 라이트/다크 토큰을 `src/theme/colors.ts`로 복사, `.env`에 `EXPO_PUBLIC_SUPABASE_URL/ANON_KEY`, `app.json`에 이름 `포도위키`·scheme `podowiki`·번들 ID `com.podowiki.app`·`supportsTablet: false`.
 - [ ] [TASK-042] (O) 마크다운 렌더러 스파이크 (최대 리스크 우선) → `MarkdownContent.tsx`의 각주 전처리·섹션 분할·넘버링을 `mobile/src/lib/markdown/structure.ts`로 포팅, unified→HTML 파이프라인(`renderHtml.ts`) + CSS/인라인 JS 템플릿(접기·각주 탭 툴팁·링크 postMessage 가로채기) + `WikiWebView` 컴포넌트. 표·각주·`w=` 이미지·인라인 HTML 포함 실문서를 웹과 나란히 비교해 파리티 검증. 실패 시 접근 재검토.
 - [ ] [TASK-043] (S) 모바일 데이터 레이어 → `supabase.ts`(anon key, `persistSession:false`), `types.ts`·`slug.ts`·`headings.ts`·`faq.ts` 복사(`// Copied from ...` 헤더), `api.ts`에 getDocument/suggestDocuments/searchDocuments(ilike 2회 병합)/getRecentRevisions/getRandomSlug/getHistory/getRevision(Pair)/getFaqItems/getHomeData, react-query 프로바이더. 주의: 리비전 코멘트 컬럼은 `comment`, 편집자 이름은 profiles RLS로 불가 → `editor_id.slice(0,8)+'…'` 익명 표기.
 - [ ] [TASK-044] (S) 탭 화면 3종: 홈·검색·최근 변경 → 홈(단체 바로가기 그리드는 웹 절대 URL 로고, 총 문서 수, 최근 변경 5건, FAQ 프리뷰 4건 — 승인 회원 수는 service role 필요라 제외), 검색(디바운스 서제스트 + 결과 + 스니펫), 최근 변경(useInfiniteQuery 무한 스크롤, PAGE_SIZE 20, pull-to-refresh).

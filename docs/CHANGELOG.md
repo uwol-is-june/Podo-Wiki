@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-041] 모바일 앱 `mobile/` Expo 프로젝트 스캐폴드 (읽기 전용 v1 트랙 시작)
+  - `create-expo-app` SDK 57 템플릿(TS + expo-router) 기반, 데모 화면 제거 후 재구성. 라우트: 루트 Stack(`src/app/_layout.tsx`, 위키 테마 내비게이션) + `(tabs)` NativeTabs 4개(홈/검색/최근 변경/더보기) + 문서 스택(`w/[slug]`, `history/[slug]`, `revision/[id]`, `diff`, `faq`) — 현재는 플레이스홀더
+  - `src/theme/colors.ts` — globals.css `--wiki-*` 라이트/다크 토큰 복사본
+  - `app.json` — 이름 포도위키, slug podo-wiki, scheme podowiki, 번들 ID `com.podowiki.app`(양대), `supportsTablet: false`, `ITSAppUsesNonExemptEncryption: false`, 스플래시 라이트/다크 배경
+  - 의존성: react-native-webview, @supabase/supabase-js@2, @tanstack/react-query@5, diff@9, unified 파이프라인(웹과 동일 메이저). `.env`(gitignore) + `.env.example`
+  - 검증: `tsc --noEmit` 통과, `expo export --platform ios` Hermes 번들 생성 확인
 - [TASK-040] 개인정보처리방침 페이지 `/privacy` 신설 (모바일 앱 스토어 등록 요건)
   - `src/app/privacy/page.tsx` — 신규. 정적 서버 컴포넌트(max-w-3xl, faq 페이지와 동일 레이아웃 관례). 앱(수집 없음·익명 열람)과 웹사이트 회원 정보(이메일·이름·소속, 편집자 한정)를 분리 서술, Supabase 위탁 고지, 문의처 podostore1111@gmail.com. App Store "App Privacy: 데이터 수집 안 함" 및 Play "데이터 보안: 수집 없음" 신고와 일치하도록 작성
 - [TASK-007] FAQ 전용 페이지 `/faq` 신설 + FAQ 파싱 유틸
