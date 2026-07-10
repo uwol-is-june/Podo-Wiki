@@ -12,6 +12,7 @@ import {
   useColorScheme,
 } from 'react-native'
 
+import { ErrorState } from '@/components/error-state'
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
 import { TROUPES } from '@/data/troupes'
 import { editorLabel, formatDateTime, getHomeData, getRandomSlug } from '@/lib/api'
@@ -21,7 +22,7 @@ import { wikiTheme } from '@/theme/colors'
 export default function HomeScreen() {
   const router = useRouter()
   const theme = wikiTheme(useColorScheme())
-  const { data, isLoading, refetch, isRefetching } = useQuery({
+  const { data, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ['home'],
     queryFn: getHomeData,
   })
@@ -29,6 +30,14 @@ export default function HomeScreen() {
   const openRandom = async () => {
     const slug = await getRandomSlug()
     if (slug) router.push({ pathname: '/w/[slug]', params: { slug } })
+  }
+
+  if (isError) {
+    return (
+      <TabScreen title="포도위키">
+        <ErrorState onRetry={refetch} />
+      </TabScreen>
+    )
   }
 
   return (

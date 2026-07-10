@@ -8,10 +8,18 @@ import { renderWikiBodyHtml } from '@/lib/markdown/renderHtml'
 import { wikiHtmlDocument } from '@/lib/markdown/template'
 import { wikiTheme } from '@/theme/colors'
 
+type WikiWebViewProps = {
+  /** 위키 문서 마크다운 (bodyHtml과 둘 중 하나) */
+  content?: string
+  /** 사전 렌더링된 본문 HTML (FAQ 아코디언 등) */
+  bodyHtml?: string
+  footerText?: string
+}
+
 // 문서 본문 마크다운을 로컬 생성 HTML로 렌더링하는 WebView.
 // 링크는 전부 가로채서 네이티브 내비게이션으로 처리한다 (원격 페이지 로딩 없음).
-export const WikiWebView = forwardRef<WebView, { content: string; footerText?: string }>(
-  function WikiWebView({ content, footerText }, ref) {
+export const WikiWebView = forwardRef<WebView, WikiWebViewProps>(
+  function WikiWebView({ content, bodyHtml, footerText }, ref) {
   const router = useRouter()
   const scheme = useColorScheme()
   const theme = wikiTheme(scheme)
@@ -19,7 +27,8 @@ export const WikiWebView = forwardRef<WebView, { content: string; footerText?: s
 
   useEffect(() => {
     let cancelled = false
-    renderWikiBodyHtml(content).then(body => {
+    const bodyPromise = bodyHtml !== undefined ? Promise.resolve(bodyHtml) : renderWikiBodyHtml(content ?? '')
+    bodyPromise.then(body => {
       const footer = footerText
         ? `<p class="doc-meta">${footerText.replace(/</g, '&lt;')}</p>`
         : ''
@@ -28,7 +37,7 @@ export const WikiWebView = forwardRef<WebView, { content: string; footerText?: s
     return () => {
       cancelled = true
     }
-  }, [content, footerText, theme])
+  }, [content, bodyHtml, footerText, theme])
 
   const handleMessage = (event: WebViewMessageEvent) => {
     let msg: { type?: string; href?: string }

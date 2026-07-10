@@ -13,6 +13,7 @@ import type { Element, Root } from 'hast'
 
 import { processFootnotes, splitBlocks } from './structure'
 import type { Block, FootnoteDef, H2Section, H3Item } from './structure'
+import type { FaqItem } from '@/lib/wiki/faq'
 
 // 웹 Img 컴포넌트의 `w=` 타이틀 규칙 포팅: title="w=300" → width:300px
 function rehypeImgWidth() {
@@ -117,6 +118,21 @@ async function footnoteListHtml(defs: FootnoteDef[]): Promise<string> {
     })
   )
   return `<div class="footnotes"><ol>${items.join('')}</ol></div>`
+}
+
+/** FAQ 아코디언 HTML — 웹 /faq의 <details open> 카드와 동일 구조 */
+export async function renderFaqBodyHtml(items: FaqItem[]): Promise<string> {
+  const cards = await Promise.all(
+    items.map(async item => {
+      const answer = await mdToHtml(item.answer)
+      return (
+        `<details open id="${escapeHtml(item.id)}" class="faq-card">` +
+        `<summary><span class="faq-q">Q.</span><span class="faq-question">${escapeHtml(item.question)}</span></summary>` +
+        `<div class="faq-answer">${answer}</div></details>`
+      )
+    })
+  )
+  return cards.join('')
 }
 
 /** 위키 문서 마크다운 → 본문 HTML (템플릿 미포함, template.ts에서 감쌈) */

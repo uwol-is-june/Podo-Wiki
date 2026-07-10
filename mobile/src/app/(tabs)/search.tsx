@@ -12,6 +12,7 @@ import {
   useColorScheme,
 } from 'react-native'
 
+import { ErrorState } from '@/components/error-state'
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
 import { searchDocuments, suggestDocuments } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
@@ -36,7 +37,7 @@ export default function SearchScreen() {
   })
 
   // 제출: 본문 포함 전체 검색 (웹 /search와 동일)
-  const { data: results, isFetching } = useQuery({
+  const { data: results, isFetching, isError, refetch } = useQuery({
     queryKey: ['search', submitted],
     queryFn: () => searchDocuments(submitted),
     enabled: submitted.length > 0,
@@ -91,6 +92,8 @@ export default function SearchScreen() {
       ) : submitted ? (
         isFetching ? (
           <ActivityIndicator color={theme.accent} style={styles.loading} />
+        ) : isError ? (
+          <ErrorState onRetry={refetch} />
         ) : (
           <FlatList
             data={results ?? []}

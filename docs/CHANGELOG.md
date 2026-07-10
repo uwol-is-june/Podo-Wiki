@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-048] 모바일 앱 아이덴티티 + 상태 폴리시
+  - 앱 아이콘 세트 — `assets/wiki_logo.png`에서 픽셀아트 포도를 배경 제거(채도/명도 마스크) 후 합성: 스토어 아이콘 1024(라이트 배경, 알파 없음 — 애플 요건), Android adaptive 전경/배경(#f7f5fc)/모노크롬, 스플래시 아이콘(투명, 라이트 `#f7f5fc`/다크 `#130d1f` 배경은 app.json)
+  - `error-state.tsx` — 쿼리 실패 공통 컴포넌트("다시 시도"), 홈·검색·최근 변경·문서·역사·리비전·diff·FAQ 전 화면 연결
+  - 템플릿 데모 에셋(expo/react 로고, tabIcons 등) 정리. 날짜는 전 화면 `formatDateTime`(Asia/Seoul) 사용, 다크모드는 시스템 테마 추종
+  - 검증: tsc + expo export 통과. 실기기 확인(Expo Go)은 TASK-049에서
+- [TASK-047] 모바일 FAQ + 더보기 탭
+  - `faq.tsx` — FAQ 아코디언을 WebView `<details open>` 카드로 렌더(답변 마크다운 링크·목록 충실도 유지, 웹 /faq와 동일 구조). `renderFaqBodyHtml` 헬퍼 + 템플릿에 faq-card CSS 추가
+  - `(tabs)/more.tsx` — FAQ·랜덤 문서·웹사이트 열기·문서 신고/문의(mailto, 애플 UGC 1.2 대응)·개인정보처리방침 목록 + 앱 버전 정보
+  - `wiki-webview.tsx`에 bodyHtml prop 추가(사전 렌더링 HTML 지원)
+- [TASK-046] 모바일 히스토리·리비전·diff 화면
+  - `history/[slug].tsx` — r번호·수정 시각·익명 편집자·바이트 증감(±색상)·코멘트, 웹 RevisionList와 동일한 2개 선택 → "선택한 버전 비교" 흐름, 행 탭 → 리비전 보기
+  - `revision/[id].tsx` — 과거 버전 안내 배너(시각·편집자·코멘트 + 현재 문서 링크) + WikiWebView 재사용
+  - `diff.tsx` — `diffLines(older, newer)` 웹과 동일 정렬·행 렌더(+/− 부호, 취소선, 가로 스크롤), 라이트/다크 green·red 팔레트, 동일 버전 안내
 - [TASK-045] 모바일 문서 보기 화면 완성
   - `mobile/src/app/w/[slug].tsx` — WikiWebView 통합, 동적 헤더 제목(문서 title), 헤더 액션(목차·역사), 브레드크럼(존재하는 상위 문서만, 가로 스크롤), not-found 카드(읽기 전용 안내), `포도위키:FAQ` → `/faq` 리다이렉트(웹과 동일)
   - `mobile/src/components/toc-sheet.tsx` — 목차 바텀시트(레벨 들여쓰기+넘버링), 탭 시 `injectJavaScript`로 해당 헤딩 smooth 스크롤

@@ -10,6 +10,7 @@ import {
   useColorScheme,
 } from 'react-native'
 
+import { ErrorState } from '@/components/error-state'
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
 import { PAGE_SIZE, editorLabel, formatDateTime, getRecentRevisions } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
@@ -18,7 +19,7 @@ export default function RecentScreen() {
   const router = useRouter()
   const theme = wikiTheme(useColorScheme())
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching } =
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching } =
     useInfiniteQuery({
       queryKey: ['recent'],
       queryFn: ({ pageParam }) => getRecentRevisions(pageParam),
@@ -33,6 +34,8 @@ export default function RecentScreen() {
     <TabScreen title="최근 변경">
       {isLoading ? (
         <ActivityIndicator color={theme.accent} style={styles.loading} />
+      ) : isError ? (
+        <ErrorState onRetry={refetch} />
       ) : (
         <FlatList
           data={rows}

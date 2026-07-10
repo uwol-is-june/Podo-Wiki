@@ -80,6 +80,23 @@ img { max-width: 100%; border-radius: 4px; margin: 12px 0; }
 sup { font-size: 12px; line-height: 0; }
 .footnote-ref { color: var(--accent); }
 .doc-meta { margin-top: 24px; font-size: 12px; color: var(--text-muted); }
+.faq-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 12px; overflow: hidden;
+}
+.faq-card summary {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; cursor: pointer; -webkit-user-select: none; user-select: none;
+  list-style: none;
+}
+.faq-card summary::-webkit-details-marker { display: none; }
+.faq-q { color: var(--accent); font-weight: 700; }
+.faq-question { font-size: 14px; font-weight: 500; flex: 1; }
+.faq-answer {
+  padding: 4px 16px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  font-size: 14px;
+}
 .footnotes { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
 .footnotes ol { list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--text-muted); }
 .fn-item { display: flex; gap: 6px; margin: 4px 0; }

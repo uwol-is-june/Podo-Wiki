@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import type WebView from 'react-native-webview'
 
+import { ErrorState } from '@/components/error-state'
 import { TocSheet } from '@/components/toc-sheet'
 import { WikiWebView } from '@/components/wiki-webview'
 import { formatDateTime, getDocument, getExistingSlugs } from '@/lib/api'
@@ -26,7 +27,7 @@ export default function DocumentScreen() {
   const webviewRef = useRef<WebView>(null)
   const [tocVisible, setTocVisible] = useState(false)
 
-  const { data: document, isLoading } = useQuery({
+  const { data: document, isLoading, isError, refetch } = useQuery({
     queryKey: ['document', slug],
     queryFn: () => getDocument(slug),
     enabled: slug !== FAQ_SLUG,
@@ -90,6 +91,8 @@ export default function DocumentScreen() {
         <View style={styles.center}>
           <ActivityIndicator color={theme.accent} />
         </View>
+      ) : isError ? (
+        <ErrorState onRetry={refetch} />
       ) : !document ? (
         <View style={styles.center}>
           <View style={[styles.notFoundCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
