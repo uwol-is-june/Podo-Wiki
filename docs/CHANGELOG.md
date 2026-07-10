@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-042] 모바일 마크다운 렌더러 — WebView + 로컬 생성 HTML (스파이크 성공)
+  - `mobile/src/lib/markdown/structure.ts` — 웹 MarkdownContent.tsx의 각주 전처리·h1/h2/h3 섹션 분할·나무위키식 넘버링을 순수 함수로 포팅
+  - `mobile/src/lib/markdown/renderHtml.ts` — 웹과 동일 플러그인의 unified 파이프라인(remarkGfm+cjkFriendly×2+rehypeRaw)으로 HTML 생성. `w=` 이미지 폭은 rehype visitor로 처리
+  - `mobile/src/lib/markdown/template.ts` — PROSE 스타일을 평문 CSS로 번역한 HTML 셸 + 인라인 JS(섹션 접기, 각주 탭 툴팁, 링크 가로채기→postMessage)
+  - `mobile/src/components/wiki-webview.tsx` — 로컬 HTML 로딩 WebView. 내부 링크(/w/·/faq·/history·/recent)는 네이티브 push, 그 외는 브라우저로. 원격 URL 로딩 차단(애플 4.2 방어)
+  - `mobile/src/lib/wiki/headings.ts` — 웹에서 복사
+  - 검증: `scripts/render-sample.ts`(dev 유틸)로 기능 총망라 픽스처 + 실문서(포도위키:도움말 24섹션, FAQ) 렌더링 — 넘버링(1./2./2.1./2.1.1.)·각주·표·raw HTML·`w=` 폭·한글 앵커 웹과 일치 확인, Hermes 번들 포함 확인(expo export)
 - [TASK-041] 모바일 앱 `mobile/` Expo 프로젝트 스캐폴드 (읽기 전용 v1 트랙 시작)
   - `create-expo-app` SDK 57 템플릿(TS + expo-router) 기반, 데모 화면 제거 후 재구성. 라우트: 루트 Stack(`src/app/_layout.tsx`, 위키 테마 내비게이션) + `(tabs)` NativeTabs 4개(홈/검색/최근 변경/더보기) + 문서 스택(`w/[slug]`, `history/[slug]`, `revision/[id]`, `diff`, `faq`) — 현재는 플레이스홀더
   - `src/theme/colors.ts` — globals.css `--wiki-*` 라이트/다크 토큰 복사본
