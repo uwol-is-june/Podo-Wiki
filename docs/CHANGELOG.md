@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-044] 모바일 탭 화면 3종 — 홈·검색·최근 변경
+  - `mobile/src/components/tab-screen.tsx` — 탭 공통 셸(안전영역+큰 제목) + 탭 바 하단 여백 상수
+  - 홈 — 단체 바로가기 그리드(웹 절대 URL 로고, expo-image) + 랜덤 문서 카드, 총 문서 수, 최근 변경 5건, FAQ 프리뷰 4건, pull-to-refresh. 승인 회원 수는 service role 필요라 제외
+  - 검색 — 300ms 디바운스 서제스트(제목/슬러그) → 제출 시 본문 포함 전체 검색(스니펫 카드), 웹 /search와 동일 로직
+  - 최근 변경 — useInfiniteQuery 무한 스크롤(PAGE_SIZE 20), pull-to-refresh, 익명 편집자 표기
+  - 검증: typed routes 생성 후 tsc 통과, expo export 번들 확인
 - [TASK-043] 모바일 데이터 레이어 — Supabase anon key 직접 쿼리 + react-query
   - `mobile/src/lib/supabase.ts` — anon key 클라이언트(persistSession:false, 인증 없음)
   - `mobile/src/lib/api.ts` — 웹 서버 컴포넌트 쿼리 미러링(각 함수에 원본 위치 주석): getDocument/getExistingSlugs/getRandomSlug/suggestDocuments/searchDocuments/getRecentRevisions/getHistory/getRevision(Pair)/getFaqItems/getHomeData + editorLabel(익명 표기)·formatDateTime(Asia/Seoul)·extractSnippet. 검색은 `.or()` 대신 ilike 2회 병합(쉼표·괄호 문법 깨짐 회피)
