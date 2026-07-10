@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ed58a45a-2877-4aff-a765-6a7fd0e915e6"
+      }
+    },
+    "owner": "uwol-is-june"
   }
 }
