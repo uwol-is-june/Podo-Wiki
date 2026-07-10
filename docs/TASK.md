@@ -18,7 +18,6 @@ _없음_
 
 > 모바일 앱(읽기 전용 v1, Expo) 출시 트랙 — TASK-040부터 순서대로 진행. 상세 계획은 승인된 플랜 참조.
 
-- [ ] [TASK-043] (S) 모바일 데이터 레이어 → `supabase.ts`(anon key, `persistSession:false`), `types.ts`·`slug.ts`·`headings.ts`·`faq.ts` 복사(`// Copied from ...` 헤더), `api.ts`에 getDocument/suggestDocuments/searchDocuments(ilike 2회 병합)/getRecentRevisions/getRandomSlug/getHistory/getRevision(Pair)/getFaqItems/getHomeData, react-query 프로바이더. 주의: 리비전 코멘트 컬럼은 `comment`, 편집자 이름은 profiles RLS로 불가 → `editor_id.slice(0,8)+'…'` 익명 표기.
 - [ ] [TASK-044] (S) 탭 화면 3종: 홈·검색·최근 변경 → 홈(단체 바로가기 그리드는 웹 절대 URL 로고, 총 문서 수, 최근 변경 5건, FAQ 프리뷰 4건 — 승인 회원 수는 service role 필요라 제외), 검색(디바운스 서제스트 + 결과 + 스니펫), 최근 변경(useInfiniteQuery 무한 스크롤, PAGE_SIZE 20, pull-to-refresh).
 - [ ] [TASK-045] (S) 문서 보기 화면 `app/w/[slug].tsx` → WikiWebView 통합, 네이티브 TOC 바텀시트(`extractHeadings` + `injectJavaScript` 스크롤), 브레드크럼(getExistingSlugs), 내부 링크 → 네이티브 push / 외부 링크 → 브라우저, `포도위키:FAQ` → `/faq` 리다이렉트, not-found 상태. 슬러그 이동은 반드시 `router.push({pathname, params})` 객체 형태(한글·`/`·`:` 인코딩).
 - [ ] [TASK-046] (S) 히스토리·리비전·diff 화면 → 히스토리(바이트 수·증감, 2개 선택 → 비교), 리비전 보기(WikiWebView 재사용), diff(`diff@9` `diffLines`, edited_at 기준 older/newer 정렬, 네이티브 +/− 행 렌더).

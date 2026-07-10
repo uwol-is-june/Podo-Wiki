@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-043] 모바일 데이터 레이어 — Supabase anon key 직접 쿼리 + react-query
+  - `mobile/src/lib/supabase.ts` — anon key 클라이언트(persistSession:false, 인증 없음)
+  - `mobile/src/lib/api.ts` — 웹 서버 컴포넌트 쿼리 미러링(각 함수에 원본 위치 주석): getDocument/getExistingSlugs/getRandomSlug/suggestDocuments/searchDocuments/getRecentRevisions/getHistory/getRevision(Pair)/getFaqItems/getHomeData + editorLabel(익명 표기)·formatDateTime(Asia/Seoul)·extractSnippet. 검색은 `.or()` 대신 ilike 2회 병합(쉼표·괄호 문법 깨짐 회피)
+  - 웹에서 복사: `lib/supabase/types.ts`(documents/revisions만), `lib/wiki/slug.ts`, `lib/wiki/faq.ts`, `data/troupes.ts`
+  - `_layout.tsx`에 QueryClientProvider(staleTime 60s) + react-native-url-polyfill
+  - 검증: `scripts/api-check.ts`로 전 함수 프로덕션 실행 — 문서 11·리비전 148·FAQ 6 등 웹과 일치, 없는 문서 null 처리·diff 페어 정렬 확인
 - [TASK-042] 모바일 마크다운 렌더러 — WebView + 로컬 생성 HTML (스파이크 성공)
   - `mobile/src/lib/markdown/structure.ts` — 웹 MarkdownContent.tsx의 각주 전처리·h1/h2/h3 섹션 분할·나무위키식 넘버링을 순수 함수로 포팅
   - `mobile/src/lib/markdown/renderHtml.ts` — 웹과 동일 플러그인의 unified 파이프라인(remarkGfm+cjkFriendly×2+rehypeRaw)으로 HTML 생성. `w=` 이미지 폭은 rehype visitor로 처리

@@ -1,8 +1,15 @@
+import 'react-native-url-polyfill/auto'
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useColorScheme } from 'react-native'
 
 import { WikiColors } from '@/theme/colors'
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { staleTime: 60_000, retry: 1 } },
+})
 
 const WikiLightNav = {
   ...DefaultTheme,
@@ -33,7 +40,8 @@ export default function RootLayout() {
   const theme = scheme === 'dark' ? WikiColors.dark : WikiColors.light
 
   return (
-    <ThemeProvider value={scheme === 'dark' ? WikiDarkNav : WikiLightNav}>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={scheme === 'dark' ? WikiDarkNav : WikiLightNav}>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -50,6 +58,7 @@ export default function RootLayout() {
         <Stack.Screen name="diff" options={{ title: '비교' }} />
         <Stack.Screen name="faq" options={{ title: '자주 묻는 질문' }} />
       </Stack>
-    </ThemeProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 }
