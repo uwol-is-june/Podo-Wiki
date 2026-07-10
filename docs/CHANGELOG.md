@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-040] 개인정보처리방침 페이지 `/privacy` 신설 (모바일 앱 스토어 등록 요건)
+  - `src/app/privacy/page.tsx` — 신규. 정적 서버 컴포넌트(max-w-3xl, faq 페이지와 동일 레이아웃 관례). 앱(수집 없음·익명 열람)과 웹사이트 회원 정보(이메일·이름·소속, 편집자 한정)를 분리 서술, Supabase 위탁 고지, 문의처 podostore1111@gmail.com. App Store "App Privacy: 데이터 수집 안 함" 및 Play "데이터 보안: 수집 없음" 신고와 일치하도록 작성
 - [TASK-007] FAQ 전용 페이지 `/faq` 신설 + FAQ 파싱 유틸
   - `src/lib/wiki/faq.ts` — 신규. `parseFaqItems(content)`: `## ` 헤딩=질문, 다음 헤딩 전까지=답변(마크다운)으로 분리. id는 기존 `slugify()` 재사용이라 앵커 규칙이 문서 목차와 동일
   - `src/app/faq/page.tsx` — 신규. force-dynamic 서버 컴포넌트, 위키 탭·목차 없는 전용 UI(max-w-3xl). 질문별 `<details open>` 카드(기본 펼침이라 앵커 딥링크 진입 시 답변 바로 보임, JS 불필요) + `id` 앵커 + `scroll-mt-20`. 답변은 ReactMarkdown을 RSC에서 직접 렌더(remarkGfm+cjk-friendly ×2+rehypeRaw — MarkdownContent의 플러그인 상수는 'use client' 모듈이라 서버 import 불가해 자체 구성), 경량 prose 스타일. 하단에 관리자(status+role 판정)만 "FAQ 문서 수정" 버튼, 그 외에는 문의 안내
