@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-045] 모바일 문서 보기 화면 완성
+  - `mobile/src/app/w/[slug].tsx` — WikiWebView 통합, 동적 헤더 제목(문서 title), 헤더 액션(목차·역사), 브레드크럼(존재하는 상위 문서만, 가로 스크롤), not-found 카드(읽기 전용 안내), `포도위키:FAQ` → `/faq` 리다이렉트(웹과 동일)
+  - `mobile/src/components/toc-sheet.tsx` — 목차 바텀시트(레벨 들여쓰기+넘버링), 탭 시 `injectJavaScript`로 해당 헤딩 smooth 스크롤
+  - `wiki-webview.tsx`에 footerText prop 추가 — 본문 하단 "최종 수정" 메타 표기
 - [TASK-044] 모바일 탭 화면 3종 — 홈·검색·최근 변경
   - `mobile/src/components/tab-screen.tsx` — 탭 공통 셸(안전영역+큰 제목) + 탭 바 하단 여백 상수
   - 홈 — 단체 바로가기 그리드(웹 절대 URL 로고, expo-image) + 랜덤 문서 카드, 총 문서 수, 최근 변경 5건, FAQ 프리뷰 4건, pull-to-refresh. 승인 회원 수는 service role 필요라 제외

@@ -79,6 +79,7 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
 img { max-width: 100%; border-radius: 4px; margin: 12px 0; }
 sup { font-size: 12px; line-height: 0; }
 .footnote-ref { color: var(--accent); }
+.doc-meta { margin-top: 24px; font-size: 12px; color: var(--text-muted); }
 .footnotes { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
 .footnotes ol { list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--text-muted); }
 .fn-item { display: flex; gap: 6px; margin: 4px 0; }

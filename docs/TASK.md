@@ -18,7 +18,6 @@ _없음_
 
 > 모바일 앱(읽기 전용 v1, Expo) 출시 트랙 — TASK-040부터 순서대로 진행. 상세 계획은 승인된 플랜 참조.
 
-- [ ] [TASK-045] (S) 문서 보기 화면 `app/w/[slug].tsx` → WikiWebView 통합, 네이티브 TOC 바텀시트(`extractHeadings` + `injectJavaScript` 스크롤), 브레드크럼(getExistingSlugs), 내부 링크 → 네이티브 push / 외부 링크 → 브라우저, `포도위키:FAQ` → `/faq` 리다이렉트, not-found 상태. 슬러그 이동은 반드시 `router.push({pathname, params})` 객체 형태(한글·`/`·`:` 인코딩).
 - [ ] [TASK-046] (S) 히스토리·리비전·diff 화면 → 히스토리(바이트 수·증감, 2개 선택 → 비교), 리비전 보기(WikiWebView 재사용), diff(`diff@9` `diffLines`, edited_at 기준 older/newer 정렬, 네이티브 +/− 행 렌더).
 - [ ] [TASK-047] (S) FAQ + 더보기 탭 → FAQ 아코디언(parseFaqItems), 랜덤 문서 액션, 문서 신고/문의(mailto: podostore1111@gmail.com — 애플 UGC 1.2 대비), 앱 버전·개인정보처리방침 링크.
 - [ ] [TASK-048] (S) 앱 아이덴티티·폴리시 → 아이콘 1024×1024(투명도 제거 — 애플 알파 거절), adaptive-icon, 스플래시(라이트 `#f7f5fc`/다크 `#130d1f`), 전 화면 로딩·빈·에러 상태, 날짜 Asia/Seoul 포맷, 다크모드 점검.

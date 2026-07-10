@@ -10,10 +10,8 @@ import { wikiTheme } from '@/theme/colors'
 
 // 문서 본문 마크다운을 로컬 생성 HTML로 렌더링하는 WebView.
 // 링크는 전부 가로채서 네이티브 내비게이션으로 처리한다 (원격 페이지 로딩 없음).
-export const WikiWebView = forwardRef<WebView, { content: string }>(function WikiWebView(
-  { content },
-  ref
-) {
+export const WikiWebView = forwardRef<WebView, { content: string; footerText?: string }>(
+  function WikiWebView({ content, footerText }, ref) {
   const router = useRouter()
   const scheme = useColorScheme()
   const theme = wikiTheme(scheme)
@@ -22,12 +20,15 @@ export const WikiWebView = forwardRef<WebView, { content: string }>(function Wik
   useEffect(() => {
     let cancelled = false
     renderWikiBodyHtml(content).then(body => {
-      if (!cancelled) setHtml(wikiHtmlDocument(body, theme))
+      const footer = footerText
+        ? `<p class="doc-meta">${footerText.replace(/</g, '&lt;')}</p>`
+        : ''
+      if (!cancelled) setHtml(wikiHtmlDocument(body + footer, theme))
     })
     return () => {
       cancelled = true
     }
-  }, [content, theme])
+  }, [content, footerText, theme])
 
   const handleMessage = (event: WebViewMessageEvent) => {
     let msg: { type?: string; href?: string }
