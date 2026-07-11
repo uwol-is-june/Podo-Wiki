@@ -18,7 +18,6 @@ _없음_
 
 > 모바일 앱(읽기 전용 v1, Expo) 출시 트랙 — TASK-040부터 순서대로 진행. 상세 계획은 승인된 플랜 참조.
 
-- [ ] [TASK-049] (S) EAS 빌드 설정 + 실기기 검증 → `eas init`, `eas.json`(preview: internal·android apk / production: autoIncrement), EAS 관리형 인증서로 양대 preview 빌드, 실기기 확인.
 - [ ] [TASK-050] (S) 스토어 리스팅 준비 → iOS: ASC 앱 생성("포도위키", 카테고리 참고), 6.9" 스크린샷 3~5장, App Privacy "데이터 수집 안 함", 심사 노트(읽기 전용·로그인 없음·편집은 웹 승인 회원만) / Android: Play Console 앱 생성, 512 아이콘 + 1024×500 피처 그래픽 + 스크린샷 2장+, 데이터 보안 "수집 없음", IARC 등급, 카테고리 도서/참고자료.
 - [ ] [TASK-051] (S) 제출 및 심사 대응 → iOS: `eas submit -p ios` → TestFlight → 심사. Android: 첫 AAB 수동 업로드 → 내부 테스트 → (개인 계정이면 비공개 12명×14일) → 프로덕션 심사. 애플 4.2 반려 시 "네이티브 화면 + 본문만 로컬 생성 HTML" 소명. ⚠️ 사용자 확인: Play 계정 유형(2023-11 이후 개인 계정이면 14일 규정), App Store "포도위키" 이름 선점 여부.
 

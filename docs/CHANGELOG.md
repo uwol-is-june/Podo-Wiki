@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-049] EAS 빌드 설정 + iOS 실기기 검증
+  - `mobile/eas.json` — development(dev client)/preview(internal, android apk)/production(autoIncrement) 프로필. EAS 프로젝트 `@uwol-is-june/podo-wiki` 연결, Supabase 환경변수는 EAS 서버 환경변수로 등록(3개 환경)
+  - App Store의 Expo Go가 SDK 54까지만 지원해 Expo Go 대신 **개발 빌드(expo-dev-client)** 채택. iOS 기기 등록(ad hoc) 후 EAS 클라우드 빌드 → 실기기 설치
+  - 공유기 AP 격리로 자동 검색 실패 → LAN 수동 URL 연결로 해결 (터널은 폰 쪽 차단으로 불안정)
+  - 실기기 확인 완료: 전 화면 동작, UI 세부 다듬기는 추후 진행
 - [TASK-048] 모바일 앱 아이덴티티 + 상태 폴리시
   - 앱 아이콘 세트 — `assets/wiki_logo.png`에서 픽셀아트 포도를 배경 제거(채도/명도 마스크) 후 합성: 스토어 아이콘 1024(라이트 배경, 알파 없음 — 애플 요건), Android adaptive 전경/배경(#f7f5fc)/모노크롬, 스플래시 아이콘(투명, 라이트 `#f7f5fc`/다크 `#130d1f` 배경은 app.json)
   - `error-state.tsx` — 쿼리 실패 공통 컴포넌트("다시 시도"), 홈·검색·최근 변경·문서·역사·리비전·diff·FAQ 전 화면 연결
