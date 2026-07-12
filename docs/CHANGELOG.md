@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-050] 스토어 리스팅 준비 완료
+  - `mobile/store-listing.md` — 앱 설명·키워드·심사 노트(영문)·양대 스토어 양식 답변 가이드
+  - `mobile/store-assets/` — Play 512 아이콘, 1024×500 피처 그래픽(PIL 합성), 실기기 스크린샷 5장을 iOS 1284×2778(6.5형)·Play 1080×1920(9:16)으로 변환. 태블릿 슬롯은 폰 스크린샷 재사용
+- [TASK-051] 양대 스토어 심사 제출 (2026-07-12)
+  - iOS: `eas submit -p ios --latest`로 ASC 업로드 → 리스팅·App Privacy(데이터 수집 안 함)·콘텐츠 권한(제3자 콘텐츠 예)·심사 노트 입력 → **심사 대기 중**
+  - Android: 프로덕션 AAB(버전 코드 2) 수동 업로드, 앱 콘텐츠 신고 일체(광고 ID 미사용·데이터 수집 없음·전체이용가) 완료, 176개국 → **검토 중**. 조직 계정이라 14일 비공개 테스트 의무 없음
+  - Play 앱 이름은 "포도위키 - 공연단체 인수인계 아카이브"로 등록됨
 - [TASK-049] EAS 빌드 설정 + iOS 실기기 검증
   - `mobile/eas.json` — development(dev client)/preview(internal, android apk)/production(autoIncrement) 프로필. EAS 프로젝트 `@uwol-is-june/podo-wiki` 연결, Supabase 환경변수는 EAS 서버 환경변수로 등록(3개 환경)
   - App Store의 Expo Go가 SDK 54까지만 지원해 Expo Go 대신 **개발 빌드(expo-dev-client)** 채택. iOS 기기 등록(ad hoc) 후 EAS 클라우드 빌드 → 실기기 설치
