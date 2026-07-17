@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-054] 푸터에 모바일 앱 다운로드 배지 추가
+  - `src/components/layout/Footer.tsx` — 저작권 줄 위에 App Store·Google Play 공식 한국어 배지 링크 (전 페이지 노출)
+  - `public/badges/` — 애플 공식 SVG(마케팅 툴박스 ko-kr) + 구글 공식 PNG. 애플 h-10, 구글은 내장 여백 보정 h-[60px]로 시각 균형
 - [TASK-052] 🎉 모바일 앱 양대 스토어 심사 통과·정식 출시 (2026-07-13)
   - App Store: https://apps.apple.com/kr/app/id6790099095 ("포도위키 - 공연단체 인수인계 아카이브")
   - Google Play: https://play.google.com/store/apps/details?id=com.podowiki.app
