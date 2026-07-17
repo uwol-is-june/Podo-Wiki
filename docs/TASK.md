@@ -16,6 +16,7 @@ _없음_
 
 ## 대기 중
 
+- [ ] [TASK-054] (S) 웹사이트에 모바일 앱 다운로드 링크 추가 → 앱 정식 출시됨(2026-07-13). 홈 하단(또는 푸터)에 App Store·Google Play 배지 링크 추가. App Store: https://apps.apple.com/kr/app/id6790099095 / Play: https://play.google.com/store/apps/details?id=com.podowiki.app. 공식 배지 이미지(Apple "Download on the App Store" 한국어 배지, Google Play 배지)를 public/에 추가해 사용, 모바일 화면에서도 자연스럽게 보이도록.
 - [ ] [TASK-053] (O) Supabase 서울 리전 이전 → 현재 ap-southeast-1(싱가포르)이라 느림. **착수 조건: 양대 스토어 심사 통과 후** (심사 중인 앱 바이너리가 싱가포르 URL을 사용하므로 옛 프로젝트를 먼저 건드리면 안 됨). 절차: ① 사용자가 서울(ap-northeast-2) 새 프로젝트 생성 ② 전체 덤프·복원(스키마+데이터+RLS+함수+auth 사용자 — 비밀번호 해시 보존) ③ 데이터 검증(문서·리비전·profiles 수 대조) ④ env 교체(Vercel·.env.local·mobile/.env·EAS env 3개 환경) ⑤ 웹 재배포 ⑥ 앱 1.0.1 빌드·스토어 업데이트 제출 ⑦ 1.0.1 확산 후(1~2주) 옛 프로젝트 정리. 이사 중 웹 편집 일시 중지 필요.
 
 ---
