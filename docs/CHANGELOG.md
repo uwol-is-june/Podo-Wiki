@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [TASK-052] 🎉 모바일 앱 양대 스토어 심사 통과·정식 출시 (2026-07-13)
+  - App Store: https://apps.apple.com/kr/app/id6790099095 ("포도위키 - 공연단체 인수인계 아카이브")
+  - Google Play: https://play.google.com/store/apps/details?id=com.podowiki.app
+  - 반려 없이 1차 통과 (애플 4.2/1.2 방어 전략 유효)
 - [TASK-050] 스토어 리스팅 준비 완료
   - `mobile/store-listing.md` — 앱 설명·키워드·심사 노트(영문)·양대 스토어 양식 답변 가이드
   - `mobile/store-assets/` — Play 512 아이콘, 1024×500 피처 그래픽(PIL 합성), 실기기 스크린샷 5장을 iOS 1284×2778(6.5형)·Play 1080×1920(9:16)으로 변환. 태블릿 슬롯은 폰 스크린샷 재사용
