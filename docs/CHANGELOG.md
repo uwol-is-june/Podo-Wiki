@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [TASK-055] 프로덕션 전면 500 장애 복구 + middleware→proxy 마이그레이션 (2026-07-17~18)
+  - 원인: Vercel 플랫폼 장애("Hobby 팀 새 배포의 함수 호출 실패 증가" — 이후 공식 인시던트 게시). 미들웨어 런타임이 배포 env 파일을 못 읽는 `EnvFileReadError`. 우리 코드·env·Supabase는 모두 정상으로 확인
+  - 복구: 직전 정상 배포로 `vercel promote` 롤백 → 장애 완화(monitoring) 후 재배포 성공, 전 라우트 200 확인
+  - `middleware.ts` → `src/proxy.ts` 마이그레이션 — Next 16에서 middleware 컨벤션 deprecated. 함수명 `proxy`로 변경, Supabase 세션 갱신 로직·matcher 동일. src/ 구조에서는 proxy.ts가 src/ 안에 있어야 인식됨(루트에 두면 조용히 무시 — 빌드 출력의 `ƒ Proxy` 라인으로 확인)
+
 ### Added
 - [TASK-054] 푸터에 모바일 앱 다운로드 배지 추가
   - `src/components/layout/Footer.tsx` — 저작권 줄 위에 App Store·Google Play 공식 한국어 배지 링크 (전 페이지 노출)
