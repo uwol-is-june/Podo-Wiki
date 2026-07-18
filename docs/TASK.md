@@ -16,7 +16,7 @@ _없음_
 
 ## 대기 중
 
-- [ ] [TASK-053] (O) Supabase 서울 리전 이전 → 현재 ap-southeast-1(싱가포르)이라 느림. **착수 조건: 양대 스토어 심사 통과 후** (심사 중인 앱 바이너리가 싱가포르 URL을 사용하므로 옛 프로젝트를 먼저 건드리면 안 됨). 절차: ① 사용자가 서울(ap-northeast-2) 새 프로젝트 생성 ② 전체 덤프·복원(스키마+데이터+RLS+함수+auth 사용자 — 비밀번호 해시 보존) ③ 데이터 검증(문서·리비전·profiles 수 대조) ④ env 교체(Vercel·.env.local·mobile/.env·EAS env 3개 환경) ⑤ 웹 재배포 ⑥ 앱 1.0.1 빌드·스토어 업데이트 제출 ⑦ 1.0.1 확산 후(1~2주) 옛 프로젝트 정리. 이사 중 웹 편집 일시 중지 필요.
+- [ ] [TASK-053] (O) Supabase 서울 리전 이전 → 현재 ap-southeast-1(싱가포르)이라 느림. **착수 조건: 양대 스토어 심사 통과 후** (심사 중인 앱 바이너리가 싱가포르 URL을 사용하므로 옛 프로젝트를 먼저 건드리면 안 됨). 절차: ① 사용자가 서울(ap-northeast-2) 새 프로젝트 생성 ② 전체 덤프·복원(스키마+데이터+RLS+함수+auth 사용자 — 비밀번호 해시 보존) ③ 데이터 검증(문서·리비전·profiles 수 대조) ④ env 교체(Vercel·.env.local·mobile/.env·EAS env 3개 환경) ⑤ **새 프로젝트 Auth URL 설정** — Authentication → URL Configuration에서 Site URL `https://podo-wiki.vercel.app`, Redirect URLs에 `https://podo-wiki.vercel.app/**`·`http://localhost:3000/**` 추가 (2026-07-18 기존 프로젝트에서 localhost 폴백 사고 재발 방지) ⑥ 웹 재배포 ⑦ 앱 1.0.1 빌드·스토어 업데이트 제출 ⑧ 1.0.1 확산 후(1~2주) 옛 프로젝트 정리. 이사 중 웹 편집 일시 중지 필요.
 
 ---
 
