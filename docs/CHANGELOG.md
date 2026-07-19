@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [TASK-056] 안드로이드 앱 전면 크래시 수정 — 1.0.1 Play 스토어 제출 (2026-07-19)
+  - 증상: 갤럭시에서 문서·FAQ 등 콘텐츠를 누르면 즉시 앱 종료 (탭 바는 정상, iOS 무관)
+  - 원인: `mobile/src/components/wiki-webview.tsx`의 `decelerationRate="normal"` — Android 신아키텍처 codegen이 Double 강제 캐스팅하며 `ClassCastException`. WebView 화면 push 즉시 크래시
+  - 확정 과정: 로컬 Mac에 Android SDK·에뮬레이터(AVD `galaxy-repro`, Android 16) 구축 → 릴리스 빌드로 재현 → logcat 스택 트레이스 확보. 수정 후 전 화면(문서·목차·역사·FAQ·최근 변경·검색·더보기) 크래시 0건 검증
+  - 1.0.1(versionCode 4) EAS 빌드 → Play Console 수동 업로드·프로덕션 제출 완료, 심사 대기 중
+  - 교훈: iOS 전용 문자열 enum을 받는 크로스플랫폼 prop은 Android 신아키텍처에서 fatal. 1.0.0은 Android 실기기 미검증 출시였음 — 이후 릴리스는 에뮬레이터 검증 필수
 - [TASK-055] 프로덕션 전면 500 장애 복구 + middleware→proxy 마이그레이션 (2026-07-17~18)
   - 원인: Vercel 플랫폼 장애("Hobby 팀 새 배포의 함수 호출 실패 증가" — 이후 공식 인시던트 게시). 미들웨어 런타임이 배포 env 파일을 못 읽는 `EnvFileReadError`. 우리 코드·env·Supabase는 모두 정상으로 확인
   - 복구: 직전 정상 배포로 `vercel promote` 롤백 → 장애 완화(monitoring) 후 재배포 성공, 전 라우트 200 확인
