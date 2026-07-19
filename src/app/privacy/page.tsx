@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: '개인정보처리방침 — 포도위키',
 }
 
-const CONTACT_EMAIL = 'podostore1111@gmail.com'
+const CONTACT_EMAIL = 'podo@podo-store.com'
 
 const SECTION_TITLE = 'text-lg font-semibold text-wiki-text mt-8 mb-3'
 const BODY = 'text-sm text-wiki-text leading-relaxed'

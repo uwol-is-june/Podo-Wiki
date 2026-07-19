@@ -30,10 +30,10 @@ export default function Footer() {
           <span className="mx-2">·</span>
           문의:{' '}
           <a
-            href="mailto:podostore1111@gmail.com"
+            href="mailto:podo@podo-store.com"
             className="text-wiki-accent hover:underline whitespace-nowrap"
           >
-            podostore1111@gmail.com
+            podo@podo-store.com
           </a>
         </p>
       </div>

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- 연락처 이메일 변경: podostore1111@gmail.com → podo@podo-store.com (2026-07-19)
+  - 웹: 개인정보처리방침(`src/app/privacy/page.tsx`)·푸터(`Footer.tsx`) — 푸시 즉시 배포
+  - 앱: `mobile/src/lib/constants.ts` CONTACT_EMAIL (더보기 탭 문의) — 1.0.2 업데이트에 포함 예정
+
 ### Fixed
 - [TASK-056] 안드로이드 앱 전면 크래시 수정 — 1.0.1 Play 스토어 제출 (2026-07-19)
   - 증상: 갤럭시에서 문서·FAQ 등 콘텐츠를 누르면 즉시 앱 종료 (탭 바는 정상, iOS 무관)
