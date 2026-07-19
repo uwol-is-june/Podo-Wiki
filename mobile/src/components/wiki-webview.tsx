@@ -93,7 +93,8 @@ export const WikiWebView = forwardRef<WebView, WikiWebViewProps>(
       }}
       setSupportMultipleWindows={false}
       allowsBackForwardNavigationGestures={false}
-      decelerationRate="normal"
+      // decelerationRate에 "normal" 같은 문자열을 주면 Android 신아키텍처가
+      // Double 캐스팅에 실패해 즉시 크래시한다 (iOS만 문자열 허용). 기본값이 normal이므로 생략.
     />
   )
 })

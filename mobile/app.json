@@ -2,7 +2,7 @@
   "expo": {
     "name": "포도위키",
     "slug": "podo-wiki",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "podowiki",
