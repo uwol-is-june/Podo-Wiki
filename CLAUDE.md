@@ -8,6 +8,7 @@
 - 배포: https://podo-wiki.vercel.app
 - 할 일: [docs/TASK.md](docs/TASK.md)
 - 아키텍처: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (구조가 바뀔 때만 업데이트)
+- 앱 배포·버전 관리: [docs/APP-RELEASES.md](docs/APP-RELEASES.md) (스토어 제출 시마다 갱신)
 
 ## 코딩 규칙
 
