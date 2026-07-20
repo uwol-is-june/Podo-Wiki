@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- [TASK-053] Supabase 서울 리전 이전 — DB·웹 부분 완료 (2026-07-20, 앱 1.0.2·옛 프로젝트 정리는 잔여)
+  - 배경: 기존 ap-southeast-1(싱가포르) 지연 → ap-northeast-2(서울) 이전. 새 프로젝트 `ywuoaxfqujtazfaidxex` 생성
+  - DB 전체 이관·검증(수 대조 100% 일치): documents 11, revisions 148, profiles 8, auth.users 8(비밀번호 해시 보존), auth.identities 8, RLS 정책 14, 함수 3. pg_dump로 public 스키마 + auth/public/storage 데이터 분리 덤프 → 복원 순서(public 스키마 → auth 데이터 → public 데이터 → storage 데이터)로 FK 준수. 새 프로젝트의 default privileges가 anon/authenticated/service_role에 자동 GRANT하므로 `--no-privileges` 덤프로 충분
+  - storage: wiki-images 버킷 파일 2개 재업로드(스토리지 API), 문서 2건·리비전 56건 본문의 옛 도메인 이미지 URL → 새 도메인 치환
+  - env 교체: `.env.local`, `mobile/.env`, Vercel(Production·Development URL/ANON + Prod/Preview SERVICE_ROLE), EAS(development·preview·production)
+  - Auth: 새 프로젝트에 Site URL·Redirect URLs·커스텀 SMTP(Gmail podosangjeom 계정)·Rate Limit 30 설정. 임시 사용자로 비밀번호 재설정 메일 발송 테스트 통과(HTTP 200)
+  - 웹: 프로덕션 재배포 후 문서 페이지가 새 프로젝트 호스트 이미지 URL을 렌더 + 전 라우트 200으로 서울 참조 확인
+- [TASK-057] 안드로이드 릴리스 빌드에 R8 mapping 파일 포함 설정 (2026-07-19)
+  - 배경: Play Console 업로드 시 "가독화 파일 없음" 경고 + Android vitals 크래시 스택 판독 불가 (TASK-056 때 겪은 문제)
+  - `expo-build-properties@~57.0.6` 설치, `mobile/app.json` 플러그인에 `android.enableMinifyInReleaseBuilds: true` — prebuild 시 gradle.properties 반영 확인. AAB 빌드 시 R8이 mapping 생성 → AGP가 AAB에 자동 포함(BUNDLE-METADATA) → Play Console 자동 인식
+  - 실빌드 검증은 1.0.2(TASK-053 ⑦) 때: R8 첫 적용이라 에뮬레이터 릴리스 검증 필수, 경고 사라졌는지 확인 (TASK-053에 명시해둠)
 - 연락처 이메일 변경: podostore1111@gmail.com → podo@podo-store.com (2026-07-19)
   - 웹: 개인정보처리방침(`src/app/privacy/page.tsx`)·푸터(`Footer.tsx`) — 푸시 즉시 배포
   - 앱: `mobile/src/lib/constants.ts` CONTACT_EMAIL (더보기 탭 문의) — 1.0.2 업데이트에 포함 예정

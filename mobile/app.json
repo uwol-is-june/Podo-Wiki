@@ -38,6 +38,14 @@
             "backgroundColor": "#130d1f"
           }
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true
+          }
+        }
       ]
     ],
     "experiments": {
