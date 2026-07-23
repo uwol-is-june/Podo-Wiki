@@ -67,19 +67,31 @@ export default function DocumentScreen() {
       <Stack.Screen
         options={{
           title: document?.title ?? slug,
+          headerTitleStyle: { fontSize: 16 },
           headerRight: () => (
             <View style={styles.headerActions}>
               {headings.length > 0 && (
-                <Pressable hitSlop={8} onPress={() => setTocVisible(true)}>
-                  <Text style={[styles.headerAction, { color: theme.headerText }]}>목차</Text>
+                <Pressable
+                  hitSlop={6}
+                  onPress={() => setTocVisible(true)}
+                  style={({ pressed }) => [
+                    styles.headerChip,
+                    { backgroundColor: theme.headerText + '22', opacity: pressed ? 0.6 : 1 },
+                  ]}
+                >
+                  <Text style={[styles.headerChipText, { color: theme.headerText }]}>목차</Text>
                 </Pressable>
               )}
               {document && (
                 <Pressable
-                  hitSlop={8}
+                  hitSlop={6}
                   onPress={() => router.push({ pathname: '/history/[slug]', params: { slug } })}
+                  style={({ pressed }) => [
+                    styles.headerChip,
+                    { backgroundColor: theme.headerText + '22', opacity: pressed ? 0.6 : 1 },
+                  ]}
                 >
-                  <Text style={[styles.headerAction, { color: theme.headerText }]}>역사</Text>
+                  <Text style={[styles.headerChipText, { color: theme.headerText }]}>역사</Text>
                 </Pressable>
               )}
             </View>
@@ -152,8 +164,9 @@ export default function DocumentScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  headerActions: { flexDirection: 'row', gap: 18 },
-  headerAction: { fontSize: 15 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 2 },
+  headerChip: { paddingHorizontal: 11, paddingVertical: 5, borderRadius: 14 },
+  headerChipText: { fontSize: 13, fontWeight: '600' },
   notFoundCard: {
     borderWidth: 1,
     borderRadius: 12,
