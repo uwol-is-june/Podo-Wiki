@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
+import { FeatureRequestSheet } from '@/components/feature-request-sheet'
 import { getRandomSlug } from '@/lib/api'
 import { CONTACT_EMAIL, SITE_URL } from '@/lib/constants'
 import { wikiTheme } from '@/theme/colors'
@@ -20,6 +21,7 @@ export default function MoreScreen() {
   const router = useRouter()
   const theme = wikiTheme(useColorScheme())
   const [randomLoading, setRandomLoading] = useState(false)
+  const [featureRequestVisible, setFeatureRequestVisible] = useState(false)
 
   const openRandom = async () => {
     if (randomLoading) return
@@ -42,6 +44,7 @@ export default function MoreScreen() {
   const rows: { label: string; sub?: string; onPress: () => void }[] = [
     { label: '자주 묻는 질문', onPress: () => router.push('/faq') },
     { label: '랜덤 문서', sub: '아무 문서나 열어보기', onPress: openRandom },
+    { label: '기능 추가 요청', sub: '원하는 기능을 알려주세요', onPress: () => setFeatureRequestVisible(true) },
     { label: '포도위키 웹사이트', sub: '문서 편집은 웹에서 (회원 전용)', onPress: () => Linking.openURL(SITE_URL).catch(() => {}) },
     { label: '문서 신고 / 문의', sub: CONTACT_EMAIL, onPress: reportDocument },
     { label: '개인정보처리방침', onPress: () => Linking.openURL(`${SITE_URL}/privacy`).catch(() => {}) },
@@ -79,6 +82,11 @@ export default function MoreScreen() {
           읽기 전용 앱 — 문서 열람에 로그인이 필요 없어요.
         </Text>
       </ScrollView>
+
+      <FeatureRequestSheet
+        visible={featureRequestVisible}
+        onClose={() => setFeatureRequestVisible(false)}
+      />
     </TabScreen>
   )
 }

@@ -56,6 +56,28 @@ export type Database = {
         };
         Relationships: [];
       };
+      feature_requests: {
+        Row: {
+          id: string;
+          content: string;
+          source: 'app' | 'web';
+          status: 'open' | 'done';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          content: string;
+          source?: 'app' | 'web';
+          status?: 'open' | 'done';
+          created_at?: string;
+        };
+        Update: {
+          content?: string;
+          source?: 'app' | 'web';
+          status?: 'open' | 'done';
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

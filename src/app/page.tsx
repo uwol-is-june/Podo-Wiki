@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 import { TROUPES } from '@/data/troupes'
 import { slugToHref } from '@/lib/wiki/slug'
 import { parseFaqItems } from '@/lib/wiki/faq'
+import FeatureRequestButton from './FeatureRequestButton'
 
 const FAQ_SLUG = '포도위키:FAQ'
 const FAQ_PREVIEW_COUNT = 4
@@ -209,6 +210,7 @@ export default async function HomePage() {
                   {label}
                 </Link>
               ))}
+              <FeatureRequestButton />
             </nav>
           </section>
         </div>

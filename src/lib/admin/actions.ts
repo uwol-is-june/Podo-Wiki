@@ -194,3 +194,38 @@ export async function rejectDeletion(requestId: string): Promise<AdminActionStat
   revalidatePath('/admin')
   return { error: '', success: '삭제 신청이 거부되었습니다.' }
 }
+
+// ── 기능 추가 요청 (TASK-059) ─────────────────────────────────────────
+export type FeatureRequestRow = {
+  id: string
+  content: string
+  source: 'app' | 'web'
+  created_at: string
+}
+
+export async function getFeatureRequests(): Promise<FeatureRequestRow[]> {
+  const adminClient = createAdminClient()
+  const { data, error } = await adminClient
+    .from('feature_requests')
+    .select('id, content, source, created_at')
+    .eq('status', 'open')
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as FeatureRequestRow[]
+}
+
+export async function deleteFeatureRequest(requestId: string): Promise<AdminActionState> {
+  if (!(await checkAdminSession())) return { error: '관리자 인증이 필요합니다.' }
+
+  const adminClient = createAdminClient()
+  const { error } = await adminClient
+    .from('feature_requests')
+    .delete()
+    .eq('id', requestId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin')
+  return { error: '', success: '요청을 삭제했습니다.' }
+}

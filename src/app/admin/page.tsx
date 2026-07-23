@@ -1,15 +1,16 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { checkAdminSession, getAllProfiles, adminLogout, getDeletionRequests } from '@/lib/admin/actions'
+import { checkAdminSession, getAllProfiles, adminLogout, getDeletionRequests, getFeatureRequests } from '@/lib/admin/actions'
 import type { Profile } from '@/lib/supabase/types'
 import AdminUserTable from './AdminUserTable'
 import AdminDeletionTable from './AdminDeletionTable'
+import AdminFeatureRequestTable from './AdminFeatureRequestTable'
 
 export const metadata: Metadata = { title: '관리자 페이지 — 포도위키' }
 
 type UserFilter = 'all' | 'pending' | 'approved' | 'rejected'
-type Section = 'users' | 'deletions'
+type Section = 'users' | 'deletions' | 'requests'
 
 const USER_TABS: { label: string; value: UserFilter }[] = [
   { label: '전체', value: 'all' },
@@ -31,15 +32,17 @@ export default async function AdminPage({ searchParams }: Props) {
 
   const { filter: rawFilter, section: rawSection } = await searchParams
 
-  const section: Section = rawSection === 'deletions' ? 'deletions' : 'users'
+  const section: Section =
+    rawSection === 'deletions' ? 'deletions' : rawSection === 'requests' ? 'requests' : 'users'
   const filter: UserFilter =
     rawFilter === 'pending' || rawFilter === 'approved' || rawFilter === 'rejected'
       ? rawFilter
       : 'all'
 
-  const [all, deletionRequests] = await Promise.all([
+  const [all, deletionRequests, featureRequests] = await Promise.all([
     getAllProfiles(),
     getDeletionRequests(),
+    getFeatureRequests(),
   ])
 
   const counts = {
@@ -93,6 +96,22 @@ export default async function AdminPage({ searchParams }: Props) {
             </span>
           )}
         </Link>
+        <Link
+          href="/admin?section=requests"
+          className={[
+            'px-4 py-2 text-sm font-medium flex items-center gap-1.5 transition-colors',
+            section === 'requests'
+              ? 'text-wiki-accent border-b-2 border-wiki-accent -mb-px'
+              : 'text-wiki-text-muted hover:text-wiki-text',
+          ].join(' ')}
+        >
+          기능 요청
+          {featureRequests.length > 0 && (
+            <span className="px-1.5 py-0.5 text-xs rounded-full bg-wiki-accent text-white">
+              {featureRequests.length}
+            </span>
+          )}
+        </Link>
       </div>
 
       {section === 'users' && (
@@ -140,6 +159,14 @@ export default async function AdminPage({ searchParams }: Props) {
         <section>
           <div className="bg-wiki-surface border border-wiki-border rounded-lg p-4">
             <AdminDeletionTable requests={deletionRequests} />
+          </div>
+        </section>
+      )}
+
+      {section === 'requests' && (
+        <section>
+          <div className="bg-wiki-surface border border-wiki-border rounded-lg p-4">
+            <AdminFeatureRequestTable requests={featureRequests} />
           </div>
         </section>
       )}
