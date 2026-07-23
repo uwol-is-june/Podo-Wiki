@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [TASK-058] 앱 문서 헤더 목차/역사 버튼 레이아웃 개선 (2026-07-21)
+  - iOS 네이티브 헤더에서 긴 문서 제목과 우측 plain 텍스트 버튼이 겹치던 문제
+  - `mobile/src/app/w/[slug].tsx` headerRight의 목차·역사를 반투명 배경 알약형 칩으로(패딩·터치영역·간격·수직정렬 정돈), `headerTitleStyle` fontSize 16. 에뮬레이터에서 칩 렌더·목차 시트 열림 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
+
 ### Added
 - [TASK-059] 기능 추가 요청 폼 (앱 더보기 + 웹 빠른 링크 모달) + admin 확인·삭제 (2026-07-21)
   - 결정: 앱·웹 모두 **비로그인 익명 제출**, 연락처 없이 내용만

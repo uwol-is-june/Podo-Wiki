@@ -16,7 +16,7 @@ _없음_
 
 ## 대기 중
 
-- [ ] [TASK-058] (S) 앱 문서 화면 상단 목차/역사 버튼 레이아웃 개선 → **환경: iOS에서 확인**. 버튼 크기와 안쪽 글자·레이아웃이 어색하고 서로/제목과 겹침. 위치: [mobile/src/app/w/[slug].tsx](mobile/src/app/w/[slug].tsx) `headerRight`의 목차·역사 버튼 (L70~86), 스타일 `headerActions: { flexDirection: 'row', gap: 18 }` · `headerAction: { fontSize: 15 }` (L155~156). 현재 네이티브 헤더(`Stack.Screen` headerRight)에 **패딩·터치타깃 없는 plain `Text`**만 들어가 있어, 긴 문서 제목(headerTitle)과 우측 액션 텍스트가 iOS 네이티브 헤더에서 충돌·겹침 추정. 개선 방향: ① 버튼에 적절한 터치 영역/패딩(또는 칩 형태) 부여해 정렬 정돈 ② 제목이 길 때 truncation(ellipsize)해서 우측 액션과 안 겹치게, 필요시 `headerTitle` 커스텀 ③ iOS·Android 양쪽 헤더에서 시각 확인. Expo SDK 57 헤더 옵션 문서(https://docs.expo.dev/versions/v57.0.0/) 참고.
+_없음_
 
 ---
 
