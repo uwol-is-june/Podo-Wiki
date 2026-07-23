@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [TASK-059] 기능 추가 요청 폼 (앱 더보기 + 웹 빠른 링크 모달) + admin 확인·삭제 (2026-07-21)
+  - 결정: 앱·웹 모두 **비로그인 익명 제출**, 연락처 없이 내용만
+  - DB: `feature_requests` 테이블(마이그레이션 20260721000000) + RLS — anon/authenticated INSERT 허용(`WITH CHECK status='open'`), content 5~2000자 CHECK로 빈값·스팸 방지, SELECT/DELETE 정책 없음 → admin service_role만 조회·삭제(`deletion_requests` 동일 패턴)
+  - 웹: 홈 빠른 링크에 "기능 추가 요청" 버튼 → 모달 폼(익명 insert, ESC·바깥클릭 닫기, 로딩·에러·성공) — `src/app/FeatureRequestButton.tsx`
+  - 웹 admin: "기능 요청" 섹션 탭 + 목록(내용·출처·접수일)·삭제 — `AdminFeatureRequestTable` + 서버액션 `getFeatureRequests`/`deleteFeatureRequest`
+  - 앱: 더보기 탭에 "기능 추가 요청" → 바텀시트 폼 — `mobile/src/components/feature-request-sheet.tsx` (**앱 반영은 다음 앱 빌드/출시부터**)
+  - 검증: Next 빌드·양쪽 tsc 통과. 서울 DB에 마이그레이션 적용(기존 12개 migration repair→applied 후 push) 후 REST로 RLS 확인 — 익명 INSERT 201 / 짧은 내용 400(CHECK) / 익명 SELECT 빈배열(차단). 웹 프로덕션 배포·홈 버튼 렌더 확인
+
 ### Changed
 - [TASK-053] Supabase 서울 리전 이전 — DB·웹 부분 완료 (2026-07-20, 앱 1.0.2·옛 프로젝트 정리는 잔여)
   - 배경: 기존 ap-southeast-1(싱가포르) 지연 → ap-northeast-2(서울) 이전. 새 프로젝트 `ywuoaxfqujtazfaidxex` 생성
