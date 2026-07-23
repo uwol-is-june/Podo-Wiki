@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - env 교체: `.env.local`, `mobile/.env`, Vercel(Production·Development URL/ANON + Prod/Preview SERVICE_ROLE), EAS(development·preview·production)
   - Auth: 새 프로젝트에 Site URL·Redirect URLs·커스텀 SMTP(Gmail podosangjeom 계정)·Rate Limit 30 설정. 임시 사용자로 비밀번호 재설정 메일 발송 테스트 통과(HTTP 200)
   - 웹: 프로덕션 재배포 후 문서 페이지가 새 프로젝트 호스트 이미지 URL을 렌더 + 전 라우트 200으로 서울 참조 확인
+  - 앱: 1.0.2 양대 스토어 출시(2026-07-21, iOS build 3 / Android vc 5) — env 서울 반영, R8 검증·mapping 포함
+  - 옛 프로젝트 정리: 싱가포르 `rskzwzvudshirfyczxtw` 삭제(2026-07-21, 사용자 결정으로 확산 대기 없이 즉시, 복구불가), 로컬 repo는 서울로 재링크. 구버전 앱 사용자는 1.0.2 업데이트 전까지 먹통. devtier_ 재개는 대시보드 Restore 필요(잔여)
 - [TASK-057] 안드로이드 릴리스 빌드에 R8 mapping 파일 포함 설정 (2026-07-19)
   - 배경: Play Console 업로드 시 "가독화 파일 없음" 경고 + Android vitals 크래시 스택 판독 불가 (TASK-056 때 겪은 문제)
   - `expo-build-properties@~57.0.6` 설치, `mobile/app.json` 플러그인에 `android.enableMinifyInReleaseBuilds: true` — prebuild 시 gradle.properties 반영 확인. AAB 빌드 시 R8이 mapping 생성 → AGP가 AAB에 자동 포함(BUNDLE-METADATA) → Play Console 자동 인식

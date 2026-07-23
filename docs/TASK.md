@@ -16,7 +16,7 @@ _없음_
 
 ## 대기 중
 
-- [ ] [TASK-053] (O) Supabase 서울 리전 이전 — **DB·웹·앱 전환 완료, 옛 프로젝트 정리(⑧)만 남음**. 완료분(①~⑦, CHANGELOG 참조): 서울 새 프로젝트 `ywuoaxfqujtazfaidxex` 생성, 전체 덤프·복원(데이터·auth 해시·storage·RLS·함수 전부 수 대조 일치), 이미지 URL 새 도메인 치환, env 교체(.env.local·mobile/.env·Vercel·EAS 3환경), Auth 설정(Site URL·Redirect URLs·커스텀 SMTP[[podosangjeom@gmail.com 계정]]·Rate Limit 30) 복제·SMTP 발송 테스트 통과, 웹 프로덕션 서울 전환·검증, **앱 1.0.2 양대 스토어 출시(2026-07-21, iOS build 3 / Android vc 5, R8 검증·mapping 포함 확인)**. **남은 것 — ⑧ 옛 프로젝트 정리**: 1.0.2 출시(7/21)로부터 **사용자 확산 대기(1~2주, 옛 프로젝트 API 사용량이 0에 수렴하는지로 판단)** → 옛 싱가포르 프로젝트 `rskzwzvudshirfyczxtw` 삭제 → devtier_ `damqewznmusjshxfeotd` 재개(슬롯 확보 위해 일시정지 중, 무료 플랜 활성 2개 제한). 주의: 구버전 앱(iOS 1.0.0/Android 1.0.1)은 OTA 미사용이라 URL이 빌드에 박혀 있어, 확산 전 싱가포르 삭제 시 구버전 앱 전면 먹통. 참고: Vercel Preview 환경의 `SUPABASE_SERVICE_ROLE_KEY`는 CLI 플러그인 버그로 미반영 → 대시보드에서 수동 추가 필요(Preview 배포 쓸 경우).
+- [ ] [TASK-053] (O) Supabase 서울 리전 이전 — **거의 완료, 사용자 대시보드 작업 2개만 남음**. 완료분(CHANGELOG 참조): 서울 `ywuoaxfqujtazfaidxex`로 DB·storage·Auth 전체 이관·검증, env 교체, 웹 프로덕션 서울 전환, 앱 1.0.2 양대 스토어 출시(7/21), **옛 싱가포르 `rskzwzvudshirfyczxtw` 삭제(7/21, 복구불가)·로컬 repo 서울로 재링크**. **남은 것(사용자 대시보드)**: ① devtier_ `damqewznmusjshxfeotd` 재개 — Restore 클릭(싱가포르 삭제로 슬롯 비었음). CLI 재개 명령 없고 Management API 토큰이 보안 분류기로 차단돼 Claude가 못 함. ② Vercel Preview의 `SUPABASE_SERVICE_ROLE_KEY` 수동 추가(CLI 플러그인 버그, Preview 배포 쓸 경우만). 주의: 삭제로 구버전 앱(1.0.0/1.0.1) 사용자는 1.0.2 업데이트 전까지 먹통.
 
 ---
 
