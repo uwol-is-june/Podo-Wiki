@@ -87,7 +87,7 @@ export default async function WikiPage({ params }: Props) {
     .map((s, i) => ({ slug: s, label: segments[i], exists: existingSlugs.has(s) }))
     .filter((b) => b.exists)
 
-  const ogUrl = `https://podo-wiki.vercel.app/w/${decodedSlug}`
+  const ogUrl = `https://wiki.podo-store.com/w/${decodedSlug}`
 
   if (!document) {
     return (
