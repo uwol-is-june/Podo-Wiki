@@ -2,6 +2,13 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 export async function proxy(request: NextRequest) {
+  // 옛 도메인(podo-wiki.vercel.app) → 새 커스텀 도메인으로 canonical 308 리다이렉트.
+  // matcher가 이미지 등 정적자산을 제외하므로 구버전 앱의 이미지 요청은 옛 도메인에서 그대로 서빙됨.
+  if (request.headers.get('host') === 'podo-wiki.vercel.app') {
+    const { pathname, search } = request.nextUrl
+    return NextResponse.redirect(`https://wiki.podo-store.com${pathname}${search}`, 308)
+  }
+
   let response = NextResponse.next({
     request: { headers: request.headers },
   })
