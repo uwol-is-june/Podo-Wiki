@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [TASK-060] 앱 1.0.3 빌드·제출 + 기능요청 폼 Android 키보드 버그 수정 (2026-07-25)
+  - 커밋만 돼 있던 앱 변경 3건을 1.0.3으로 함께 출시: SITE_URL → 커스텀 도메인 `wiki.podo-store.com`, 헤더 목차/역사 칩(TASK-058), 더보기 기능 추가 요청 폼(TASK-059)
+  - **에뮬레이터 검증에서 실제 버그 발견·수정**: `feature-request-sheet`의 KeyboardAvoidingView가 iOS에만 적용돼 Android에서 키보드가 시트(입력창·제출버튼)를 전부 가림 → KAV가 전체를 감싸고 behavior height(Android)/padding(iOS) + backdrop flex로 시트를 키보드 위로 리프트. 재검증: 키보드 뜬 채 입력·제출→접수 성공 확인
+  - EAS 빌드(iOS build 4 / Android vc 6, AAB에 proguard.map 포함), iOS는 ASC 자동 업로드, Android AAB 다운로드. 스토어 제출은 사용자 대시보드 단계 잔여
 - [TASK-058] 앱 문서 헤더 목차/역사 버튼 레이아웃 개선 (2026-07-21)
   - iOS 네이티브 헤더에서 긴 문서 제목과 우측 plain 텍스트 버튼이 겹치던 문제
   - `mobile/src/app/w/[slug].tsx` headerRight의 목차·역사를 반투명 배경 알약형 칩으로(패딩·터치영역·간격·수직정렬 정돈), `headerTitleStyle` fontSize 16. 에뮬레이터에서 칩 렌더·목차 시트 열림 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
