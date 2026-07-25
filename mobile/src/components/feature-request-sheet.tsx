@@ -63,11 +63,11 @@ export function FeatureRequestSheet({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      <Pressable style={styles.backdrop} onPress={close} />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.kav}
       >
+        <Pressable style={styles.backdrop} onPress={close} />
         <View
           style={[
             styles.sheet,
@@ -142,8 +142,8 @@ export function FeatureRequestSheet({
 }
 
 const styles = StyleSheet.create({
+  kav: { flex: 1 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
-  kav: { position: 'absolute', left: 0, right: 0, bottom: 0 },
   sheet: {
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
