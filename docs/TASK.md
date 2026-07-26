@@ -16,7 +16,7 @@ _없음_
 
 ## 대기 중
 
-- [ ] [TASK-061] (S) Vercel Preview 환경변수 2개 대시보드 추가 → CLI 플러그인 버그(all-preview-branches 비대화형)로 Preview 환경에만 미반영된 것 정리. Production은 정상. **Preview 배포를 쓸 때만 필요** (안 쓰면 무시 가능). Vercel 대시보드 → podo-wiki → Settings → Environment Variables → Preview에 추가: `NEXT_PUBLIC_SITE_URL` = `https://wiki.podo-store.com`, `SUPABASE_SERVICE_ROLE_KEY` = Production과 동일 값.
+_없음_
 
 ---
 
