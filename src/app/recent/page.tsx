@@ -69,7 +69,7 @@ export default async function RecentPage({ searchParams }: Props) {
                   <td className="px-4 py-3">
                     <Link
                       href={slugToHref(rev.document_slug)}
-                      className="text-wiki-accent hover:underline font-medium"
+                      className="text-wiki-accent-text hover:underline font-medium"
                     >
                       {rev.documents?.title ?? rev.document_slug}
                     </Link>
@@ -100,7 +100,7 @@ export default async function RecentPage({ searchParams }: Props) {
           {currentPage > 1 && (
             <Link
               href={`/recent?page=${currentPage - 1}`}
-              className="px-4 py-2 text-sm border border-wiki-border rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+              className="px-4 py-2 text-sm border border-wiki-border rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
             >
               ← 이전
             </Link>
@@ -111,7 +111,7 @@ export default async function RecentPage({ searchParams }: Props) {
           {currentPage < totalPages && (
             <Link
               href={`/recent?page=${currentPage + 1}`}
-              className="px-4 py-2 text-sm border border-wiki-border rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+              className="px-4 py-2 text-sm border border-wiki-border rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
             >
               다음 →
             </Link>

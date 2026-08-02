@@ -73,7 +73,7 @@ export default async function HistoryPage({ params }: Props) {
           >
             수정
           </Link>
-          <span className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px">
+          <span className="px-4 py-2 text-sm font-medium text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px">
             역사
           </span>
         </div>

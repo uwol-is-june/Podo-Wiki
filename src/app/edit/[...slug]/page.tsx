@@ -67,7 +67,7 @@ export default async function EditPage({ params }: Props) {
         </p>
         <Link
           href={slugToHref(decodedSlug)}
-          className="mt-2 px-4 py-2 border border-wiki-border rounded text-sm text-wiki-text hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+          className="mt-2 px-4 py-2 border border-wiki-border rounded text-sm text-wiki-text hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
         >
           문서로 돌아가기
         </Link>
@@ -109,7 +109,7 @@ export default async function EditPage({ params }: Props) {
         </p>
         <Link
           href={slugToHref(decodedSlug)}
-          className="mt-2 px-4 py-2 border border-wiki-border rounded text-sm text-wiki-text hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+          className="mt-2 px-4 py-2 border border-wiki-border rounded text-sm text-wiki-text hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
         >
           문서로 돌아가기
         </Link>

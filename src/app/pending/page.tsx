@@ -21,7 +21,7 @@ export default function PendingPage() {
         <div className="flex flex-col gap-2 items-center">
           <Link
             href="/"
-            className="text-sm text-wiki-accent hover:underline"
+            className="text-sm text-wiki-accent-text hover:underline"
           >
             홈으로 이동
           </Link>

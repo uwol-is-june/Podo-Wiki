@@ -67,11 +67,11 @@ export default async function HomePage() {
                   className="rounded-lg object-cover w-14 h-14"
                 />
               ) : (
-                <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent text-xl font-bold">
+                <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent-text text-xl font-bold">
                   {troupe.name[0]}
                 </div>
               )}
-              <span className="text-xs text-wiki-text group-hover:text-wiki-accent transition-colors text-center leading-tight break-keep">
+              <span className="text-xs text-wiki-text group-hover:text-wiki-accent-text transition-colors text-center leading-tight break-keep">
                 {troupe.name}
               </span>
             </Link>
@@ -98,7 +98,7 @@ export default async function HomePage() {
               </p>
               <p className="text-wiki-text-muted text-xs pt-1">
                 처음이시라면{' '}
-                <Link href="/w/포도위키:도움말" className="text-wiki-accent hover:underline">
+                <Link href="/w/포도위키:도움말" className="text-wiki-accent-text hover:underline">
                   도움말
                 </Link>
                 을 먼저 읽어보세요.
@@ -113,7 +113,7 @@ export default async function HomePage() {
                 <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide">
                   자주 묻는 질문
                 </h2>
-                <Link href="/faq" className="text-xs text-wiki-accent hover:underline">
+                <Link href="/faq" className="text-xs text-wiki-accent-text hover:underline">
                   전체 보기
                 </Link>
               </div>
@@ -122,9 +122,9 @@ export default async function HomePage() {
                   <li key={item.id}>
                     <Link
                       href={`/faq#${item.id}`}
-                      className="flex items-start gap-2 text-sm text-wiki-text hover:text-wiki-accent transition-colors py-1.5"
+                      className="flex items-start gap-2 text-sm text-wiki-text hover:text-wiki-accent-text transition-colors py-1.5"
                     >
-                      <span className="text-wiki-accent font-semibold shrink-0">Q.</span>
+                      <span className="text-wiki-accent-text font-semibold shrink-0">Q.</span>
                       {item.question}
                     </Link>
                   </li>
@@ -137,7 +137,7 @@ export default async function HomePage() {
           <section className="bg-wiki-surface border border-wiki-border rounded-lg p-5">
             <div className="flex items-center justify-between mb-3 pb-2 border-b border-wiki-border">
               <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide">최근 변경</h2>
-              <Link href="/recent" className="text-xs text-wiki-accent hover:underline">
+              <Link href="/recent" className="text-xs text-wiki-accent-text hover:underline">
                 전체 보기
               </Link>
             </div>
@@ -151,7 +151,7 @@ export default async function HomePage() {
                   <li key={rev.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                     <Link
                       href={slugToHref(rev.document_slug)}
-                      className="text-wiki-accent hover:underline truncate"
+                      className="text-wiki-accent-text hover:underline truncate"
                     >
                       {rev.documents?.title ?? rev.document_slug}
                     </Link>
@@ -180,11 +180,11 @@ export default async function HomePage() {
             </h2>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center p-3 bg-wiki-bg rounded-lg">
-                <div className="text-3xl font-bold text-wiki-accent">{docCount ?? 0}</div>
+                <div className="text-3xl font-bold text-wiki-accent-text">{docCount ?? 0}</div>
                 <div className="text-xs text-wiki-text-muted mt-1">총 문서</div>
               </div>
               <div className="text-center p-3 bg-wiki-bg rounded-lg">
-                <div className="text-3xl font-bold text-wiki-accent">{memberCount ?? 0}</div>
+                <div className="text-3xl font-bold text-wiki-accent-text">{memberCount ?? 0}</div>
                 <div className="text-xs text-wiki-text-muted mt-1">승인 회원</div>
               </div>
             </div>
@@ -204,9 +204,9 @@ export default async function HomePage() {
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center gap-2 text-sm text-wiki-text hover:text-wiki-accent transition-colors py-1.5"
+                  className="flex items-center gap-2 text-sm text-wiki-text hover:text-wiki-accent-text transition-colors py-1.5"
                 >
-                  <span className="text-wiki-accent font-medium">›</span>
+                  <span className="text-wiki-accent-text font-medium">›</span>
                   {label}
                 </Link>
               ))}

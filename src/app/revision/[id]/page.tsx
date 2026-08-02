@@ -81,7 +81,7 @@ export default async function RevisionPage({ params }: Props) {
           </Link>
           <Link
             href={slugToHistoryHref(slug)}
-            className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px"
+            className="px-4 py-2 text-sm font-medium text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px"
           >
             역사
           </Link>
@@ -94,7 +94,7 @@ export default async function RevisionPage({ params }: Props) {
         </span>
         <Link
           href={slugToHref(slug)}
-          className="text-wiki-accent hover:underline font-medium shrink-0 ml-4"
+          className="text-wiki-accent-text hover:underline font-medium shrink-0 ml-4"
         >
           최신 버전 보기 →
         </Link>

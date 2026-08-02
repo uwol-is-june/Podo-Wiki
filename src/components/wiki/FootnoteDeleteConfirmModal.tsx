@@ -39,7 +39,7 @@ export default function FootnoteDeleteConfirmModal({ open, content, onCancel, on
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-1.5 text-sm border border-wiki-border text-wiki-text rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+              className="px-3 py-1.5 text-sm border border-wiki-border text-wiki-text rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
             >
               취소
             </button>

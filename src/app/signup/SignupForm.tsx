@@ -19,9 +19,9 @@ export default function SignupForm() {
   if (state.success) {
     return (
       <div className="text-center">
-        <p className="text-wiki-accent font-medium mb-2">✓ 가입 신청 완료</p>
+        <p className="text-wiki-accent-text font-medium mb-2">✓ 가입 신청 완료</p>
         <p className="text-sm text-wiki-text-muted mb-6">{state.success}</p>
-        <Link href="/login" className="text-sm text-wiki-accent hover:underline">
+        <Link href="/login" className="text-sm text-wiki-accent-text hover:underline">
           로그인 페이지로 이동
         </Link>
       </div>
@@ -124,14 +124,14 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="h-10 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="h-10 bg-wiki-accent text-wiki-on-accent rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isPending ? '가입 신청 중…' : '회원가입 신청'}
       </button>
 
       <p className="text-center text-sm text-wiki-text-muted">
         이미 계정이 있으신가요?{' '}
-        <Link href="/login" className="text-wiki-accent hover:underline">
+        <Link href="/login" className="text-wiki-accent-text hover:underline">
           로그인
         </Link>
       </p>

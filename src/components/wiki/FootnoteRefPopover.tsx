@@ -55,7 +55,7 @@ export default function FootnoteRefPopover({ content, top, left, onClose, onSave
             <button
               type="button"
               onClick={() => setMode('edit')}
-              className="px-2 py-1 text-xs border border-wiki-border text-wiki-text rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+              className="px-2 py-1 text-xs border border-wiki-border text-wiki-text rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
             >
               수정
             </button>
@@ -84,7 +84,7 @@ export default function FootnoteRefPopover({ content, top, left, onClose, onSave
             <button
               type="button"
               onClick={() => setMode('view')}
-              className="px-2 py-1 text-xs border border-wiki-border text-wiki-text rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+              className="px-2 py-1 text-xs border border-wiki-border text-wiki-text rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
             >
               취소
             </button>
@@ -92,7 +92,7 @@ export default function FootnoteRefPopover({ content, top, left, onClose, onSave
               type="button"
               onClick={handleSave}
               disabled={!draft.trim()}
-              className="px-2 py-1 text-xs bg-wiki-accent text-white rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs bg-wiki-accent text-wiki-on-accent rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               저장
             </button>

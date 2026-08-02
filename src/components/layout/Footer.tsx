@@ -23,7 +23,7 @@ export default function Footer() {
             href="https://creativecommons.org/licenses/by-nc-sa/2.0/kr/"
             target="_blank"
             rel="noreferrer"
-            className="text-wiki-accent hover:underline whitespace-nowrap"
+            className="text-wiki-accent-text hover:underline whitespace-nowrap"
           >
             CC BY-NC-SA 2.0 KR
           </a>
@@ -31,7 +31,7 @@ export default function Footer() {
           문의:{' '}
           <a
             href="mailto:podo@podo-store.com"
-            className="text-wiki-accent hover:underline whitespace-nowrap"
+            className="text-wiki-accent-text hover:underline whitespace-nowrap"
           >
             podo@podo-store.com
           </a>

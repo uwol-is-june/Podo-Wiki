@@ -10,6 +10,7 @@ import MarkdownContent from '@/components/wiki/MarkdownContent'
 import TableOfContents from '@/components/wiki/TableOfContents'
 import UrlNormalizer from '@/components/wiki/UrlNormalizer'
 import Breadcrumb from '@/components/wiki/Breadcrumb'
+import BookmarkButton from '@/components/wiki/BookmarkButton'
 import DeletionRequestButton from '@/components/wiki/DeletionRequestButton'
 import ShareButton from '@/components/wiki/ShareButton'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -105,7 +106,7 @@ export default async function WikiPage({ params }: Props) {
           </p>
           <Link
             href={slugToEditHref(decodedSlug)}
-            className="inline-block px-5 py-2 bg-wiki-accent text-white rounded hover:bg-wiki-accent-hover transition-colors text-sm font-medium"
+            className="inline-block px-5 py-2 bg-wiki-accent text-wiki-on-accent rounded hover:bg-wiki-accent-hover transition-colors text-sm font-medium"
           >
             새 문서 만들기
           </Link>
@@ -128,14 +129,15 @@ export default async function WikiPage({ params }: Props) {
           <h1 className="text-2xl font-bold text-wiki-text">
             {document.title}
           </h1>
-          <div className="flex-shrink-0 pt-0.5">
+          <div className="flex-shrink-0 pt-0.5 flex items-center gap-0.5">
+            <BookmarkButton slug={decodedSlug} title={document.title} />
             <ShareButton title={document.title} url={ogUrl} />
           </div>
         </div>
         <div className="flex items-center gap-0 border-b border-wiki-border">
           <Link
             href={slugToHref(decodedSlug)}
-            className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px"
+            className="px-4 py-2 text-sm font-medium text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px"
           >
             보기
           </Link>

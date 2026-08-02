@@ -68,7 +68,7 @@ function DeletionRow({ req }: { req: DeletionRequestWithDetails }) {
       <td className="py-3 pr-4">
         <Link
           href={slugToHref(req.document_slug)}
-          className="text-wiki-accent hover:underline font-medium"
+          className="text-wiki-accent-text hover:underline font-medium"
           target="_blank"
         >
           {req.document_title}

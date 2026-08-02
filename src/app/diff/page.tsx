@@ -91,7 +91,7 @@ export default async function DiffPage({ searchParams }: Props) {
           </Link>
           <Link
             href={slugToHistoryHref(slug)}
-            className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px"
+            className="px-4 py-2 text-sm font-medium text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px"
           >
             역사
           </Link>

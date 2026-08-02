@@ -14,9 +14,9 @@ export default function FeatureRequestButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-2 text-sm text-wiki-text hover:text-wiki-accent transition-colors py-1.5 text-left"
+        className="flex w-full items-center gap-2 text-sm text-wiki-text hover:text-wiki-accent-text transition-colors py-1.5 text-left"
       >
-        <span className="text-wiki-accent font-medium">›</span>
+        <span className="text-wiki-accent-text font-medium">›</span>
         기능 추가 요청
       </button>
       {open && <FeatureRequestModal onClose={() => setOpen(false)} />}
@@ -78,7 +78,7 @@ function FeatureRequestModal({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-wiki-accent text-white text-sm rounded hover:bg-wiki-accent/90 transition-colors"
+              className="px-4 py-2 bg-wiki-accent text-wiki-on-accent text-sm rounded hover:bg-wiki-accent/90 transition-colors"
             >
               닫기
             </button>
@@ -125,7 +125,7 @@ function FeatureRequestModal({ onClose }: { onClose: () => void }) {
                 type="button"
                 onClick={handleSubmit}
                 disabled={!canSubmit}
-                className="px-4 py-2 bg-wiki-accent text-white text-sm rounded hover:bg-wiki-accent/90 transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-wiki-accent text-wiki-on-accent text-sm rounded hover:bg-wiki-accent/90 transition-colors disabled:opacity-50"
               >
                 {status === 'submitting' ? '제출 중…' : '제출'}
               </button>

@@ -69,7 +69,7 @@ export default async function SearchPage({ searchParams }: Props) {
             >
               <Link
                 href={slugToHref(doc.slug)}
-                className="text-wiki-accent font-semibold text-base hover:underline"
+                className="text-wiki-accent-text font-semibold text-base hover:underline"
               >
                 {doc.title}
               </Link>
@@ -88,7 +88,7 @@ export default async function SearchPage({ searchParams }: Props) {
           </p>
           <Link
             href={slugToEditHref(query)}
-            className="inline-block px-4 py-2 bg-wiki-accent text-white rounded text-sm hover:bg-wiki-accent-hover transition-colors"
+            className="inline-block px-4 py-2 bg-wiki-accent text-wiki-on-accent rounded text-sm hover:bg-wiki-accent-hover transition-colors"
           >
             &ldquo;{query}&rdquo; 문서 만들기
           </Link>

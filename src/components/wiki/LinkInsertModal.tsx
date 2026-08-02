@@ -125,7 +125,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
                 onClick={() => setTab(t)}
                 className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors ${
                   tab === t
-                    ? 'text-wiki-accent border-b-2 border-wiki-accent -mb-px'
+                    ? 'text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px'
                     : 'text-wiki-text-muted hover:text-wiki-text'
                 }`}
               >
@@ -157,7 +157,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
                 />
                 {selected && !search && (
                   <div className="flex items-center gap-2 px-3 py-2 text-sm rounded bg-wiki-accent/10 border border-wiki-accent/30">
-                    <span className="text-wiki-accent font-medium">{selected.title}</span>
+                    <span className="text-wiki-accent-text font-medium">{selected.title}</span>
                     <span className="text-wiki-text-muted text-xs">{selected.slug}</span>
                   </div>
                 )}
@@ -211,7 +211,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3 py-1.5 text-sm border border-wiki-border text-wiki-text rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+                className="px-3 py-1.5 text-sm border border-wiki-border text-wiki-text rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
               >
                 취소
               </button>
@@ -219,7 +219,7 @@ export default function LinkInsertModal({ open, initialHref, initialText, onClos
                 type="button"
                 onClick={handleConfirm}
                 disabled={!canConfirm}
-                className="px-3 py-1.5 text-sm bg-wiki-accent text-white rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-sm bg-wiki-accent text-wiki-on-accent rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 확인
               </button>

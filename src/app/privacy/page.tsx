@@ -55,7 +55,7 @@ export default function PrivacyPage() {
       <h2 className={SECTION_TITLE}>5. 문의처</h2>
       <p className={BODY}>
         개인정보 관련 문의:{' '}
-        <a href={`mailto:${CONTACT_EMAIL}`} className="text-wiki-accent hover:underline">
+        <a href={`mailto:${CONTACT_EMAIL}`} className="text-wiki-accent-text hover:underline">
           {CONTACT_EMAIL}
         </a>
       </p>

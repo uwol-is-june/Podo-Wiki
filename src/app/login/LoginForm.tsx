@@ -54,7 +54,7 @@ export default function LoginForm({ next }: { next: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="h-10 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="h-10 bg-wiki-accent text-wiki-on-accent rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isPending && (
           <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
@@ -68,11 +68,11 @@ export default function LoginForm({ next }: { next: string }) {
       <div className="flex flex-col items-center gap-1.5">
         <p className="text-center text-sm text-wiki-text-muted">
           계정이 없으신가요?{' '}
-          <Link href="/signup" className="text-wiki-accent hover:underline">
+          <Link href="/signup" className="text-wiki-accent-text hover:underline">
             회원가입
           </Link>
         </p>
-        <Link href="/forgot-password" className="text-xs text-wiki-text-muted hover:text-wiki-accent hover:underline transition-colors">
+        <Link href="/forgot-password" className="text-xs text-wiki-text-muted hover:text-wiki-accent-text hover:underline transition-colors">
           비밀번호를 잊으셨나요?
         </Link>
       </div>

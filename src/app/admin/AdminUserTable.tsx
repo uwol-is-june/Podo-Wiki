@@ -102,7 +102,7 @@ function UserRow({ user }: { user: Profile }) {
       </td>
       <td className="py-3 pr-4">
         {user.role === 'admin' ? (
-          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-wiki-accent/10 text-wiki-accent-text">
             관리자
           </span>
         ) : (
@@ -115,7 +115,7 @@ function UserRow({ user }: { user: Profile }) {
           <button
             onClick={handleApprove}
             disabled={isPending}
-            className="px-3 py-1 bg-wiki-accent text-white text-xs rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-50"
+            className="px-3 py-1 bg-wiki-accent text-wiki-on-accent text-xs rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-50"
           >
             승인
           </button>

@@ -44,7 +44,7 @@ function FootnoteTooltip({ label, num, content, href }: {
       <a
         id={`fnref-${label}`}
         href={href}
-        className="text-wiki-accent no-underline hover:underline"
+        className="text-wiki-accent-text no-underline hover:underline"
         onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
       >
@@ -353,7 +353,7 @@ const PROSE = `prose max-w-none text-wiki-text
   sm:[&_h3]:text-lg sm:[&_h3]:mt-5 sm:[&_h3]:mb-2
   [&_p]:my-2 [&_p]:leading-relaxed
   sm:[&_p]:my-3
-  [&_a]:text-wiki-accent [&_a]:hover:underline
+  [&_a]:text-wiki-accent-text [&_a]:hover:underline
   [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
   [&_ul_ul]:list-[circle] [&_ul_ul_ul]:list-[square] [&_ul_ul_ul_ul]:list-disc
   [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-3
@@ -368,7 +368,7 @@ const PROSE = `prose max-w-none text-wiki-text
   [&_td]:border [&_td]:border-wiki-border [&_td]:px-3 [&_td]:py-2
   [&_hr]:border-wiki-border [&_hr]:my-6
   [&_img]:max-w-full [&_img]:rounded [&_img]:my-3
-  [&_sup]:text-xs [&_sup]:leading-none [&_.footnote-ref]:text-wiki-accent [&_.footnote-ref]:no-underline [&_.footnote-ref]:hover:underline`
+  [&_sup]:text-xs [&_sup]:leading-none [&_.footnote-ref]:text-wiki-accent-text [&_.footnote-ref]:no-underline [&_.footnote-ref]:hover:underline`
 
 export default function MarkdownContent({ content }: { content: string }) {
   const { processed, defs } = useMemo(() => processFootnotes(content), [content])
@@ -429,7 +429,7 @@ export default function MarkdownContent({ content }: { content: string }) {
           <ol className="list-none pl-0 space-y-1 text-sm text-wiki-text-muted">
             {defs.map(({ label, content: fnContent, num }) => (
               <li key={label} id={`fn-${label}`} className="flex gap-1.5">
-                <a href={`#fnref-${label}`} className="text-wiki-accent hover:underline shrink-0">
+                <a href={`#fnref-${label}`} className="text-wiki-accent-text hover:underline shrink-0">
                   [{num}]
                 </a>
                 <span className="[&_p]:inline [&_p]:m-0">

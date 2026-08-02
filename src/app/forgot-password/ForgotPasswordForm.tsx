@@ -12,9 +12,9 @@ export default function ForgotPasswordForm() {
   if (state.success) {
     return (
       <div className="text-center">
-        <p className="text-wiki-accent font-medium mb-2">✓ 이메일 발송 완료</p>
+        <p className="text-wiki-accent-text font-medium mb-2">✓ 이메일 발송 완료</p>
         <p className="text-sm text-wiki-text-muted mb-6">{state.success}</p>
-        <Link href="/login" className="text-sm text-wiki-accent hover:underline">
+        <Link href="/login" className="text-sm text-wiki-accent-text hover:underline">
           로그인 페이지로 이동
         </Link>
       </div>
@@ -48,7 +48,7 @@ export default function ForgotPasswordForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="h-10 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="h-10 bg-wiki-accent text-wiki-on-accent rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isPending && (
           <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
@@ -60,7 +60,7 @@ export default function ForgotPasswordForm() {
       </button>
 
       <p className="text-center text-sm text-wiki-text-muted">
-        <Link href="/login" className="text-wiki-accent hover:underline">
+        <Link href="/login" className="text-wiki-accent-text hover:underline">
           로그인으로 돌아가기
         </Link>
       </p>

@@ -65,7 +65,7 @@ export default function RevisionList({
         {diffHref && (
           <Link
             href={diffHref}
-            className="px-4 py-1.5 bg-wiki-accent text-white text-sm rounded hover:bg-wiki-accent-hover transition-colors"
+            className="px-4 py-1.5 bg-wiki-accent text-wiki-on-accent text-sm rounded hover:bg-wiki-accent-hover transition-colors"
           >
             선택한 버전 비교
           </Link>
@@ -110,7 +110,7 @@ export default function RevisionList({
                       {new Date(rev.edited_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
                     </span>
                     {isLatest && (
-                      <span className="ml-auto text-xs text-wiki-accent font-medium shrink-0 sm:hidden">최신</span>
+                      <span className="ml-auto text-xs text-wiki-accent-text font-medium shrink-0 sm:hidden">최신</span>
                     )}
                   </div>
                   {/* 모바일 2행: 편집자 + 바이트차이 + 요약 */}
@@ -128,7 +128,7 @@ export default function RevisionList({
                     )}
                   </div>
                   {isLatest && (
-                    <span className="hidden sm:block ml-auto text-xs text-wiki-accent font-medium shrink-0">최신</span>
+                    <span className="hidden sm:block ml-auto text-xs text-wiki-accent-text font-medium shrink-0">최신</span>
                   )}
                 </Link>
               </div>

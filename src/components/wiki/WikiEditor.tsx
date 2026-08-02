@@ -252,7 +252,7 @@ function ToolbarBtn({
         disabled
           ? 'text-wiki-text-muted/40 cursor-not-allowed'
           : active
-            ? 'bg-wiki-accent text-white'
+            ? 'bg-wiki-accent text-wiki-on-accent'
             : 'text-wiki-text hover:bg-wiki-border/60'
       }`}
     >
@@ -478,7 +478,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
       {/* 페이지 헤더 */}
       <div className="mb-4">
         <div className="flex items-center gap-0 border-b border-wiki-border">
-          <span className="px-4 py-2 text-sm font-medium text-wiki-accent border-b-2 border-wiki-accent -mb-px">
+          <span className="px-4 py-2 text-sm font-medium text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px">
             수정
           </span>
         </div>
@@ -488,7 +488,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
         {isPending && (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-black/20 backdrop-blur-[1px]">
             <div className="bg-wiki-surface rounded-xl shadow-lg px-8 py-6 flex flex-col items-center gap-3">
-              <svg className="animate-spin w-7 h-7 text-wiki-accent" viewBox="0 0 24 24" fill="none">
+              <svg className="animate-spin w-7 h-7 text-wiki-accent-text" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
@@ -704,7 +704,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           [&_.ProseMirror_h2]:text-xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-5 [&_.ProseMirror_h2]:mb-2
           [&_.ProseMirror_h3]:text-lg [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:mt-4 [&_.ProseMirror_h3]:mb-2
           [&_.ProseMirror_p]:my-2 [&_.ProseMirror_p]:leading-relaxed
-          [&_.ProseMirror_a]:text-wiki-accent [&_.ProseMirror_a]:underline
+          [&_.ProseMirror_a]:text-wiki-accent-text [&_.ProseMirror_a]:underline
           [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-2
           [&_.ProseMirror_ul_ul]:list-[circle] [&_.ProseMirror_ul_ul_ul]:list-[square] [&_.ProseMirror_ul_ul_ul_ul]:list-disc
           [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:my-2
@@ -784,7 +784,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           type="button"
           onClick={handleSave}
           disabled={isPending || isUploading}
-          className="px-5 py-2 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-5 py-2 bg-wiki-accent text-wiki-on-accent rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? '저장 중…' : '저장'}
         </button>
@@ -792,7 +792,7 @@ export default function WikiEditor({ slug, initialTitle, initialHtml }: Props) {
           type="button"
           onClick={async () => { await releaseLock(slug); router.push(slugToHref(slug)) }}
           disabled={isPending || isUploading}
-          className="px-5 py-2 border border-wiki-border text-wiki-text rounded text-sm hover:border-wiki-accent hover:text-wiki-accent transition-colors disabled:opacity-50"
+          className="px-5 py-2 border border-wiki-border text-wiki-text rounded text-sm hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors disabled:opacity-50"
         >
           취소
         </button>

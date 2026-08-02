@@ -74,7 +74,7 @@ export default async function AdminPage({ searchParams }: Props) {
           className={[
             'px-4 py-2 text-sm font-medium transition-colors',
             section === 'users'
-              ? 'text-wiki-accent border-b-2 border-wiki-accent -mb-px'
+              ? 'text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px'
               : 'text-wiki-text-muted hover:text-wiki-text',
           ].join(' ')}
         >
@@ -85,13 +85,13 @@ export default async function AdminPage({ searchParams }: Props) {
           className={[
             'px-4 py-2 text-sm font-medium flex items-center gap-1.5 transition-colors',
             section === 'deletions'
-              ? 'text-wiki-accent border-b-2 border-wiki-accent -mb-px'
+              ? 'text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px'
               : 'text-wiki-text-muted hover:text-wiki-text',
           ].join(' ')}
         >
           삭제 신청
           {deletionRequests.length > 0 && (
-            <span className="px-1.5 py-0.5 text-xs rounded-full bg-wiki-accent text-white">
+            <span className="px-1.5 py-0.5 text-xs rounded-full bg-wiki-accent text-wiki-on-accent">
               {deletionRequests.length}
             </span>
           )}
@@ -101,13 +101,13 @@ export default async function AdminPage({ searchParams }: Props) {
           className={[
             'px-4 py-2 text-sm font-medium flex items-center gap-1.5 transition-colors',
             section === 'requests'
-              ? 'text-wiki-accent border-b-2 border-wiki-accent -mb-px'
+              ? 'text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px'
               : 'text-wiki-text-muted hover:text-wiki-text',
           ].join(' ')}
         >
           기능 요청
           {featureRequests.length > 0 && (
-            <span className="px-1.5 py-0.5 text-xs rounded-full bg-wiki-accent text-white">
+            <span className="px-1.5 py-0.5 text-xs rounded-full bg-wiki-accent text-wiki-on-accent">
               {featureRequests.length}
             </span>
           )}
@@ -127,7 +127,7 @@ export default async function AdminPage({ searchParams }: Props) {
                   className={[
                     'px-4 py-2 text-sm font-medium flex items-center gap-1.5 transition-colors',
                     isActive
-                      ? 'text-wiki-accent border-b-2 border-wiki-accent -mb-px'
+                      ? 'text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px'
                       : 'text-wiki-text-muted hover:text-wiki-text',
                   ].join(' ')}
                 >
@@ -137,7 +137,7 @@ export default async function AdminPage({ searchParams }: Props) {
                       className={[
                         'px-1.5 py-0.5 text-xs rounded-full',
                         tab.value === 'pending'
-                          ? 'bg-wiki-accent text-white'
+                          ? 'bg-wiki-accent text-wiki-on-accent'
                           : 'bg-wiki-border text-wiki-text-muted',
                       ].join(' ')}
                     >

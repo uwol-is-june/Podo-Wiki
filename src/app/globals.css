@@ -7,8 +7,14 @@
   --wiki-surface: #ffffff;
   --wiki-text: #1c1128;
   --wiki-text-muted: #6b6080;
+  /* accent: 버튼 등 '배경'용 — 이 위에 올라가는 글자색은 --wiki-on-accent */
   --wiki-accent: #6a39c0;
   --wiki-accent-hover: #5528a8;
+  /* accent-text: 링크·라벨 등 '텍스트'용. 라이트모드에선 accent와 같은 값이지만,
+     다크모드에선 배경용보다 밝게 띄워서 가독성을 확보한다 (아래 .dark 참고) */
+  --wiki-accent-text: #6a39c0;
+  /* on-accent: accent 배경 '위에 올라가는 글자'색 (accent-text와 반대 방향이니 혼동 주의) */
+  --wiki-on-accent: #ffffff;
   --wiki-border: #ddd5f0;
   --wiki-header-bg: #6a39c0;
   --wiki-header-text: #ffffff;
@@ -20,8 +26,15 @@
   --wiki-surface: #1e1530;
   --wiki-text: #e5dff5;
   --wiki-text-muted: #9080b8;
+  /* 배경용 — 버튼이 배경에서 도드라지는 밝기(bg 위 5.12:1)를 유지하려고 그대로 둔다 */
   --wiki-accent: #9b6de0;
   --wiki-accent-hover: #b389f0;
+  /* 텍스트용 — 배경용(#9b6de0)은 surface 위 4.69:1, accent/10 틴트 위 4.15:1(AA 미달)이라 밝힌 값.
+     surface 위 7.62:1 / bg 위 8.31:1 / accent-10% 틴트 위 6.74:1 (WCAG AA 본문 4.5:1) */
+  --wiki-accent-text: #c09bf0;
+  /* 다크에선 흰 글씨가 accent 배경 위에서 3.71:1로 AA 미달이라 어두운 글자로 뒤집는다 (5.12:1).
+     배경 밝기를 유지해서 버튼이 배경에서 도드라지는 정도(5.12:1)는 그대로 */
+  --wiki-on-accent: #130d1f;
   --wiki-border: #352558;
   --wiki-header-bg: #1e1530;
   --wiki-header-text: #e5dff5;
@@ -35,6 +48,8 @@
   --color-wiki-text-muted: var(--wiki-text-muted);
   --color-wiki-accent: var(--wiki-accent);
   --color-wiki-accent-hover: var(--wiki-accent-hover);
+  --color-wiki-accent-text: var(--wiki-accent-text);
+  --color-wiki-on-accent: var(--wiki-on-accent);
   --color-wiki-border: var(--wiki-border);
   --color-wiki-header-bg: var(--wiki-header-bg);
   --color-wiki-header-text: var(--wiki-header-text);
@@ -76,17 +91,13 @@ body {
 
 /* 에디터 본문 내 각주 참조 [^n] 강조 — 배지 형태로 눈에 띄게 표시 (다른 UI 요소와 통일된 radius) */
 .fn-ref {
-  color: #fff;
+  color: var(--wiki-on-accent);
   background-color: var(--wiki-accent);
   border-radius: 3px;
   padding: 0 6px;
   font-weight: 600;
   font-size: 0.85em;
 }
-.dark .fn-ref {
-  color: var(--wiki-bg);
-}
-
 /* Tiptap 이미지 리사이즈 핸들 */
 [data-resize-handle] {
   width: 10px;

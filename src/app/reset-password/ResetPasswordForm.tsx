@@ -69,7 +69,7 @@ export default function ResetPasswordForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="h-10 bg-wiki-accent text-white rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="h-10 bg-wiki-accent text-wiki-on-accent rounded text-sm font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isPending && (
           <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">

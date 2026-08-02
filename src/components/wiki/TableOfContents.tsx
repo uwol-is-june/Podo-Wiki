@@ -19,8 +19,8 @@ function TocList({
           <a
             href={`#${id}`}
             onClick={onLinkClick}
-            className={`block py-0.5 leading-snug hover:text-wiki-accent transition-colors truncate ${
-              activeId === id ? 'text-wiki-accent font-medium' : 'text-wiki-text-muted'
+            className={`block py-0.5 leading-snug hover:text-wiki-accent-text transition-colors truncate ${
+              activeId === id ? 'text-wiki-accent-text font-medium' : 'text-wiki-text-muted'
             }`}
           >
             <span className="text-wiki-text-muted/70 mr-1">{number}.</span>

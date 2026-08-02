@@ -139,6 +139,9 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
               <ShuffleIcon />
               임의문서
             </Link>
+            <Link href="/bookmarks" className="px-2 py-1 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
+              북마크
+            </Link>
             {user ? (
               <div className="ml-1 flex items-center gap-1">
                 <Link href="/mypage" className="px-2 py-1 text-xs text-wiki-header-text/70 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
@@ -221,6 +224,9 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
               <Link href="/random" className="flex items-center gap-2 px-3 py-2.5 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
                 <ShuffleIcon />
                 임의문서
+              </Link>
+              <Link href="/bookmarks" className="px-3 py-2.5 text-sm text-wiki-header-text/80 hover:text-wiki-header-text hover:bg-wiki-header-text/10 rounded transition-colors">
+                북마크
               </Link>
               <div className="h-px bg-wiki-border/30 my-1" />
               {user ? (

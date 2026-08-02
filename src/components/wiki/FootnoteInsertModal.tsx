@@ -57,7 +57,7 @@ export default function FootnoteInsertModal({ open, onClose, onConfirm }: Props)
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 text-sm border border-wiki-border text-wiki-text rounded hover:border-wiki-accent hover:text-wiki-accent transition-colors"
+              className="px-3 py-1.5 text-sm border border-wiki-border text-wiki-text rounded hover:border-wiki-accent-text hover:text-wiki-accent-text transition-colors"
             >
               취소
             </button>
@@ -65,7 +65,7 @@ export default function FootnoteInsertModal({ open, onClose, onConfirm }: Props)
               type="button"
               onClick={handleConfirm}
               disabled={!content.trim()}
-              className="px-3 py-1.5 text-sm bg-wiki-accent text-white rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm bg-wiki-accent text-wiki-on-accent rounded hover:bg-wiki-accent-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               삽입
             </button>
