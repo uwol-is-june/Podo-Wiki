@@ -6,17 +6,15 @@
 
 ## ① 지금 버전
 
-| 플랫폼  | 스토어 버전 | 상태                                           |
-| ------- | ----------- | ---------------------------------------------- |
-| iOS     | 1.0.3       | 🔨 1.1.0 build 5 **ASC 업로드 완료** (8/2) — 심사 제출 대기 |
-| Android | 1.0.3       | 🔨 1.1.0 vc 7 **AAB 빌드 완료** (8/2) — 업로드 대기 |
+| 플랫폼  | 스토어 버전 | 상태                              |
+| ------- | ----------- | --------------------------------- |
+| iOS     | 1.0.3       | ⏳ 1.1.0 (build 5) **심사 중** (8/2 제출) |
+| Android | 1.0.3       | ⏳ 1.1.0 (vc 7) **심사 중** (8/2 제출)   |
 
-- **1.1.0 (양대, 제출 진행 중)**: 다크모드 대비 개선(T-062·T-063) + 북마크 탭·문서 화면 개편(T-065) + 본문·표 크기 조정(T-067)
-  - Android — versionCode 7, [AAB](https://expo.dev/artifacts/eas/-QIpS6sfwTACfxjc1EfdHdYMHdCu2dlTDolVMKPLVtE.aab) / [빌드](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/builds/510465b0-0df4-4da6-ae80-e39de2853446)
-    - **남은 단계: Play Console에 AAB 수동 업로드 → 출시 노트 → 프로덕션 출시** (서비스 계정 키가 없어 자동 제출 불가)
-    - AAB 안에 `proguard.map` 포함 확인함 → "가독화 파일 없음" 경고는 안 뜨는 게 정상
-  - iOS — build 5, [빌드](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/builds/3ae870b7-ba9b-47e5-9303-1fdc8b9d144f) / [제출](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/submissions/e73d536f-a578-4e7c-96b0-a4fd2174ead6)
-    - `eas submit`으로 ASC 업로드 완료. **남은 단계: ASC에서 새 버전(1.1.0) 생성 → build 5 선택 → "새로운 기능" 작성 → 심사 제출**
+- **1.1.0 (양대, 8/2 심사 제출 완료)**: 다크모드 대비 개선(T-062·T-063) + 북마크 탭·문서 화면 개편(T-065) + 본문·표 크기 조정(T-067)
+  - Android — versionCode 7, [AAB](https://expo.dev/artifacts/eas/-QIpS6sfwTACfxjc1EfdHdYMHdCu2dlTDolVMKPLVtE.aab) / [빌드](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/builds/510465b0-0df4-4da6-ae80-e39de2853446). Play Console 프로덕션 제출 완료
+    - AAB에 `proguard.map` 포함 확인 — 이번엔 "가독화 파일 없음" 경고 없었음
+  - iOS — build 5, [빌드](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/builds/3ae870b7-ba9b-47e5-9303-1fdc8b9d144f) / [제출](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/submissions/e73d536f-a578-4e7c-96b0-a4fd2174ead6). `eas submit` → ASC 업로드 → 심사 제출 완료
   - 에뮬레이터 릴리스 빌드로 라이트/다크 양쪽 검증 완료 (북마크 저장·재시작 유지·삭제, 접이식 목차, 맨 위로 FAB, 최근 변경 진입, 본문·표 크기)
   - 웹은 같은 날 배포 완료 — 웹 북마크(T-066) 포함
 - 1.0.3 내용: 커스텀 도메인 `wiki.podo-store.com`로 앱 SITE_URL 전환 + 문서 헤더 목차/역사 칩(TASK-058) + 더보기 기능 추가 요청 폼(TASK-059)
