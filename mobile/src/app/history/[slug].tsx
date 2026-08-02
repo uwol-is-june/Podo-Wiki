@@ -80,7 +80,7 @@ export default function HistoryScreen() {
                   })
                 }
               >
-                <Text style={styles.diffButtonText}>선택한 버전 비교</Text>
+                <Text style={[styles.diffButtonText, { color: theme.onAccent }]}>선택한 버전 비교</Text>
               </Pressable>
             )}
           </View>
@@ -114,7 +114,7 @@ export default function HistoryScreen() {
                       isSelected && { backgroundColor: theme.accent },
                     ]}
                   >
-                    {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                    {isSelected && <Text style={[styles.checkmark, { color: theme.onAccent }]}>✓</Text>}
                   </Pressable>
                   <Pressable
                     style={styles.rowBody}
@@ -126,7 +126,7 @@ export default function HistoryScreen() {
                         {formatDateTime(item.edited_at)}
                       </Text>
                       {index === 0 && (
-                        <Text style={[styles.latest, { color: theme.accent }]}>최신</Text>
+                        <Text style={[styles.latest, { color: theme.accentText }]}>최신</Text>
                       )}
                     </View>
                     <View style={styles.rowBottom}>
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   toolbarHint: { fontSize: 12 },
   diffButton: { borderRadius: 6, paddingHorizontal: 14, paddingVertical: 7 },
-  diffButtonText: { color: '#ffffff', fontSize: 13, fontWeight: '600' },
+  diffButtonText: { fontSize: 13, fontWeight: '600' },
   empty: { fontSize: 13, textAlign: 'center', marginTop: 48 },
   row: {
     flexDirection: 'row',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
-  checkmark: { color: '#ffffff', fontSize: 12, fontWeight: '700' },
+  checkmark: { fontSize: 12, fontWeight: '700' },
   rowBody: { flex: 1, paddingVertical: 10 },
   rowTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   revNum: { fontSize: 12, fontVariant: ['tabular-nums'], width: 28 },

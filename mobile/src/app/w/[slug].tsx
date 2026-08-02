@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Redirect, Stack, useLocalSearchParams, useRouter } from 'expo-router'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   Pressable,
@@ -13,8 +13,10 @@ import {
 import type WebView from 'react-native-webview'
 
 import { ErrorState } from '@/components/error-state'
-import { TocSheet } from '@/components/toc-sheet'
+import { ScrollTopFab } from '@/components/scroll-top-fab'
+import { TocBar } from '@/components/toc-bar'
 import { WikiWebView } from '@/components/wiki-webview'
+import { useBookmarkToggle, useSyncBookmarkTitle } from '@/hooks/use-bookmarks'
 import { formatDateTime, getDocument, getExistingSlugs } from '@/lib/api'
 import { FAQ_SLUG } from '@/lib/constants'
 import { extractHeadings } from '@/lib/wiki/headings'
@@ -25,7 +27,8 @@ export default function DocumentScreen() {
   const router = useRouter()
   const theme = wikiTheme(useColorScheme())
   const webviewRef = useRef<WebView>(null)
-  const [tocVisible, setTocVisible] = useState(false)
+  // 본문을 이 정도 내렸을 때부터 '맨 위로' 버튼을 띄운다 (화면 절반 남짓)
+  const [showTopFab, setShowTopFab] = useState(false)
 
   const { data: document, isLoading, isError, refetch } = useQuery({
     queryKey: ['document', slug],
@@ -53,8 +56,21 @@ export default function DocumentScreen() {
     [document]
   )
 
+  const { isBookmarked, toggle: toggleBookmark } = useBookmarkToggle(slug, document?.title)
+
+  // 저장해둔 문서를 다시 열었을 때 그 사이 바뀐 제목을 북마크 목록에도 반영
+  const syncBookmarkTitle = useSyncBookmarkTitle()
+  useEffect(() => {
+    if (document?.title) void syncBookmarkTitle(slug, document.title)
+  }, [document?.title, slug, syncBookmarkTitle])
+
   // 웹과 동일: FAQ 문서는 전용 화면으로
   if (slug === FAQ_SLUG) return <Redirect href="/faq" />
+
+  const scrollToTop = () => {
+    webviewRef.current?.injectJavaScript(`window.scrollTo({top:0,behavior:'smooth'}); true;`)
+    setShowTopFab(false)
+  }
 
   const scrollToHeading = (id: string) => {
     webviewRef.current?.injectJavaScript(
@@ -68,34 +84,21 @@ export default function DocumentScreen() {
         options={{
           title: document?.title ?? slug,
           headerTitleStyle: { fontSize: 16 },
-          headerRight: () => (
-            <View style={styles.headerActions}>
-              {headings.length > 0 && (
-                <Pressable
-                  hitSlop={6}
-                  onPress={() => setTocVisible(true)}
-                  style={({ pressed }) => [
-                    styles.headerChip,
-                    { backgroundColor: theme.headerText + '22', opacity: pressed ? 0.6 : 1 },
-                  ]}
-                >
-                  <Text style={[styles.headerChipText, { color: theme.headerText }]}>목차</Text>
-                </Pressable>
-              )}
-              {document && (
-                <Pressable
-                  hitSlop={6}
-                  onPress={() => router.push({ pathname: '/history/[slug]', params: { slug } })}
-                  style={({ pressed }) => [
-                    styles.headerChip,
-                    { backgroundColor: theme.headerText + '22', opacity: pressed ? 0.6 : 1 },
-                  ]}
-                >
-                  <Text style={[styles.headerChipText, { color: theme.headerText }]}>역사</Text>
-                </Pressable>
-              )}
-            </View>
-          ),
+          headerRight: () =>
+            document ? (
+              <Pressable
+                hitSlop={10}
+                onPress={() => toggleBookmark()}
+                accessibilityRole="button"
+                accessibilityLabel={isBookmarked ? '북마크 해제' : '북마크에 저장'}
+                accessibilityState={{ selected: isBookmarked }}
+                style={({ pressed }) => [styles.headerIcon, { opacity: pressed ? 0.6 : 1 }]}
+              >
+                <Text style={[styles.headerIconText, { color: theme.headerText }]}>
+                  {isBookmarked ? '★' : '☆'}
+                </Text>
+              </Pressable>
+            ) : null,
         }}
       />
 
@@ -132,7 +135,7 @@ export default function DocumentScreen() {
                     hitSlop={6}
                     onPress={() => router.push({ pathname: '/w/[slug]', params: { slug: b.slug } })}
                   >
-                    <Text style={[styles.breadcrumbLink, { color: theme.accent }]}>{b.label}</Text>
+                    <Text style={[styles.breadcrumbLink, { color: theme.accentText }]}>{b.label}</Text>
                   </Pressable>
                   <Text style={[styles.breadcrumbSep, { color: theme.textMuted }]}>›</Text>
                 </View>
@@ -143,18 +146,16 @@ export default function DocumentScreen() {
             </ScrollView>
           )}
 
+          <TocBar headings={headings} onSelect={scrollToHeading} />
+
           <WikiWebView
             ref={webviewRef}
             content={document.content}
             footerText={`최종 수정: ${formatDateTime(document.updated_at)}`}
+            onScrollY={y => setShowTopFab(y > 400)}
           />
 
-          <TocSheet
-            visible={tocVisible}
-            headings={headings}
-            onSelect={scrollToHeading}
-            onClose={() => setTocVisible(false)}
-          />
+          <ScrollTopFab visible={showTopFab} onPress={scrollToTop} />
         </>
       )}
     </View>
@@ -164,9 +165,8 @@ export default function DocumentScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 2 },
-  headerChip: { paddingHorizontal: 11, paddingVertical: 5, borderRadius: 14 },
-  headerChipText: { fontSize: 13, fontWeight: '600' },
+  headerIcon: { paddingHorizontal: 4, paddingVertical: 2 },
+  headerIconText: { fontSize: 20, lineHeight: 24 },
   notFoundCard: {
     borderWidth: 1,
     borderRadius: 12,

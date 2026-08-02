@@ -15,7 +15,7 @@ const WikiLightNav = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: WikiColors.light.accent,
+    primary: WikiColors.light.accentText,
     background: WikiColors.light.bg,
     card: WikiColors.light.headerBg,
     text: WikiColors.light.headerText,
@@ -27,7 +27,7 @@ const WikiDarkNav = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: WikiColors.dark.accent,
+    primary: WikiColors.dark.accentText,
     background: WikiColors.dark.bg,
     card: WikiColors.dark.headerBg,
     text: WikiColors.dark.headerText,
@@ -57,6 +57,7 @@ export default function RootLayout() {
         <Stack.Screen name="revision/[id]" options={{ title: '리비전' }} />
         <Stack.Screen name="diff" options={{ title: '비교' }} />
         <Stack.Screen name="faq" options={{ title: '자주 묻는 질문' }} />
+        <Stack.Screen name="recent" options={{ title: '최근 변경' }} />
       </Stack>
       </ThemeProvider>
     </QueryClientProvider>

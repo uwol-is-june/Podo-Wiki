@@ -9,8 +9,8 @@ export default function TabsLayout() {
   return (
     <NativeTabs
       backgroundColor={theme.surface}
-      tintColor={theme.accent}
-      labelStyle={{ selected: { color: theme.accent } }}
+      tintColor={theme.accentText}
+      labelStyle={{ selected: { color: theme.accentText } }}
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>홈</NativeTabs.Trigger.Label>
@@ -22,9 +22,9 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="recent">
-        <NativeTabs.Trigger.Label>최근 변경</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="clock" md="schedule" />
+      <NativeTabs.Trigger name="bookmarks">
+        <NativeTabs.Trigger.Label>북마크</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="bookmark.fill" md="bookmark" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="more">

@@ -12,10 +12,10 @@ export function ErrorState({ onRetry }: { onRetry: () => void }) {
         불러오지 못했어요.{'\n'}네트워크 연결을 확인해 주세요.
       </Text>
       <Pressable
-        style={[styles.button, { borderColor: theme.accent }]}
+        style={[styles.button, { borderColor: theme.accentText }]}
         onPress={onRetry}
       >
-        <Text style={[styles.buttonText, { color: theme.accent }]}>다시 시도</Text>
+        <Text style={[styles.buttonText, { color: theme.accentText }]}>다시 시도</Text>
       </Pressable>
     </View>
   )

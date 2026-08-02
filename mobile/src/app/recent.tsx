@@ -7,11 +7,11 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  View,
   useColorScheme,
 } from 'react-native'
 
 import { ErrorState } from '@/components/error-state'
-import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
 import { PAGE_SIZE, editorLabel, formatDateTime, getRecentRevisions } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
 
@@ -31,7 +31,7 @@ export default function RecentScreen() {
   const rows = data?.pages.flatMap(page => page.rows) ?? []
 
   return (
-    <TabScreen title="최근 변경">
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
       {isLoading ? (
         <ActivityIndicator color={theme.accent} style={styles.loading} />
       ) : isError ? (
@@ -40,7 +40,7 @@ export default function RecentScreen() {
         <FlatList
           data={rows}
           keyExtractor={item => item.id}
-          contentContainerStyle={{ paddingBottom: BOTTOM_TAB_INSET + 24 }}
+          contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={theme.accent} />
           }
@@ -63,7 +63,7 @@ export default function RecentScreen() {
                 router.push({ pathname: '/w/[slug]', params: { slug: item.document_slug } })
               }
             >
-              <Text style={[styles.rowTitle, { color: theme.accent }]} numberOfLines={1}>
+              <Text style={[styles.rowTitle, { color: theme.accentText }]} numberOfLines={1}>
                 {item.documents?.title ?? item.document_slug}
               </Text>
               <Text style={[styles.rowMeta, { color: theme.textMuted }]}>
@@ -73,11 +73,13 @@ export default function RecentScreen() {
           )}
         />
       )}
-    </TabScreen>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
+  listContent: { paddingBottom: 24 },
   loading: { marginTop: 32 },
   empty: { fontSize: 13, textAlign: 'center', marginTop: 48 },
   footerLoading: { paddingVertical: 16 },

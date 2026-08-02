@@ -69,7 +69,9 @@ export default function HomeScreen() {
                 />
               ) : (
                 <View style={[styles.troupeInitial, { backgroundColor: theme.accent }]}>
-                  <Text style={styles.troupeInitialText}>{troupe.name[0]}</Text>
+                  <Text style={[styles.troupeInitialText, { color: theme.onAccent }]}>
+                    {troupe.name[0]}
+                  </Text>
                 </View>
               )}
               <Text style={[styles.troupeName, { color: theme.text }]} numberOfLines={1}>
@@ -89,7 +91,7 @@ export default function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>최근 변경</Text>
           <Pressable onPress={() => router.push('/recent')}>
-            <Text style={[styles.moreLink, { color: theme.accent }]}>전체 보기</Text>
+            <Text style={[styles.moreLink, { color: theme.accentText }]}>전체 보기</Text>
           </Pressable>
         </View>
         <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -109,7 +111,7 @@ export default function HomeScreen() {
                   router.push({ pathname: '/w/[slug]', params: { slug: rev.document_slug } })
                 }
               >
-                <Text style={[styles.recentTitle, { color: theme.accent }]} numberOfLines={1}>
+                <Text style={[styles.recentTitle, { color: theme.accentText }]} numberOfLines={1}>
                   {rev.documents?.title ?? rev.document_slug}
                 </Text>
                 <Text style={[styles.recentMeta, { color: theme.textMuted }]}>
@@ -124,7 +126,7 @@ export default function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>자주 묻는 질문</Text>
           <Pressable onPress={() => router.push('/faq')}>
-            <Text style={[styles.moreLink, { color: theme.accent }]}>전체 보기</Text>
+            <Text style={[styles.moreLink, { color: theme.accentText }]}>전체 보기</Text>
           </Pressable>
         </View>
         <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -142,7 +144,7 @@ export default function HomeScreen() {
                 ]}
                 onPress={() => router.push('/faq')}
               >
-                <Text style={[styles.faqQ, { color: theme.accent }]}>Q.</Text>
+                <Text style={[styles.faqQ, { color: theme.accentText }]}>Q.</Text>
                 <Text style={[styles.faqText, { color: theme.text }]} numberOfLines={2}>
                   {item.question}
                 </Text>
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  troupeInitialText: { color: '#ffffff', fontSize: 18, fontWeight: '700' },
+  troupeInitialText: { fontSize: 18, fontWeight: '700' },
   troupeName: { fontSize: 12, paddingHorizontal: 6 },
   card: { borderWidth: 1, borderRadius: 10, marginBottom: 16, overflow: 'hidden' },
   cardLoading: { paddingVertical: 24 },

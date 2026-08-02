@@ -14,12 +14,14 @@ type WikiWebViewProps = {
   /** 사전 렌더링된 본문 HTML (FAQ 아코디언 등) */
   bodyHtml?: string
   footerText?: string
+  /** 본문 세로 스크롤 위치(px). '맨 위로' 버튼 노출 판단용 */
+  onScrollY?: (y: number) => void
 }
 
 // 문서 본문 마크다운을 로컬 생성 HTML로 렌더링하는 WebView.
 // 링크는 전부 가로채서 네이티브 내비게이션으로 처리한다 (원격 페이지 로딩 없음).
 export const WikiWebView = forwardRef<WebView, WikiWebViewProps>(
-  function WikiWebView({ content, bodyHtml, footerText }, ref) {
+  function WikiWebView({ content, bodyHtml, footerText, onScrollY }, ref) {
   const router = useRouter()
   const scheme = useColorScheme()
   const theme = wikiTheme(scheme)
@@ -87,6 +89,9 @@ export const WikiWebView = forwardRef<WebView, WikiWebViewProps>(
       originWhitelist={['*']}
       style={{ backgroundColor: theme.bg }}
       onMessage={handleMessage}
+      onScroll={
+        onScrollY ? event => onScrollY(event.nativeEvent.contentOffset.y) : undefined
+      }
       // 링크는 JS에서 가로채 postMessage로 전달하므로 초기 HTML 로딩 외 내비게이션은 차단
       onShouldStartLoadWithRequest={request => {
         return request.url === 'about:blank' || request.url.startsWith(SITE_URL)

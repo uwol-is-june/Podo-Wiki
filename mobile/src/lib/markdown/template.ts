@@ -1,5 +1,7 @@
 // WebView에 로딩할 완전한 HTML 문서 셸.
-// CSS는 웹 MarkdownContent.tsx의 PROSE 규칙(모바일 기준 크기)을 평문 CSS로 옮긴 것 — keep in sync.
+// CSS는 웹 MarkdownContent.tsx의 PROSE 규칙을 평문 CSS로 옮긴 것 — 구조·색은 keep in sync.
+// 단, 글자 크기는 웹보다 한 단계 작다(TASK-067): 앱은 주변 네이티브 UI가 13px대라
+// 웹과 같은 16px 본문이 유독 커 보였음. 색 토큰은 accent(배경용)와 accent-text(글자용)를 구분해서 쓸 것.
 import type { WikiTheme } from '@/theme/colors'
 
 export function wikiHtmlDocument(bodyHtml: string, theme: WikiTheme): string {
@@ -15,33 +17,34 @@ export function wikiHtmlDocument(bodyHtml: string, theme: WikiTheme): string {
   --text: ${theme.text};
   --text-muted: ${theme.textMuted};
   --accent: ${theme.accent};
+  --accent-text: ${theme.accentText};
   --border: ${theme.border};
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  padding: 16px 16px 40px;
+  padding: 14px 14px 36px;
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: 15px;
+  line-height: 1.65;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
 h1, h2, h3 { scroll-margin-top: 12px; }
 h1 {
-  font-size: 20px; font-weight: 700; margin: 20px 0 12px; padding-bottom: 8px;
+  font-size: 19px; font-weight: 700; margin: 18px 0 10px; padding-bottom: 7px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 8px;
 }
 h2 {
-  font-size: 18px; font-weight: 700; margin: 16px 0 8px; padding-bottom: 4px;
+  font-size: 17px; font-weight: 700; margin: 15px 0 7px; padding-bottom: 4px;
   border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
   display: flex; align-items: center; gap: 8px;
 }
-h3 { font-size: 16px; font-weight: 600; margin: 12px 0 4px; }
+h3 { font-size: 15px; font-weight: 600; margin: 11px 0 4px; }
 h1.collapsible, h2.collapsible { cursor: pointer; -webkit-user-select: none; user-select: none; }
 .h-text { flex: 1; }
 .hnum { color: var(--text-muted); margin-right: 6px; }
@@ -49,16 +52,16 @@ h1.collapsible, h2.collapsible { cursor: pointer; -webkit-user-select: none; use
 section.closed > .sec-body { display: none; }
 section.closed .caret { transform: rotate(0deg); }
 p { margin: 8px 0; }
-a { color: var(--accent); text-decoration: none; }
-ul { list-style: disc; padding-left: 24px; margin: 12px 0; }
+a { color: var(--accent-text); text-decoration: none; }
+ul { list-style: disc; padding-left: 20px; margin: 11px 0; }
 ul ul { list-style: circle; } ul ul ul { list-style: square; } ul ul ul ul { list-style: disc; }
-ol { list-style: decimal; padding-left: 24px; margin: 12px 0; }
+ol { list-style: decimal; padding-left: 20px; margin: 11px 0; }
 ol ol { list-style: lower-alpha; } ol ol ol { list-style: lower-roman; } ol ol ol ol { list-style: decimal; }
 li { margin: 4px 0; }
 code {
   background: color-mix(in srgb, var(--border) 30%, transparent);
   padding: 2px 4px; border-radius: 4px;
-  font-family: ui-monospace, Menlo, monospace; font-size: 14px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 13px;
 }
 pre {
   background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
@@ -69,16 +72,16 @@ blockquote {
   border-left: 4px solid var(--accent); padding-left: 16px; margin: 16px 0;
   color: var(--text-muted);
 }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; display: block; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin: 14px 0; display: block; overflow-x: auto; font-size: 14px; }
 th {
   border: 1px solid var(--border); background: color-mix(in srgb, var(--border) 20%, transparent);
-  padding: 8px 12px; text-align: left; font-weight: 600;
+  padding: 6px 9px; text-align: left; font-weight: 600;
 }
-td { border: 1px solid var(--border); padding: 8px 12px; }
+td { border: 1px solid var(--border); padding: 6px 9px; }
 hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
 img { max-width: 100%; border-radius: 4px; margin: 12px 0; }
 sup { font-size: 12px; line-height: 0; }
-.footnote-ref { color: var(--accent); }
+.footnote-ref { color: var(--accent-text); }
 .doc-meta { margin-top: 24px; font-size: 12px; color: var(--text-muted); }
 .faq-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -90,7 +93,7 @@ sup { font-size: 12px; line-height: 0; }
   list-style: none;
 }
 .faq-card summary::-webkit-details-marker { display: none; }
-.faq-q { color: var(--accent); font-weight: 700; }
+.faq-q { color: var(--accent-text); font-weight: 700; }
 .faq-question { font-size: 14px; font-weight: 500; flex: 1; }
 .faq-answer {
   padding: 4px 16px 14px;

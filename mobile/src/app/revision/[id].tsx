@@ -56,7 +56,7 @@ export default function RevisionScreen() {
                 router.push({ pathname: '/w/[slug]', params: { slug: revision.document_slug } })
               }
             >
-              <Text style={[styles.bannerLink, { color: theme.accent }]}>현재 문서</Text>
+              <Text style={[styles.bannerLink, { color: theme.accentText }]}>현재 문서</Text>
             </Pressable>
           </View>
 

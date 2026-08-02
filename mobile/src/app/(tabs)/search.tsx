@@ -112,7 +112,7 @@ export default function SearchScreen() {
                 style={[styles.resultCard, { backgroundColor: theme.surface, borderColor: theme.border }]}
                 onPress={() => openDocument(item.slug)}
               >
-                <Text style={[styles.resultTitle, { color: theme.accent }]}>{item.title}</Text>
+                <Text style={[styles.resultTitle, { color: theme.accentText }]}>{item.title}</Text>
                 <Text style={[styles.resultSnippet, { color: theme.textMuted }]} numberOfLines={2}>
                   {item.snippet}
                 </Text>

@@ -84,7 +84,7 @@ export function FeatureRequestSheet({
                 style={[styles.submitBtn, { backgroundColor: theme.accent }]}
                 onPress={close}
               >
-                <Text style={styles.submitText}>닫기</Text>
+                <Text style={[styles.submitText, { color: theme.onAccent }]}>닫기</Text>
               </Pressable>
             </View>
           ) : (
@@ -127,9 +127,9 @@ export function FeatureRequestSheet({
                   disabled={!canSubmit}
                 >
                   {status === 'submitting' ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color={theme.onAccent} size="small" />
                   ) : (
-                    <Text style={styles.submitText}>제출</Text>
+                    <Text style={[styles.submitText, { color: theme.onAccent }]}>제출</Text>
                   )}
                 </Pressable>
               </View>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  submitText: { fontSize: 15, color: '#fff', fontWeight: '600' },
+  submitText: { fontSize: 15, fontWeight: '600' },
   doneBox: { alignItems: 'center', paddingVertical: 16 },
   doneTitle: { fontSize: 16, fontWeight: '600', marginBottom: 6 },
   doneSub: { fontSize: 13, textAlign: 'center', marginBottom: 20, lineHeight: 18 },
