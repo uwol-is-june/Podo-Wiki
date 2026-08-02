@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [TASK-067] 앱 문서 본문·표 크기 축소 (2026-08-02)
+  - "본문 텍스트와 표가 크고, 모바일에서 전체적으로 요소가 크게 보인다"는 피드백
+  - **원인 판별 먼저**: WebView에 `textZoom`이 없어 Android 시스템 글꼴 배율이 본문에만 곱해지는 가능성을 의심했으나, **에뮬레이터 글꼴 배율 1.0에서도 본문이 확연히 큼**을 확인 → 접근성 확대를 무력화하는 `textZoom` 고정은 불필요하고 CSS 값 문제로 확정. 앱 네이티브 UI는 13px가 최다인데 WebView 본문만 16px였던 것이 원인
+  - `lib/markdown/template.ts` — 본문 16→15px·line-height 1.7→1.65·여백 16→14px, h1 20→19 / h2 18→17 / h3 16→15px, 목록 들여쓰기 24→20px, 인라인 코드 14→13px
+  - 표 — 본문 크기를 상속받던 것을 **`font-size: 14px` 명시**, 셀 패딩 8×12 → 6×9px. 3열 표가 가로 스크롤 없이 화면에 들어옴
+  - 이 템플릿은 문서·FAQ·리비전 세 화면이 공유하므로 함께 바뀜. 웹 PROSE와 의도적으로 한 단계 차이가 나므로 파일 상단 주석에 사유 기록
+  - 검증: 에뮬레이터 릴리스 빌드에서 라이트/다크 양쪽 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
+- [TASK-063] 다크모드 accent 버튼의 글자 대비 확보 — `on-accent` 토큰 신설 (2026-08-02)
+  - TASK-062(보라색 *글씨*) 검증 중 발견한 별개 문제. 이번엔 **보라색 배경 위 흰 글씨** — 다크에서 `#ffffff` on `#9b6de0` = **3.71:1로 AA 미달**. 버튼 라벨이 `text-sm`(14px)이라 large text 예외(3:1)에도 해당 안 됐음. 라이트는 7.10:1로 정상이라 **다크 전용 문제**
+  - 선택: 배경을 어둡게 하는 대신(버튼이 배경에서 덜 도드라짐 5.12→3.79:1) **글자를 어둡게 뒤집는 방식** 채택 — 배경 밝기를 유지해 버튼 존재감(5.12:1)을 그대로 두면서 라벨 대비만 확보
+  - 해결: `--wiki-on-accent` / `WikiTheme.onAccent` 신설 — 라이트 `#ffffff`(현행 유지), 다크 `#130d1f`. **3.71 → 5.12:1**
+  - 토큰 이름 주의 — `accent-text`(accent를 글자색으로)와 `on-accent`(accent 배경 위 글자색)는 방향이 반대. 양쪽 정의부에 주석으로 명시
+  - 웹: `bg-wiki-accent text-white` 19곳을 `text-wiki-on-accent`로. 각주 배지 `.fn-ref`는 이미 같은 방식(라이트 흰색/다크 어두운색)을 수동 구현하고 있어 토큰으로 통일하고 `.dark .fn-ref` 오버라이드 제거
+  - 앱: 하드코딩 `#ffffff`/`#fff` 5곳(단체 이니셜, 비교 버튼, 체크마크, 제출 버튼 라벨·스피너)을 `theme.onAccent`로 — StyleSheet에서 색만 빼고 사용처에서 인라인 주입. 앱 내 하드코딩 흰색 전멸
+  - 빨강 삭제 버튼(`bg-red-*` 4곳)은 별개 색 계열이라 대상 제외
+  - 검증: Next 빌드·양쪽 tsc 통과, 컴파일된 CSS에서 라이트/다크 토큰 값·유틸리티 규칙·`.dark` 오버라이드 제거 확인, 대비율 스크립트 재확인 (**앱 반영은 다음 앱 빌드/출시부터**)
+- [TASK-062] 다크모드 보라색 글자 가독성 개선 — accent 토큰을 텍스트용/배경용으로 분리 (2026-08-02)
+  - "다크모드에서 글자가 잘 안 보인다"는 피드백. 흰 글씨(13:1)는 정상이고 **보라색 글씨가 원인** — 다크 accent `#9b6de0`가 surface 위 4.69:1, `accent/10` 틴트 위 **4.15:1로 AA 미달**. 대부분 `text-xs`/`text-sm` 한글이라 체감은 수치보다 더 나빴음
+  - 근본 원인: accent 토큰 하나가 **텍스트 색과 버튼 배경을 겸용**해서, 텍스트를 밝히면 흰 글씨 버튼 대비가 깨지는 구조에 묶여 있었음
+  - 해결: 텍스트 전용 토큰 신설 — 웹 `--wiki-accent-text`, 앱 `WikiTheme.accentText`. 다크 `#c09bf0`, 라이트는 기존 `#6a39c0` 유지(라이트 디자인 무변화). 배경용 `--wiki-accent`/`accent`는 그대로 둬서 흰 글씨 버튼 보존
+  - 개선 결과 — surface 위 4.69→**7.62:1**, bg 위 5.12→**8.31:1**, accent/10 틴트 위 4.15→**6.74:1**(AA 미달 해소)
+  - 웹: 텍스트 64곳(`text-`/`hover:text-`/`group-hover:text-`) + 탭 활성 밑줄 10곳 + 아웃라인 버튼 hover 테두리 11곳 치환. `AdminUserTable`의 하드코딩 `dark:text-purple-400` 관리자 배지도 토큰으로 통일(프로젝트 내 하드코딩 purple 전멸)
+  - 앱: `colors.ts`에 `accentText` 추가, 텍스트 12곳 + 네비게이션 테마 `primary` + 탭바 `tintColor`(라벨과 색이 어긋나서) + `error-state` 아웃라인 테두리 치환
+  - 앱 WebView 본문(`lib/markdown/template.ts`) — **처음 범위 산정에서 빠뜨렸다가 뒤늦게 보완.** 템플릿 CSS가 `--accent`(배경용)를 링크·각주 참조·FAQ "Q." 라벨에 쓰고 있어서 정작 링크가 가장 많은 문서 본문이 그대로였음. `--accent-text` 변수를 추가해 세 곳 전환(blockquote 좌측 바만 장식용으로 `--accent` 유지). 에뮬레이터에서 각주 렌더 색이 `#c09bf0`인 것을 픽셀로 확인
+  - 배경용은 의도적으로 유지 — 웹 `bg-wiki-accent` 19곳, 앱 `backgroundColor` 5곳, 입력 `focus:border`, blockquote 좌측 바, 이력 체크박스, 스피너
+  - 검증: Next 빌드·양쪽 tsc 통과, 컴파일된 CSS에서 라이트/다크 토큰 값과 유틸리티 규칙 생성 확인, 대비율 스크립트로 수치 재확인 (**앱 반영은 다음 앱 빌드/출시부터**)
 - [TASK-060] 앱 1.0.3 빌드·제출 + 기능요청 폼 Android 키보드 버그 수정 (2026-07-25)
   - 커밋만 돼 있던 앱 변경 3건을 1.0.3으로 함께 출시: SITE_URL → 커스텀 도메인 `wiki.podo-store.com`, 헤더 목차/역사 칩(TASK-058), 더보기 기능 추가 요청 폼(TASK-059)
   - **에뮬레이터 검증에서 실제 버그 발견·수정**: `feature-request-sheet`의 KeyboardAvoidingView가 iOS에만 적용돼 Android에서 키보드가 시트(입력창·제출버튼)를 전부 가림 → KAV가 전체를 감싸고 behavior height(Android)/padding(iOS) + backdrop flex로 시트를 키보드 위로 리프트. 재검증: 키보드 뜬 채 입력·제출→접수 성공 확인
@@ -18,6 +44,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `mobile/src/app/w/[slug].tsx` headerRight의 목차·역사를 반투명 배경 알약형 칩으로(패딩·터치영역·간격·수직정렬 정돈), `headerTitleStyle` fontSize 16. 에뮬레이터에서 칩 렌더·목차 시트 열림 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
 
 ### Added
+- [TASK-066] 웹 북마크 — localStorage 기반 (2026-08-02)
+  - 앱이 로그인 없이 기기 로컬 저장을 쓰므로(T-065) 웹도 같은 "이 기기에 저장" 모델로 통일. 비로그인 독자도 쓸 수 있고 DB·RLS 작업이 없음. 브라우저 데이터를 지우면 사라지고 기기 간 동기화가 안 되는 건 감수한 트레이드오프
+  - `lib/bookmarks.ts` — 저장 형태를 앱(`mobile/src/lib/bookmarks.ts`)과 동일하게 맞춰 나중에 서버 저장으로 올릴 때 대비. 같은 탭 동기화를 위한 커스텀 이벤트 + 다른 탭용 `storage` 이벤트 양쪽 처리
+  - `hooks/useBookmarks.ts` — **하이드레이션 대응**: 서버 렌더와 첫 클라이언트 렌더에서는 항상 빈 목록 + `ready: false`를 주고, 마운트 이후에만 실제 값 반영. localStorage로 곧장 그리면 서버 HTML과 달라져 불일치가 남
+  - `components/wiki/BookmarkButton.tsx` — 문서 제목 옆 공유 버튼과 나란히. **웹은 앱과 달리 보기/수정/역사 탭을 그대로 유지**(편집이 웹의 핵심)
+  - `/bookmarks` 모아보기 페이지 + 헤더 네비 진입점(데스크톱·모바일 메뉴 양쪽)
+  - 검증: 프로덕션 빌드를 로컬 서버로 띄우고 Android 에뮬레이터 Chrome에서 저장→아이콘 반영→헤더 메뉴로 목록 진입까지 확인. (dev 서버로는 `10.0.2.2`가 `allowedDevOrigins`에 없어 클라이언트 JS가 차단돼 하이드레이션이 안 되므로 검증 불가 — 설정을 건드리지 않고 프로덕션 서버로 확인함)
+- [TASK-065] 앱 북마크 탭 신설 + 문서 화면 개편 (2026-08-02)
+  - **앱에는 로그인이 없어**(`lib/supabase.ts`가 `persistSession: false` + anon key 읽기 전용, iOS 심사 방어 논리이기도 함) 북마크를 서버에 둘 수 없음 → **AsyncStorage 기기 로컬 저장**. 웹과 동기화되지 않으며 빈 상태 문구로 그렇게 안내
+  - `lib/bookmarks.ts` — 저장소. 값이 깨져도 빈 목록으로 떨어지게 방어, 이미 있는 북마크는 제목만 갱신하고 저장 시각은 유지(목록 순서 안정). `hooks/use-bookmarks.ts` — react-query로 감싸 문서 화면 토글이 북마크 탭에 즉시 반영
+  - 탭 3번째 최근 변경 → **북마크**로 교체. `recent.tsx`는 삭제하지 않고 탭 밖으로 옮겨 스택 화면으로 전환(홈 "전체 보기" 링크 유지). 탭 전용 셸 `TabScreen`은 자체 큰 제목이 있어 스택 헤더와 겹치므로 컨테이너 교체
+  - 문서 헤더의 목차·역사 칩 2개 → **북마크 토글(☆/★)** 하나로. **역사 화면 파일은 유지** — `wiki-webview.tsx`가 본문 안 `/history/...` 링크를 가로채 열고 있어 지우면 그 링크가 깨짐
+  - 목차는 `components/toc-bar.tsx` **본문 상단 접이식 바**로 이동(웹이 모바일에서 쓰는 `TableOfContents variant="mobile"`과 같은 방식). 기존 바텀시트 `toc-sheet.tsx`는 미사용이 되어 삭제. 신아키텍처(Fabric)에서 `LayoutAnimation`이 지원되지 않아 애니메이션 없이 구현
+  - `components/scroll-top-fab.tsx` **맨 위로 FAB** — WebView `onScroll`로 400px 이상에서만 노출, `injectJavaScript`로 최상단 이동
+  - 검증: 에뮬레이터 릴리스 빌드에서 북마크 추가→탭 반영→**앱 강제종료 후 유지**→삭제, 목차 펼침·이동·자동 접힘, FAB 노출·동작·자동 숨김, 홈 링크로 최근 변경 진입까지 라이트/다크 양쪽 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
 - [TASK-059] 기능 추가 요청 폼 (앱 더보기 + 웹 빠른 링크 모달) + admin 확인·삭제 (2026-07-21)
   - 결정: 앱·웹 모두 **비로그인 익명 제출**, 연락처 없이 내용만
   - DB: `feature_requests` 테이블(마이그레이션 20260721000000) + RLS — anon/authenticated INSERT 허용(`WITH CHECK status='open'`), content 5~2000자 CHECK로 빈값·스팸 방지, SELECT/DELETE 정책 없음 → admin service_role만 조회·삭제(`deletion_requests` 동일 패턴)

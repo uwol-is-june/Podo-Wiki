@@ -6,11 +6,16 @@
 
 ## ① 지금 버전
 
-| 플랫폼  | 스토어 버전 | 상태                     |
-| ------- | ----------- | ------------------------ |
-| iOS     | 1.0.3       | ✅ 출시됨 (7/25)         |
-| Android | 1.0.3       | ✅ 출시됨 (7/25)         |
+| 플랫폼  | 스토어 버전 | 상태                                      |
+| ------- | ----------- | ----------------------------------------- |
+| iOS     | 1.0.3       | ✅ 출시됨 (7/25) — 1.1.0 미제출            |
+| Android | 1.0.3       | 🔨 1.1.0 AAB 빌드 완료 (8/2) — **업로드 대기** |
 
+- **1.1.0 (Android, 제출 전)**: 다크모드 대비 개선(T-062·T-063) + 북마크 탭·문서 화면 개편(T-065) + 본문·표 크기 조정(T-067)
+  - EAS 빌드 완료 — versionCode 7, [AAB](https://expo.dev/artifacts/eas/-QIpS6sfwTACfxjc1EfdHdYMHdCu2dlTDolVMKPLVtE.aab) / [빌드 페이지](https://expo.dev/accounts/uwol-is-june/projects/podo-wiki/builds/510465b0-0df4-4da6-ae80-e39de2853446)
+  - **남은 단계: Play Console에 AAB 수동 업로드 → 출시 노트 → 프로덕션 출시** (서비스 계정 키가 없어 자동 제출 불가)
+  - 에뮬레이터 릴리스 빌드로 라이트/다크 양쪽 검증 완료 (북마크 저장·재시작 유지·삭제, 접이식 목차, 맨 위로 FAB, 최근 변경 진입, 본문·표 크기)
+  - iOS는 같은 코드가 들어가 있으나 이번에 제출하지 않음. 나중에 제출하면 1.1.0 이후 번호로 나감
 - 1.0.3 내용: 커스텀 도메인 `wiki.podo-store.com`로 앱 SITE_URL 전환 + 문서 헤더 목차/역사 칩(TASK-058) + 더보기 기능 추가 요청 폼(TASK-059)
   - 에뮬레이터 검증에서 **기능요청 폼 Android 키보드 가림 버그 발견·수정** 후 재검증(폼 제출→접수 성공)
   - iOS build 4 / Android vc 6, AAB에 `proguard.map` 포함 확인
@@ -21,6 +26,7 @@
 
 | 버전  | 플랫폼  | 제출일     | 내용                                       |
 | ----- | ------- | ---------- | ------------------------------------------ |
+| 1.1.0 | Android | (업로드 대기) | 다크모드 대비 개선(T-062·063) + 북마크 탭·문서 화면 개편(T-065) + 본문·표 크기 조정(T-067). Android vc 7 |
 | 1.0.3 | 양대    | 2026-07-25 | 커스텀 도메인(wiki.podo-store.com) + 헤더 칩(T-058) + 기능요청 폼(T-059). iOS build 4 / Android vc 6 |
 | 1.0.2 | 양대    | 2026-07-21 | 서울 리전 전환(T-053) + R8 mapping 포함(T-057) + 새 이메일. iOS build 3 / Android vc 5 |
 | 1.0.1 | Android | 2026-07-19 | 문서 열면 앱 종료되던 크래시 수정 (T-056), 7/19 통과 |
@@ -73,7 +79,7 @@
 ## 3단계 · 제출 후
 
 - 이 문서 맨 위 **두 표 갱신**
-- `docs/TASK.md` 완료 처리 → `docs/CHANGELOG.md`에 기록
+- `docs/TASK_M.md` 완료 처리 → `docs/CHANGELOG.md`에 기록
 - 심사 통과하면 상태를 "심사 중" → "출시됨"으로 변경
 
 
@@ -116,7 +122,10 @@ SDK `/opt/homebrew/share/android-commandlinetools`
 # 2. 릴리스 빌드
 #    ⚠️ 8GB RAM: 단일 아키텍처 + 워커 제한 필수, 에뮬레이터와 동시 실행 금지
 cd mobile && npx expo prebuild -p android --no-install
-cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@17 ./gradlew :app:assembleRelease \
+# ⚠️ prebuild가 android/를 재생성하면서 SDK 경로가 담긴 local.properties를 지운다.
+#    그래서 ANDROID_HOME을 함께 넘겨야 한다 (없으면 "SDK location not found"로 실패)
+cd android && ANDROID_HOME=/opt/homebrew/share/android-commandlinetools \
+  JAVA_HOME=/opt/homebrew/opt/openjdk@17 ./gradlew :app:assembleRelease \
   -PreactNativeArchitectures=arm64-v8a --max-workers=3
 
 # 3. 설치하고 눌러보기
