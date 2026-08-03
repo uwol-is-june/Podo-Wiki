@@ -1,6 +1,6 @@
 // Ported from src/components/wiki/MarkdownContent.tsx (processFootnotes/splitH3/splitBlocks)
 // — keep the parsing rules in sync with the web renderer
-import { slugify } from '@/lib/wiki/headings'
+import { headingId } from '@/lib/wiki/headings'
 
 export type FootnoteDef = { label: string; content: string; num: number }
 
@@ -67,7 +67,7 @@ function splitH3(text: string): { intro: string; h3s: Omit<H3Item, 'number'>[] }
     if (h3m) {
       flush()
       const heading = h3m[1].trim()
-      cur = { heading, id: slugify(heading), buf: [] }
+      cur = { heading, id: headingId(heading), buf: [] }
     } else if (cur) {
       cur.buf.push(line)
     } else {
@@ -108,11 +108,11 @@ export function splitBlocks(markdown: string): Block[] {
     if (h1m) {
       flush()
       const heading = h1m[1].trim()
-      cur = { level: 1, heading, id: slugify(heading) }
+      cur = { level: 1, heading, id: headingId(heading) }
     } else if (h2m) {
       flush()
       const heading = h2m[1].trim()
-      cur = { level: 2, heading, id: slugify(heading) }
+      cur = { level: 2, heading, id: headingId(heading) }
     } else {
       buf.push(line)
     }

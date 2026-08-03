@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm'
 import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkCjkFriendlyGfmStrikethrough from 'remark-cjk-friendly-gfm-strikethrough'
 import rehypeRaw from 'rehype-raw'
-import { slugify } from '@/lib/wiki/headings'
+import { headingId } from '@/lib/wiki/headings'
 
 const remarkPlugins = [remarkGfm, remarkCjkFriendly, remarkCjkFriendlyGfmStrikethrough]
 
@@ -131,7 +131,7 @@ function splitH3(text: string): { intro: string; h3s: Omit<H3Item, 'number'>[] }
     if (h3m) {
       flush()
       const heading = h3m[1].trim()
-      cur = { heading, id: slugify(heading), buf: [] }
+      cur = { heading, id: headingId(heading), buf: [] }
     } else if (cur) {
       cur.buf.push(line)
     } else {
@@ -172,11 +172,11 @@ function splitBlocks(markdown: string): Block[] {
     if (h1m) {
       flush()
       const heading = h1m[1].trim()
-      cur = { level: 1, heading, id: slugify(heading) }
+      cur = { level: 1, heading, id: headingId(heading) }
     } else if (h2m) {
       flush()
       const heading = h2m[1].trim()
-      cur = { level: 2, heading, id: slugify(heading) }
+      cur = { level: 2, heading, id: headingId(heading) }
     } else {
       buf.push(line)
     }

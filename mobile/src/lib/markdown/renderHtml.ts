@@ -14,6 +14,7 @@ import type { Element, Root } from 'hast'
 import { processFootnotes, splitBlocks } from './structure'
 import type { Block, FootnoteDef, H2Section, H3Item } from './structure'
 import type { FaqItem } from '@/lib/wiki/faq'
+import { headingText } from '@/lib/wiki/headings'
 
 // 웹 Img 컴포넌트의 `w=` 타이틀 규칙 포팅: title="w=300" → width:300px
 function rehypeImgWidth() {
@@ -55,8 +56,10 @@ function escapeHtml(text: string): string {
 }
 
 // 웹과 동일: 헤딩 표시 텍스트에서 마크다운 링크는 라벨만 남긴다
-function headingText(heading: string): string {
-  return escapeHtml(heading.replace(/\[(.+?)\]\(.+?\)/g, '$1'))
+// 제목의 인라인 표기 제거는 목차와 같은 규칙을 쓴다 (headings.ts).
+// 여기서만 따로 처리하면 굵게/코드 표기가 본문에 날것으로 남는다 (TASK-070).
+function headingDisplay(heading: string): string {
+  return escapeHtml(headingText(heading))
 }
 
 const CARET_SVG =
@@ -65,14 +68,14 @@ const CARET_SVG =
 function headingHtml(tag: 'h1' | 'h2', id: string, number: string, heading: string): string {
   return (
     `<${tag} id="${escapeHtml(id)}" class="collapsible">${CARET_SVG}` +
-    `<span class="h-text"><span class="hnum">${escapeHtml(number)}.</span>${headingText(heading)}</span></${tag}>`
+    `<span class="h-text"><span class="hnum">${escapeHtml(number)}.</span>${headingDisplay(heading)}</span></${tag}>`
   )
 }
 
 async function h3Html(h: H3Item): Promise<string> {
   const body = await mdToHtml(h.body)
   return (
-    `<section><h3 id="${escapeHtml(h.id)}"><span class="hnum">${escapeHtml(h.number)}.</span>${headingText(h.heading)}</h3>` +
+    `<section><h3 id="${escapeHtml(h.id)}"><span class="hnum">${escapeHtml(h.number)}.</span>${headingDisplay(h.heading)}</h3>` +
     body +
     '</section>'
   )

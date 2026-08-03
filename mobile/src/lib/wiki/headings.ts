@@ -34,18 +34,34 @@ export function slugify(text: string): string {
   )
 }
 
+/** 제목 줄에서 인라인 마크다운 표기(굵게·기울임·코드·링크)를 걷어낸 표시용 텍스트 */
+export function headingText(raw: string): string {
+  return raw
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+    .trim()
+}
+
+/**
+ * 제목 줄 → 앵커 id.
+ *
+ * 목차와 본문 렌더러가 **반드시 이 함수를 함께** 써야 한다.
+ * 한쪽만 원본 줄을 그대로 slugify하면 링크가 든 제목에서 id가 어긋나
+ * 목차를 눌러도 아무 일이 없는 상태가 된다 (TASK-070).
+ */
+export function headingId(raw: string): string {
+  return slugify(headingText(raw))
+}
+
 export function extractHeadings(content: string): Heading[] {
   const raw: { level: 1 | 2 | 3; text: string; id: string }[] = []
   for (const line of content.split('\n')) {
     const match = line.match(/^(#{1,3})\s+(.+)$/)
     if (!match) continue
     const level = match[1].length as 1 | 2 | 3
-    const text = match[2]
-      .replace(/\*\*(.+?)\*\*/g, '$1')
-      .replace(/\*(.+?)\*/g, '$1')
-      .replace(/`(.+?)`/g, '$1')
-      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-      .trim()
+    const text = headingText(match[2])
     raw.push({ level, text, id: slugify(text) })
   }
   return numberHeadings(raw)
