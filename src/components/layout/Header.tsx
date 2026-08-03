@@ -96,14 +96,10 @@ export default function Header({ initialUser, initialProfileStatus }: HeaderProp
     return () => subscription.unsubscribe()
   }, [supabase])
 
-  useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      setUser(user)
-      if (!user) { setProfileStatus(null); return }
-      const { data } = await supabase.from('profiles').select('status').eq('id', user.id).single()
-      setProfileStatus((data?.status as ProfileStatus) ?? null)
-    })
-  }, [pathname, supabase])
+  // 페이지를 옮길 때마다 getUser()로 다시 물어보던 효과는 제거했다.
+  // 로그인·로그아웃 모두 서버 액션이 revalidatePath로 레이아웃을 다시 렌더하므로
+  // 서버가 넘긴 initialUser가 이미 정답이고, 레이아웃에서 key로 이 컴포넌트를 새로 마운트한다.
+  // (예전에는 그 왕복이 끝나야 헤더가 갱신돼서 느린 회선일수록 로그아웃 상태가 오래 남았음)
 
   return (
     <>

@@ -44,7 +44,14 @@ export default async function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-wiki-bg text-wiki-text antialiased">
         <ThemeProvider>
-          <Header initialUser={user ?? null} initialProfileStatus={profileStatus} />
+          {/* Header는 레이아웃에 있어 페이지를 옮겨도 언마운트되지 않는다. 내부 useState 초기값이
+              최초 마운트에서만 반영되므로, 로그인/로그아웃으로 사용자가 바뀌면 key를 바꿔
+              새로 마운트시켜 서버가 조회한 값이 즉시 반영되게 한다. */}
+          <Header
+            key={user?.id ?? 'anon'}
+            initialUser={user ?? null}
+            initialProfileStatus={profileStatus}
+          />
           <main className="flex-1 pt-[50px]">{children}</main>
           <Footer />
         </ThemeProvider>
