@@ -6,7 +6,7 @@ import { useBookmarks } from '@/hooks/useBookmarks'
 import { slugToHref } from '@/lib/wiki/slug'
 
 export default function BookmarkList() {
-  const { bookmarks, ready, remove } = useBookmarks()
+  const { bookmarks, ready, error, remove } = useBookmarks()
 
   // 마운트 전에는 localStorage를 읽을 수 없어 목록을 알 수 없다.
   // 빈 상태 문구를 먼저 띄우면 잘못된 안내가 깜빡이므로 아무것도 그리지 않는다.
@@ -26,7 +26,17 @@ export default function BookmarkList() {
   }
 
   return (
-    <ul>
+    <>
+      {/* 삭제가 저장되지 않았는데 사라진 것처럼 보이지 않게 알린다 (TASK-069) */}
+      {error && (
+        <p
+          role="alert"
+          className="px-4 py-3 text-sm text-wiki-text bg-wiki-border/20 border-b border-wiki-border"
+        >
+          {error}
+        </p>
+      )}
+      <ul>
       {bookmarks.map((b, i) => (
         <li
           key={b.slug}
@@ -75,7 +85,8 @@ export default function BookmarkList() {
             </svg>
           </button>
         </li>
-      ))}
-    </ul>
+        ))}
+      </ul>
+    </>
   )
 }

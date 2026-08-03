@@ -56,7 +56,11 @@ export default function DocumentScreen() {
     [document]
   )
 
-  const { isBookmarked, toggle: toggleBookmark } = useBookmarkToggle(slug, document?.title)
+  const {
+    isBookmarked,
+    toggle: toggleBookmark,
+    isPending: bookmarkPending,
+  } = useBookmarkToggle(slug, document?.title)
 
   // 저장해둔 문서를 다시 열었을 때 그 사이 바뀐 제목을 북마크 목록에도 반영
   const syncBookmarkTitle = useSyncBookmarkTitle()
@@ -89,10 +93,15 @@ export default function DocumentScreen() {
               <Pressable
                 hitSlop={10}
                 onPress={() => toggleBookmark()}
+                // 저장이 끝나기 전 연타를 막는다 — 두 번 다 같은 방향으로 처리되는 것 방지 (TASK-069)
+                disabled={bookmarkPending}
                 accessibilityRole="button"
                 accessibilityLabel={isBookmarked ? '북마크 해제' : '북마크에 저장'}
-                accessibilityState={{ selected: isBookmarked }}
-                style={({ pressed }) => [styles.headerIcon, { opacity: pressed ? 0.6 : 1 }]}
+                accessibilityState={{ selected: isBookmarked, disabled: bookmarkPending }}
+                style={({ pressed }) => [
+                  styles.headerIcon,
+                  { opacity: bookmarkPending ? 0.4 : pressed ? 0.6 : 1 },
+                ]}
               >
                 <Text style={[styles.headerIconText, { color: theme.headerText }]}>
                   {isBookmarked ? '★' : '☆'}
