@@ -1,3 +1,4 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { useQuery } from '@tanstack/react-query'
 import { Redirect, Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -29,6 +30,9 @@ export default function DocumentScreen() {
   const webviewRef = useRef<WebView>(null)
   // 본문을 이 정도 내렸을 때부터 '맨 위로' 버튼을 띄운다 (화면 절반 남짓)
   const [showTopFab, setShowTopFab] = useState(false)
+  // '맨 위로'를 눌러 스크롤이 진행되는 동안 노출 판단을 멈추기 위한 플래그
+  const suppressFab = useRef(false)
+  const lastScrollY = useRef(0)
 
   const { data: document, isLoading, isError, refetch } = useQuery({
     queryKey: ['document', slug],
@@ -72,8 +76,22 @@ export default function DocumentScreen() {
   if (slug === FAQ_SLUG) return <Redirect href="/faq" />
 
   const scrollToTop = () => {
+    // 부드러운 스크롤이 진행되는 동안에도 WebView는 계속 onScroll을 쏘고 그때 y는 아직
+    // 임계값보다 크다. 억제하지 않으면 버튼이 사라졌다가 곧바로 다시 나타난다 (TASK-071)
+    suppressFab.current = true
     webviewRef.current?.injectJavaScript(`window.scrollTo({top:0,behavior:'smooth'}); true;`)
     setShowTopFab(false)
+  }
+
+  const handleScrollY = (y: number) => {
+    const prev = lastScrollY.current
+    lastScrollY.current = y
+    if (suppressFab.current) {
+      // 맨 위에 닿았거나, 사용자가 도중에 다시 아래로 스크롤하면 억제를 푼다
+      if (y <= 8 || y > prev) suppressFab.current = false
+      else return
+    }
+    setShowTopFab(y > 400)
   }
 
   const scrollToHeading = (id: string) => {
@@ -103,9 +121,12 @@ export default function DocumentScreen() {
                   { opacity: bookmarkPending ? 0.4 : pressed ? 0.6 : 1 },
                 ]}
               >
-                <Text style={[styles.headerIconText, { color: theme.headerText }]}>
-                  {isBookmarked ? '★' : '☆'}
-                </Text>
+                {/* 탭바 아이콘(md="bookmark")과 같은 리본 모양으로 맞춘다 (TASK-068) */}
+                <MaterialIcons
+                  name={isBookmarked ? 'bookmark' : 'bookmark-border'}
+                  size={22}
+                  color={theme.headerText}
+                />
               </Pressable>
             ) : null,
         }}
@@ -161,7 +182,7 @@ export default function DocumentScreen() {
             ref={webviewRef}
             content={document.content}
             footerText={`최종 수정: ${formatDateTime(document.updated_at)}`}
-            onScrollY={y => setShowTopFab(y > 400)}
+            onScrollY={handleScrollY}
           />
 
           <ScrollTopFab visible={showTopFab} onPress={scrollToTop} />
@@ -175,7 +196,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   headerIcon: { paddingHorizontal: 4, paddingVertical: 2 },
-  headerIconText: { fontSize: 20, lineHeight: 24 },
   notFoundCard: {
     borderWidth: 1,
     borderRadius: 12,
