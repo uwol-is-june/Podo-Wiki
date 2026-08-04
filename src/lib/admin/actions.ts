@@ -243,9 +243,7 @@ const LOGO_MAX_EDGE = 320 // 홈 카드가 88px, 2배 화면을 고려해도 충
 
 // 이미지 테두리의 균일한 여백(흰 배경·투명 영역)을 잘라내고 한 변을 320px 이하로 줄인다.
 // SVG 는 벡터 그대로 두는 편이 낫고(래스터화하면 오히려 손해), 처리에 실패하면 원본을 그대로 쓴다.
-async function normalizeLogo(
-  logo: File
-): Promise<{ body: Blob | Buffer; contentType: string; ext: string }> {
+async function normalizeLogo(logo: File): Promise<{ body: File; contentType: string; ext: string }> {
   const fallbackExt = (logo.name.split('.').pop() ?? 'png').toLowerCase()
 
   if (logo.type === 'image/svg+xml') {
@@ -259,10 +257,37 @@ async function normalizeLogo(
       .resize(LOGO_MAX_EDGE, LOGO_MAX_EDGE, { fit: 'inside', withoutEnlargement: true })
       .png()
       .toBuffer()
-    return { body: trimmed, contentType: 'image/png', ext: 'png' }
+
+    // Buffer 를 그대로 업로드하면 Vercel 런타임에서 본문이 UTF-8 문자열로 취급돼
+    // 0x80 이상 바이트가 전부 EF BF BD 로 치환된 깨진 파일이 올라간다(TASK-079).
+    // 업로드 경로가 원래 다루던 File 형태로 감싸서 넘긴다.
+    return {
+      body: new File([new Uint8Array(trimmed)], 'logo.png', { type: 'image/png' }),
+      contentType: 'image/png',
+      ext: 'png',
+    }
   } catch {
     // 전부 단색이라 trim 이 실패하는 등의 경우 — 원본을 그대로 올린다
     return { body: logo, contentType: logo.type, ext: fallbackExt }
+  }
+}
+
+// 올라간 파일이 실제로 이미지 바이트인지 확인한다. 본문이 문자열로 취급돼 깨지는 사고를
+// 조용히 넘기지 않기 위한 안전장치 — 깨졌으면 객체를 지우고 에러로 알린다.
+async function verifyUploadedImage(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { cache: 'no-store' })
+    if (!res.ok) return false
+    const head = new Uint8Array((await res.arrayBuffer()).slice(0, 12))
+    const startsWith = (sig: number[]) => sig.every((b, i) => head[i] === b)
+    return (
+      startsWith([0x89, 0x50, 0x4e, 0x47]) || // PNG
+      startsWith([0xff, 0xd8, 0xff]) || // JPEG
+      startsWith([0x52, 0x49, 0x46, 0x46]) || // WebP (RIFF)
+      startsWith([0x3c]) // SVG (<)
+    )
+  } catch {
+    return false
   }
 }
 
@@ -293,7 +318,14 @@ async function uploadTroupeLogo(
     .upload(path, normalized.body, { contentType: normalized.contentType, upsert: false })
   if (uploadError) return { error: `썸네일 업로드 실패: ${uploadError.message}` }
 
-  return { url: adminClient.storage.from(TROUPE_LOGO_BUCKET).getPublicUrl(path).data.publicUrl }
+  const url = adminClient.storage.from(TROUPE_LOGO_BUCKET).getPublicUrl(path).data.publicUrl
+
+  if (!(await verifyUploadedImage(url))) {
+    await adminClient.storage.from(TROUPE_LOGO_BUCKET).remove([path])
+    return { error: '썸네일이 이미지로 저장되지 않았습니다. 다시 시도해 주세요.' }
+  }
+
+  return { url }
 }
 
 // 업로드했던 로고만 지운다. public/logos/ 에 커밋된 기존 로고(상대 경로)는 건드리지 않는다.

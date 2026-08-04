@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [TASK-079] 새로 올린 단체 로고가 홈에서 아예 안 뜨던 문제 (2026-08-04)
+  - TASK-078 배포 후 재업로드한 로고가 표시되지 않음. `next/image` 가 400(`INVALID_IMAGE_OPTIMIZE_REQUEST`)을 냈고 서버 로그는 "The requested resource isn't a valid image … received null"
+  - **원본 파일 자체가 깨져 있었음**: Storage 에 올라간 바이트를 받아보니 PNG 시그니처 `89 50 4E 47` 이 `EF BF BD 50 4E 47` 로, 0x80 이상 바이트가 전부 U+FFFD 로 치환됨 = 바이너리가 UTF-8 문자열로 취급된 흔적. 헤더는 `image/png` 라 겉으로는 정상이라 눈치채기 어려웠음
+  - 원인은 TASK-078 에서 sharp 처리 결과를 **`Buffer` 그대로 업로드**하도록 바꾼 것. 그 전에는 브라우저가 보낸 `File` 을 그대로 넘겨서 문제가 없었음. 로컬(`next start`)에서는 Buffer 도 정상 전송돼 재현되지 않고 Vercel 런타임에서만 깨졌음
+  - sharp 출력물을 `File` 로 감싸서 업로드하도록 되돌림. 남은 바이트가 320×240 으로 읽히는 것으로 보아 트림 자체는 프로덕션에서도 정상 동작했음
+  - **안전장치 추가**: 업로드 직후 공개 URL 을 받아 앞 바이트가 PNG/JPEG/WebP/SVG 시그니처인지 확인하고, 아니면 객체를 지우고 에러로 알림. 같은 종류의 조용한 손상이 다시 나면 화면에 드러남
+  - 검증: 로컬 에코 서버로 Next 런타임에서 나가는 실제 본문을 확인 — `File` 은 raw fetch·supabase-js(multipart) 양쪽 모두 PNG 시그니처가 온전
 - [TASK-078] 단체마다 홈 로고 크기가 들쭉날쭉하던 문제 (2026-08-04)
   - 사용자 제보: "광운극예술연구회랑 시네씨아 로고 크기 차이가 왜 이렇게 크지?"
   - 원인은 CSS 가 아니라 **이미지 안쪽 여백 차이**. 두 파일을 열어 확인: 광운 PNG(1216×864)는 그림이 프레임을 거의 채우는데, 시네씨아 JPG(1400×1400)는 위아래로 흰 여백이 크게 잡혀 실제 그림이 절반 남짓. 같은 88px 칸에 넣어도 후자가 훨씬 작아 보임
