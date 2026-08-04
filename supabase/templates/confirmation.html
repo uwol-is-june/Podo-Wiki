@@ -5,42 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>포도위키 이메일 인증</title>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f4f4f5; margin: 0; padding: 40px 16px;">
-  <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #ffffff; margin: 0; padding: 32px 16px; color: #18181b;">
+  <div style="max-width: 480px; margin: 0 auto;">
 
-    <!-- 헤더 -->
-    <div style="background: #6a39c0; padding: 32px 40px; text-align: center;">
-      <p style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px;">🍇 포도위키</p>
-      <p style="color: rgba(255,255,255,0.75); font-size: 13px; margin: 6px 0 0;">공연단체 인수인계 위키 플랫폼</p>
-    </div>
+    <p style="font-size: 15px; font-weight: 700; color: #18181b; margin: 0 0 24px; padding-bottom: 16px; border-bottom: 1px solid #e4e4e7;">
+      포도위키
+    </p>
 
-    <!-- 본문 -->
-    <div style="padding: 36px 40px;">
-      <h1 style="font-size: 18px; font-weight: 600; color: #18181b; margin: 0 0 14px; letter-spacing: -0.2px;">이메일 주소를 인증해주세요</h1>
-      <p style="font-size: 14px; color: #52525b; line-height: 1.7; margin: 0 0 28px;">
-        포도위키에 가입 신청해주셔서 감사합니다.<br>
-        아래 버튼을 눌러 이메일 인증을 완료해주세요.<br>
-        인증 후 관리자 승인을 받으면 문서를 자유롭게 편집할 수 있습니다.
-      </p>
-      <div style="text-align: center; margin: 0 0 28px;">
-        <a href="{{ .ConfirmationURL }}"
-           style="display: inline-block; background: #6a39c0; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 36px; border-radius: 8px; letter-spacing: -0.1px;">
-          이메일 인증하기
-        </a>
-      </div>
-      <p style="font-size: 12px; color: #a1a1aa; line-height: 1.7; margin: 0; border-top: 1px solid #f4f4f5; padding-top: 20px;">
-        이 링크는 24시간 동안 유효합니다.<br>
-        본인이 가입 신청하지 않으셨다면 이 메일을 무시하시면 됩니다.
-      </p>
-    </div>
+    <p style="font-size: 15px; line-height: 1.7; margin: 0 0 20px;">
+      포도위키에 가입 신청하신 이메일 주소가 맞는지 확인하려고 보내드립니다.
+      아래 주소를 눌러 인증을 완료해주세요. 인증 후 관리자 승인을 받으면 문서를 편집할 수 있습니다.
+    </p>
 
-    <!-- 푸터 -->
-    <div style="background: #fafafa; border-top: 1px solid #f0f0f0; padding: 18px 40px; text-align: center;">
-      <p style="font-size: 12px; color: #a1a1aa; margin: 0;">
-        포도위키 &middot;
-        <a href="{{ .SiteURL }}" style="color: #6a39c0; text-decoration: none;">podo-wiki.vercel.app</a>
-      </p>
-    </div>
+    <p style="margin: 0 0 20px;">
+      <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup"
+         style="display: inline-block; background: #6a39c0; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 12px 28px; border-radius: 6px;">
+        이메일 인증하기
+      </a>
+    </p>
+
+    <p style="font-size: 13px; color: #52525b; line-height: 1.6; margin: 0 0 24px; word-break: break-all;">
+      버튼이 눌리지 않으면 아래 주소를 복사해 브라우저에 붙여넣어 주세요.<br>
+      <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup" style="color: #6a39c0;">{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup</a>
+    </p>
+
+    <p style="font-size: 13px; color: #52525b; line-height: 1.7; margin: 0; padding-top: 16px; border-top: 1px solid #e4e4e7;">
+      이 링크는 24시간 동안 유효합니다.
+      가입을 신청하신 적이 없다면 이 메일을 무시하셔도 됩니다. 아무 일도 일어나지 않습니다.
+    </p>
+
+    <p style="font-size: 13px; color: #71717a; line-height: 1.7; margin: 20px 0 0;">
+      포도위키 · 공연단체 인수인계 위키<br>
+      <a href="{{ .SiteURL }}" style="color: #6a39c0;">{{ .SiteURL }}</a><br>
+      문의 <a href="mailto:podo@podo-store.com" style="color: #6a39c0;">podo@podo-store.com</a>
+    </p>
 
   </div>
 </body>
