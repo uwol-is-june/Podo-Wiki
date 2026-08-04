@@ -1,16 +1,17 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { checkAdminSession, getAllProfiles, adminLogout, getDeletionRequests, getFeatureRequests } from '@/lib/admin/actions'
+import { checkAdminSession, getAllProfiles, adminLogout, getDeletionRequests, getFeatureRequests, getTroupes } from '@/lib/admin/actions'
 import type { Profile } from '@/lib/supabase/types'
 import AdminUserTable from './AdminUserTable'
 import AdminDeletionTable from './AdminDeletionTable'
 import AdminFeatureRequestTable from './AdminFeatureRequestTable'
+import AdminTroupeTable from './AdminTroupeTable'
 
 export const metadata: Metadata = { title: '관리자 페이지 — 포도위키' }
 
 type UserFilter = 'all' | 'pending' | 'approved' | 'rejected'
-type Section = 'users' | 'deletions' | 'requests'
+type Section = 'users' | 'deletions' | 'requests' | 'troupes'
 
 const USER_TABS: { label: string; value: UserFilter }[] = [
   { label: '전체', value: 'all' },
@@ -33,16 +34,23 @@ export default async function AdminPage({ searchParams }: Props) {
   const { filter: rawFilter, section: rawSection } = await searchParams
 
   const section: Section =
-    rawSection === 'deletions' ? 'deletions' : rawSection === 'requests' ? 'requests' : 'users'
+    rawSection === 'deletions'
+      ? 'deletions'
+      : rawSection === 'requests'
+        ? 'requests'
+        : rawSection === 'troupes'
+          ? 'troupes'
+          : 'users'
   const filter: UserFilter =
     rawFilter === 'pending' || rawFilter === 'approved' || rawFilter === 'rejected'
       ? rawFilter
       : 'all'
 
-  const [all, deletionRequests, featureRequests] = await Promise.all([
+  const [all, deletionRequests, featureRequests, troupes] = await Promise.all([
     getAllProfiles(),
     getDeletionRequests(),
     getFeatureRequests(),
+    getTroupes(),
   ])
 
   const counts = {
@@ -112,6 +120,17 @@ export default async function AdminPage({ searchParams }: Props) {
             </span>
           )}
         </Link>
+        <Link
+          href="/admin?section=troupes"
+          className={[
+            'px-4 py-2 text-sm font-medium transition-colors',
+            section === 'troupes'
+              ? 'text-wiki-accent-text border-b-2 border-wiki-accent-text -mb-px'
+              : 'text-wiki-text-muted hover:text-wiki-text',
+          ].join(' ')}
+        >
+          단체 관리
+        </Link>
       </div>
 
       {section === 'users' && (
@@ -167,6 +186,14 @@ export default async function AdminPage({ searchParams }: Props) {
         <section>
           <div className="bg-wiki-surface border border-wiki-border rounded-lg p-4">
             <AdminFeatureRequestTable requests={featureRequests} />
+          </div>
+        </section>
+      )}
+
+      {section === 'troupes' && (
+        <section>
+          <div className="bg-wiki-surface border border-wiki-border rounded-lg p-4">
+            <AdminTroupeTable troupes={troupes} />
           </div>
         </section>
       )}

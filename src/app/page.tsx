@@ -3,7 +3,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
-import { TROUPES } from '@/data/troupes'
 import { slugToHref } from '@/lib/wiki/slug'
 import { parseFaqItems } from '@/lib/wiki/faq'
 import FeatureRequestButton from './FeatureRequestButton'
@@ -27,17 +26,28 @@ type RevisionRow = {
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const [{ count: docCount }, { count: memberCount }, { data: recentRevisions }, { data: faqDoc }] =
-    await Promise.all([
-      supabase.from('documents').select('slug', { count: 'exact', head: true }),
-      createAdminClient().from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
-      supabase
-        .from('revisions')
-        .select('id, document_slug, edited_at, documents(title)')
-        .order('edited_at', { ascending: false })
-        .limit(5) as unknown as Promise<{ data: RevisionRow[] | null }>,
-      supabase.from('documents').select('content').eq('slug', FAQ_SLUG).maybeSingle(),
-    ])
+  const [
+    { count: docCount },
+    { count: memberCount },
+    { data: recentRevisions },
+    { data: faqDoc },
+    { data: troupes },
+  ] = await Promise.all([
+    supabase.from('documents').select('slug', { count: 'exact', head: true }),
+    createAdminClient().from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+    supabase
+      .from('revisions')
+      .select('id, document_slug, edited_at, documents(title)')
+      .order('edited_at', { ascending: false })
+      .limit(5) as unknown as Promise<{ data: RevisionRow[] | null }>,
+    supabase.from('documents').select('content').eq('slug', FAQ_SLUG).maybeSingle(),
+    // 단체 목록은 /admin 에서 등록 (TASK-075) — 예전 src/data/troupes.ts 하드코딩을 대체
+    supabase
+      .from('troupes')
+      .select('slug, name, logo_url')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+  ])
 
   // FAQ 문서의 ## 헤딩이 곧 질문 목록 — 대표 질문은 문서상 앞의 4개 (문서 내 순서로 노출 제어)
   const faqItems = faqDoc?.content
@@ -52,15 +62,15 @@ export default async function HomePage() {
           공연단체
         </h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-          {TROUPES.map((troupe) => (
+          {(troupes ?? []).map((troupe) => (
             <Link
               key={troupe.slug}
               href={slugToHref(troupe.slug)}
               className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
             >
-              {troupe.logo ? (
+              {troupe.logo_url ? (
                 <Image
-                  src={troupe.logo}
+                  src={troupe.logo_url}
                   alt={troupe.name}
                   width={56}
                   height={56}

@@ -1,4 +1,4 @@
-// Copied from src/lib/supabase/types.ts — keep in sync (모바일은 documents/revisions만 사용)
+// Copied from src/lib/supabase/types.ts — keep in sync (모바일은 documents/revisions/troupes만 사용)
 export type Database = {
   public: {
     Tables: {
@@ -78,6 +78,29 @@ export type Database = {
         };
         Relationships: [];
       };
+      troupes: {
+        Row: {
+          slug: string;
+          name: string;
+          // 절대 URL(웹 관리자가 업로드한 Storage 파일) 또는 '/logos/…'(웹 public/ 에 있는 기존 로고)
+          logo_url: string | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          slug: string;
+          name: string;
+          logo_url?: string | null;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          logo_url?: string | null;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -88,3 +111,4 @@ export type Database = {
 
 export type Document = Database["public"]["Tables"]["documents"]["Row"];
 export type Revision = Database["public"]["Tables"]["revisions"]["Row"];
+export type Troupe = Database["public"]["Tables"]["troupes"]["Row"];

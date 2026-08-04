@@ -1,9 +1,9 @@
 // 웹 서버 컴포넌트들의 Supabase 쿼리를 미러링한 읽기 전용 데이터 레이어.
 // 각 함수 주석에 원본 웹 코드 위치를 표기 — keep in sync
-import { FAQ_SLUG } from './constants'
+import { FAQ_SLUG, SITE_URL } from './constants'
 import { supabase } from './supabase'
 import { parseFaqItems, type FaqItem } from './wiki/faq'
-import type { Document } from './supabase/types'
+import type { Document, Troupe } from './supabase/types'
 
 export const PAGE_SIZE = 20
 
@@ -229,11 +229,19 @@ export type HomeData = {
   docCount: number
   recent: RecentRevision[]
   faqPreview: FaqItem[]
+  troupes: Troupe[]
+}
+
+// logo_url 은 Storage 절대 URL 이거나 웹 public/ 의 상대 경로('/logos/…') 둘 중 하나다.
+// 상대 경로면 웹 사이트 주소를 붙여야 앱에서 뜬다. (src/lib/admin/actions.ts createTroupe 참조)
+export function troupeLogoUri(logoUrl: string | null): string | null {
+  if (!logoUrl) return null
+  return logoUrl.startsWith('http') ? logoUrl : `${SITE_URL}${logoUrl}`
 }
 
 // src/app/page.tsx (승인 회원 수는 service role 필요라 문서 수만 표시)
 export async function getHomeData(): Promise<HomeData> {
-  const [{ count }, { data: recent }, faqItems] = await Promise.all([
+  const [{ count }, { data: recent }, faqItems, { data: troupes }] = await Promise.all([
     supabase.from('documents').select('slug', { count: 'exact', head: true }),
     supabase
       .from('revisions')
@@ -241,10 +249,17 @@ export async function getHomeData(): Promise<HomeData> {
       .order('edited_at', { ascending: false })
       .limit(5),
     getFaqItems(),
+    // 단체 목록은 웹 /admin 에서 관리 (TASK-075) — 앱 재배포 없이 반영되도록 DB 에서 읽는다
+    supabase
+      .from('troupes')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
   ])
   return {
     docCount: count ?? 0,
     recent: (recent as RecentRevision[] | null) ?? [],
     faqPreview: faqItems.slice(0, 4),
+    troupes: troupes ?? [],
   }
 }

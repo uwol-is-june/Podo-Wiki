@@ -147,6 +147,29 @@ export type Database = {
         };
         Relationships: [];
       };
+      troupes: {
+        Row: {
+          slug: string;
+          name: string;
+          // 절대 URL(Storage 업로드) 또는 '/logos/…'(저장소 public/ 에 있던 기존 로고)
+          logo_url: string | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          slug: string;
+          name: string;
+          logo_url?: string | null;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          logo_url?: string | null;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -162,3 +185,4 @@ export type ProfileStatus = Profile['status'];
 export type ProfileRole = Profile['role'];
 export type DeletionRequest = Database["public"]["Tables"]["deletion_requests"]["Row"];
 export type FeatureRequest = Database["public"]["Tables"]["feature_requests"]["Row"];
+export type Troupe = Database["public"]["Tables"]["troupes"]["Row"];

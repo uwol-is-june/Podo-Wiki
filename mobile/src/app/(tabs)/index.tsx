@@ -14,9 +14,7 @@ import {
 
 import { ErrorState } from '@/components/error-state'
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
-import { TROUPES } from '@/data/troupes'
-import { editorLabel, formatDateTime, getHomeData, getRandomSlug } from '@/lib/api'
-import { SITE_URL } from '@/lib/constants'
+import { editorLabel, formatDateTime, getHomeData, getRandomSlug, troupeLogoUri } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
 
 export default function HomeScreen() {
@@ -55,15 +53,16 @@ export default function HomeScreen() {
         {/* 공연단체 바로가기 */}
         <Text style={[styles.sectionTitle, { color: theme.text }]}>공연단체</Text>
         <View style={styles.troupeGrid}>
-          {TROUPES.map(troupe => (
+          {/* 단체 목록은 웹 /admin 에서 등록 (TASK-075) — 로딩 중이면 랜덤 문서 카드만 먼저 보인다 */}
+          {(data?.troupes ?? []).map(troupe => (
             <Pressable
               key={troupe.slug}
               style={[styles.troupeCard, { backgroundColor: theme.surface, borderColor: theme.border }]}
               onPress={() => router.push({ pathname: '/w/[slug]', params: { slug: troupe.slug } })}
             >
-              {troupe.logo ? (
+              {troupeLogoUri(troupe.logo_url) ? (
                 <Image
-                  source={{ uri: `${SITE_URL}${troupe.logo}` }}
+                  source={{ uri: troupeLogoUri(troupe.logo_url)! }}
                   style={styles.troupeLogo}
                   contentFit="contain"
                 />

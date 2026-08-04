@@ -90,6 +90,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `mobile/src/app/w/[slug].tsx` headerRight의 목차·역사를 반투명 배경 알약형 칩으로(패딩·터치영역·간격·수직정렬 정돈), `headerTitleStyle` fontSize 16. 에뮬레이터에서 칩 렌더·목차 시트 열림 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
 
 ### Added
+- [TASK-075] 관리자 페이지에서 공연단체 추가 (2026-08-04)
+  - 그동안 단체를 하나 늘리려면 `src/data/troupes.ts`와 손으로 복사해둔 사본 `mobile/src/data/troupes.ts`를 같이 고치고 로고 PNG를 `public/logos/`에 커밋한 뒤 웹 배포 + 앱 스토어 심사를 거쳐야 했음. `/admin` → **단체 관리** 탭에서 이름·썸네일만 넣으면 등록되도록 바꿈
+  - 새 `troupes` 테이블(`supabase/migrations/20260804000000_troupes.sql`) — 공개 SELECT RLS(웹 SSR·앱 anon 클라이언트가 읽음), 쓰기 정책 없이 admin은 service_role 로 우회하는 기존 패턴. 하드코딩 파일 2개는 삭제하고 웹 홈·앱 홈 모두 DB 조회로 교체
+  - **썸네일은 Supabase Storage `troupe-logos` 퍼블릭 버킷** — Vercel 런타임에서는 `public/`에 파일을 쓸 수 없어 정적 파일 방식을 유지할 수 없음. 본문 이미지용 `wiki-images` 버킷(`WikiEditor.tsx`, 대시보드에서 만들어져 마이그레이션에는 없음)과 같은 업로드 패턴을 따르되 버킷은 분리 — 쓰기 주체(관리자 service_role vs 승인 회원 클라이언트)와 용량·MIME 제약이 다르고, 단체 제거 시 로고만 정리하기 쉬움. `logo_url`은 절대 URL(신규 업로드)과 `/logos/…` 상대 경로(기존 커밋 로고)를 모두 허용해서, **기존 광운극예술연구회는 로고를 재업로드하지 않고 경로 그대로 이관**
+  - 결정 3가지: ⓐ slug는 단체 이름 그대로(기존 한글 slug 방식 유지 — 입력 칸이 2개로 끝남) ⓑ 썸네일은 선택, 없으면 기존 이니셜 플레이스홀더 ⓒ **등록과 동시에 제목만 있는 빈 문서를 생성**해 카드가 "문서 없음"으로 빠지지 않게 함. 같은 이름 문서가 이미 있으면 손대지 않음(본문 덮어쓰기 방지), revisions 행은 만들지 않음(시드 문서들과 같은 "편집 이력 없는 문서" 상태)
+  - 설정 2건이 함께 필요했음: `next.config.ts`에 Storage 호스트 `remotePatterns`(없으면 next/image가 차단), `experimental.serverActions.bodySizeLimit`(기본 1MB라 2MB 썸네일이 막힘)
+  - 단체 제거는 목록·업로드 로고만 지우고 **위키 문서는 남김** — 기존 삭제 신청 흐름을 우회하지 않도록
+  - 검증: 마이그레이션 적용 전 `supabase migration list`로 원격 이력이 로컬과 일치(새 파일만 미적용)함을 확인 후 push. 적용 뒤 문서 11건·리비전 150건 그대로이고 `troupes`에 기존 단체 1건이 로고 경로까지 유지된 채 들어간 것을 조회로 확인. 웹 빌드·양쪽 tsc·lint 통과
+  - **앱은 다음 빌드/출시부터 반영** — 그 전까지 새로 등록한 단체는 웹에만 보임
 - [TASK-066] 웹 북마크 — localStorage 기반 (2026-08-02)
   - 앱이 로그인 없이 기기 로컬 저장을 쓰므로(T-065) 웹도 같은 "이 기기에 저장" 모델로 통일. 비로그인 독자도 쓸 수 있고 DB·RLS 작업이 없음. 브라우저 데이터를 지우면 사라지고 기기 간 동기화가 안 되는 건 감수한 트레이드오프
   - `lib/bookmarks.ts` — 저장 형태를 앱(`mobile/src/lib/bookmarks.ts`)과 동일하게 맞춰 나중에 서버 저장으로 올릴 때 대비. 같은 탭 동기화를 위한 커스텀 이벤트 + 다른 탭용 `storage` 이벤트 양쪽 처리
