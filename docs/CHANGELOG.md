@@ -28,6 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `isPending` 처리가 없던 건 아니고 버튼 라벨만 `가입 신청 중…`으로 바뀌어서 변화가 눈에 안 띄었음. 로그인 폼(`LoginForm.tsx`)에는 이미 스피너가 있어 두 폼의 표현이 어긋나 있었음
   - 느린 이유는 구조적: `supabase.auth.signUp()`이 커스텀 SMTP로 **인증 메일을 동기 발송**하고 서버 액션이 그걸 끝까지 기다림. 몇 초 걸리는 게 정상이라 UI로 덮는 게 맞는 대응
   - 로그인 폼과 같은 `animate-spin` SVG를 버튼에 넣고, 입력 5칸도 제출 중 `disabled` 처리(로그인 폼과 동일). 대기가 더 긴 화면이라 "인증 메일을 보내는 중이라 몇 초 걸릴 수 있어요" 안내를 버튼 아래 함께 노출
+- [TASK-073] 회원가입 인증 메일이 스팸메일처럼 보이던 문제 + 지메일 자동 스팸 분류 (2026-08-04)
+  - 사용자 제보는 "메일 생김새가 스팸 같다"였는데, 고치고 테스트하는 과정에서 **지메일이 이 메일을 자동으로 스팸함에 넣고 있다는 별개 문제**가 드러나 함께 해결
+  - **① 생김새**: `supabase/templates/` 2종에서 보라색 풀블리드 배너·🍇 이모지 로고·카드 그림자를 걷어내고 텍스트 위주 트랜잭션 레이아웃으로. 버튼에만 숨어 있던 링크를 원문 주소로 병기. 푸터에 하드코딩돼 있던 옛 도메인(`podo-wiki.vercel.app`)을 `{{ .SiteURL }}`로 교체
+  - **② 링크 도메인**: `{{ .ConfirmationURL }}`이 `<프로젝트ref>.supabase.co`(무작위 문자열 서브도메인)를 가리켜 메일 본문에 피싱 패턴이 그대로 노출됐음. `{{ .TokenHash }}`로 링크를 직접 만들어 우리 도메인만 남기고, 이를 받을 `src/app/auth/confirm/route.ts` 신규 작성(`verifyOtp`). **덤으로 PC에서 가입하고 폰에서 메일을 열면 인증이 실패하던 제약도 해소** — `code` 방식과 달리 code_verifier 쿠키가 필요 없음. 기존 `/auth/callback`은 이미 발송된 옛 메일 때문에 존치
+  - **③ 발신 도메인**: 커스텀 SMTP가 개인 Gmail 계정이라 `From:`이 `gmail.com`이었음. Resend로 이전(`noreply@podo-store.com`, Sender name `포도위키`). Route 53에 DKIM(`resend._domainkey`)·SPF(`send`)·반송 MX(`send`, 도쿄 리전)·DMARC(`_dmarc`, `p=none`) 4개 추가 — DNS는 별도 담당자가 작업. **루트 SPF(`include:zohomail.com`)와 Zoho MX는 손대지 않아 기존 메일 송수신 무영향**
+  - 도메인 정리: `NEXT_PUBLIC_SITE_URL`(로컬·Vercel 프로덕션)과 Supabase Site URL을 `https://wiki.podo-store.com`으로 통일. 이전에는 인증 링크가 supabase.co → vercel.app → 308 → 커스텀 도메인으로 3단 이동했음
+  - 진단 근거: 지메일 스팸 사유 배너가 "This message is similar to messages that were identified as spam in the past"였음 — **인증 실패가 아니라 내용·평판 기반 분류**(인증 실패면 "발신자를 확인할 수 없습니다"로 표시). 이 문구 덕에 SPF/DKIM 실패가 아니라 발신 주소·링크 도메인이 원인임을 특정
+  - 검증: 비밀번호 재설정 링크로 `/auth/confirm` 동작을 먼저 확인(SMTP·DNS와 무관하게 검증 가능) → DNS 4개를 권한 네임서버 4대와 공개 리졸버에서 대조(DKIM 218자 온전) → Resend 도메인 검증 통과 → 새 지메일 주소로 가입 테스트에서 수신함 도착·인증 링크 정상 동작 확인
+  - 주의로 남길 것: `supabase config push`는 로컬 config.toml 전체를 원격에 덮어써서 대시보드에만 있는 값(Rate Limit 30 등)이 CLI 기본값으로 리셋됨. 이번 건에서는 쓰지 않았고, 앞으로도 auth 설정은 대시보드에서 직접 만질 것
 - [TASK-072] 로그인 후 헤더가 로그인 상태로 바로 안 바뀌던 문제 (2026-08-03)
   - 사용자 제보: "로그인해서 메인으로 오면 새로고침 전까지 헤더가 로그인 상태로 안 바뀐다"
   - 원인: `Header`가 클라이언트 컴포넌트인데 `useState(initialUser)`로 서버 값을 받고 있었음. **초기값은 최초 마운트에서만 반영되는데 Header는 레이아웃에 있어 페이지를 옮겨도 언마운트되지 않음.** 그래서 로그인 후 서버가 새 값을 내려줘도 화면은 옛 상태로 남고, 뒤늦게 도는 클라이언트 `getUser()` 왕복이 끝나야 갱신됐음
