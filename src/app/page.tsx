@@ -74,7 +74,7 @@ export default async function HomePage() {
                   alt={troupe.name}
                   width={88}
                   height={88}
-                  className="rounded-lg object-cover w-22 h-22"
+                  className="rounded-lg object-contain w-22 h-22"
                 />
               ) : (
                 <div className="w-22 h-22 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent-text text-3xl font-bold">

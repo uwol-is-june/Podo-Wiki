@@ -239,6 +239,33 @@ const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+
 
 type AdminClient = ReturnType<typeof createAdminClient>
 
+const LOGO_MAX_EDGE = 320 // 홈 카드가 88px, 2배 화면을 고려해도 충분
+
+// 이미지 테두리의 균일한 여백(흰 배경·투명 영역)을 잘라내고 한 변을 320px 이하로 줄인다.
+// SVG 는 벡터 그대로 두는 편이 낫고(래스터화하면 오히려 손해), 처리에 실패하면 원본을 그대로 쓴다.
+async function normalizeLogo(
+  logo: File
+): Promise<{ body: Blob | Buffer; contentType: string; ext: string }> {
+  const fallbackExt = (logo.name.split('.').pop() ?? 'png').toLowerCase()
+
+  if (logo.type === 'image/svg+xml') {
+    return { body: logo, contentType: logo.type, ext: 'svg' }
+  }
+
+  try {
+    const { default: sharp } = await import('sharp')
+    const trimmed = await sharp(Buffer.from(await logo.arrayBuffer()))
+      .trim() // 모서리 픽셀과 같은 색인 테두리를 제거 — 여백이 없으면 아무것도 안 잘림
+      .resize(LOGO_MAX_EDGE, LOGO_MAX_EDGE, { fit: 'inside', withoutEnlargement: true })
+      .png()
+      .toBuffer()
+    return { body: trimmed, contentType: 'image/png', ext: 'png' }
+  } catch {
+    // 전부 단색이라 trim 이 실패하는 등의 경우 — 원본을 그대로 올린다
+    return { body: logo, contentType: logo.type, ext: fallbackExt }
+  }
+}
+
 // 업로드된 썸네일을 Storage 에 올리고 공개 URL 을 돌려준다. 파일이 안 왔으면 url: null.
 async function uploadTroupeLogo(
   adminClient: AdminClient,
@@ -253,13 +280,17 @@ async function uploadTroupeLogo(
     return { error: '썸네일은 2MB 이하만 올릴 수 있습니다.' }
   }
 
+  // 로고마다 이미지 안쪽 여백이 제각각이라(꽉 찬 것 vs 흰 여백이 절반인 것) 그대로 쓰면
+  // 같은 크기 칸에 넣어도 로고 크기가 들쭉날쭉해 보인다. 업로드 시점에 테두리 여백을 잘라
+  // 실제 그림만 남긴다. 홈에서는 object-contain 이라 잘라낸 만큼 로고가 커 보인다.
+  const normalized = await normalizeLogo(logo)
+
   // 파일명에 한글·공백이 섞이면 공개 URL 인코딩이 번거로워져 UUID 로 저장
-  const ext = logo.type === 'image/svg+xml' ? 'svg' : (logo.name.split('.').pop() ?? 'png').toLowerCase()
-  const path = `${crypto.randomUUID()}.${ext}`
+  const path = `${crypto.randomUUID()}.${normalized.ext}`
 
   const { error: uploadError } = await adminClient.storage
     .from(TROUPE_LOGO_BUCKET)
-    .upload(path, logo, { contentType: logo.type, upsert: false })
+    .upload(path, normalized.body, { contentType: normalized.contentType, upsert: false })
   if (uploadError) return { error: `썸네일 업로드 실패: ${uploadError.message}` }
 
   return { url: adminClient.storage.from(TROUPE_LOGO_BUCKET).getPublicUrl(path).data.publicUrl }
