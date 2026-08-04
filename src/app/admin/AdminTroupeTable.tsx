@@ -1,14 +1,17 @@
 'use client'
 
-import { useActionState, useRef, useTransition } from 'react'
+import { useActionState, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { createTroupe, deleteTroupe, type AdminActionState } from '@/lib/admin/actions'
+import { createTroupe, deleteTroupe, updateTroupe, type AdminActionState } from '@/lib/admin/actions'
 import type { Troupe } from '@/lib/supabase/types'
 import { slugToHref } from '@/lib/wiki/slug'
 
 type Props = { troupes: Troupe[] }
 
 const initialState: AdminActionState = { error: '' }
+
+const editInputClass =
+  'h-9 px-3 rounded border border-wiki-border bg-wiki-bg text-wiki-text placeholder:text-wiki-text-muted focus:outline-none focus:border-wiki-accent transition-colors text-sm'
 
 export default function AdminTroupeTable({ troupes }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
@@ -130,12 +133,101 @@ export default function AdminTroupeTable({ troupes }: Props) {
 
 function TroupeRow({ troupe }: { troupe: Troupe }) {
   const [isPending, startTransition] = useTransition()
+  const [isEditing, setIsEditing] = useState(false)
+  const [editState, editAction, isSaving] = useActionState(
+    async (prev: AdminActionState, formData: FormData) => {
+      const result = await updateTroupe(prev, formData)
+      if (result.success) setIsEditing(false)
+      return result
+    },
+    initialState
+  )
 
   const handleDelete = () => {
     if (!confirm(`${troupe.name} 단체를 목록에서 제거할까요?\n위키 문서는 그대로 남습니다.`)) return
     startTransition(async () => {
       await deleteTroupe(troupe.slug)
     })
+  }
+
+  if (isEditing) {
+    return (
+      <tr className="border-b border-wiki-border last:border-0">
+        <td colSpan={3} className="py-4">
+          <form action={editAction} className="flex flex-col gap-3">
+            <input type="hidden" name="slug" value={troupe.slug} />
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-wiki-text">소속</label>
+              <input
+                name="affiliation"
+                type="text"
+                defaultValue={troupe.affiliation ?? ''}
+                disabled={isSaving}
+                maxLength={60}
+                placeholder="예) 광운대학교"
+                className={editInputClass}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-wiki-text">명칭</label>
+              <input
+                name="name"
+                type="text"
+                required
+                defaultValue={troupe.name}
+                disabled={isSaving}
+                maxLength={60}
+                className={editInputClass}
+              />
+              <p className="text-xs text-wiki-text-muted">
+                명칭을 바꾸면 홈 표기와 문서 제목이 함께 바뀝니다. 다만 <strong>문서 주소는
+                등록 당시 그대로</strong>입니다 (<code className="text-[11px]">{slugToHref(troupe.slug)}</code>).
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-wiki-text">썸네일 교체</label>
+              <input
+                name="logo"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                disabled={isSaving}
+                className="text-sm text-wiki-text file:mr-3 file:px-3 file:py-1.5 file:rounded file:border-0 file:bg-wiki-border file:text-wiki-text file:text-xs file:cursor-pointer"
+              />
+              <p className="text-xs text-wiki-text-muted">
+                고르지 않으면 지금 썸네일이 그대로 유지됩니다.
+              </p>
+            </div>
+
+            {editState.error && (
+              <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
+                {editState.error}
+              </p>
+            )}
+
+            <div className="flex items-center gap-2">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="px-4 py-1.5 bg-wiki-accent text-wiki-on-accent text-xs rounded font-medium hover:bg-wiki-accent-hover transition-colors disabled:opacity-50"
+              >
+                {isSaving ? '저장 중…' : '저장'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                disabled={isSaving}
+                className="px-4 py-1.5 border border-wiki-border text-wiki-text text-xs rounded hover:bg-wiki-bg transition-colors disabled:opacity-50"
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        </td>
+      </tr>
+    )
   }
 
   return (
@@ -164,13 +256,22 @@ function TroupeRow({ troupe }: { troupe: Troupe }) {
         </a>
       </td>
       <td className="py-3">
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors disabled:opacity-50"
-        >
-          제거
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsEditing(true)}
+            disabled={isPending}
+            className="px-3 py-1 border border-wiki-border text-wiki-text text-xs rounded hover:bg-wiki-bg transition-colors disabled:opacity-50"
+          >
+            수정
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors disabled:opacity-50"
+          >
+            제거
+          </button>
+        </div>
       </td>
     </tr>
   )

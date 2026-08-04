@@ -237,6 +237,41 @@ const TROUPE_LOGO_BUCKET = 'troupe-logos'
 const MAX_LOGO_BYTES = 2 * 1024 * 1024 // 2MB — 버킷 file_size_limit 과 동일
 const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
 
+type AdminClient = ReturnType<typeof createAdminClient>
+
+// 업로드된 썸네일을 Storage 에 올리고 공개 URL 을 돌려준다. 파일이 안 왔으면 url: null.
+async function uploadTroupeLogo(
+  adminClient: AdminClient,
+  logo: FormDataEntryValue | null
+): Promise<{ url: string | null } | { error: string }> {
+  if (!(logo instanceof File) || logo.size === 0) return { url: null }
+
+  if (!ALLOWED_LOGO_TYPES.includes(logo.type)) {
+    return { error: 'PNG · JPG · WebP · SVG 이미지만 올릴 수 있습니다.' }
+  }
+  if (logo.size > MAX_LOGO_BYTES) {
+    return { error: '썸네일은 2MB 이하만 올릴 수 있습니다.' }
+  }
+
+  // 파일명에 한글·공백이 섞이면 공개 URL 인코딩이 번거로워져 UUID 로 저장
+  const ext = logo.type === 'image/svg+xml' ? 'svg' : (logo.name.split('.').pop() ?? 'png').toLowerCase()
+  const path = `${crypto.randomUUID()}.${ext}`
+
+  const { error: uploadError } = await adminClient.storage
+    .from(TROUPE_LOGO_BUCKET)
+    .upload(path, logo, { contentType: logo.type, upsert: false })
+  if (uploadError) return { error: `썸네일 업로드 실패: ${uploadError.message}` }
+
+  return { url: adminClient.storage.from(TROUPE_LOGO_BUCKET).getPublicUrl(path).data.publicUrl }
+}
+
+// 업로드했던 로고만 지운다. public/logos/ 에 커밋된 기존 로고(상대 경로)는 건드리지 않는다.
+async function removeTroupeLogoObject(adminClient: AdminClient, logoUrl: string | null) {
+  if (!logoUrl?.startsWith('http')) return
+  const objectPath = logoUrl.split(`/${TROUPE_LOGO_BUCKET}/`)[1]
+  if (objectPath) await adminClient.storage.from(TROUPE_LOGO_BUCKET).remove([objectPath])
+}
+
 export async function getTroupes(): Promise<Troupe[]> {
   const adminClient = createAdminClient()
   const { data, error } = await adminClient
@@ -276,28 +311,9 @@ export async function createTroupe(
   if (existing) return { error: '이미 등록된 단체입니다.' }
 
   // 썸네일은 선택 — 없으면 홈에서 이니셜 플레이스홀더로 렌더된다
-  const logo = formData.get('logo')
-  let logoUrl: string | null = null
-
-  if (logo instanceof File && logo.size > 0) {
-    if (!ALLOWED_LOGO_TYPES.includes(logo.type)) {
-      return { error: 'PNG · JPG · WebP · SVG 이미지만 올릴 수 있습니다.' }
-    }
-    if (logo.size > MAX_LOGO_BYTES) {
-      return { error: '썸네일은 2MB 이하만 올릴 수 있습니다.' }
-    }
-
-    // 파일명에 한글·공백이 섞이면 공개 URL 인코딩이 번거로워져 UUID 로 저장
-    const ext = logo.type === 'image/svg+xml' ? 'svg' : (logo.name.split('.').pop() ?? 'png').toLowerCase()
-    const path = `${crypto.randomUUID()}.${ext}`
-
-    const { error: uploadError } = await adminClient.storage
-      .from(TROUPE_LOGO_BUCKET)
-      .upload(path, logo, { contentType: logo.type, upsert: false })
-    if (uploadError) return { error: `썸네일 업로드 실패: ${uploadError.message}` }
-
-    logoUrl = adminClient.storage.from(TROUPE_LOGO_BUCKET).getPublicUrl(path).data.publicUrl
-  }
+  const uploaded = await uploadTroupeLogo(adminClient, formData.get('logo'))
+  if ('error' in uploaded) return { error: uploaded.error }
+  const logoUrl = uploaded.url
 
   const { data: last } = await adminClient
     .from('troupes')
@@ -338,6 +354,61 @@ export async function createTroupe(
   return { error: '', success: `${name} 단체를 등록했습니다.` }
 }
 
+export async function updateTroupe(
+  prevState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  if (!(await checkAdminSession())) return { error: '관리자 인증이 필요합니다.' }
+
+  const slug = String(formData.get('slug') ?? '')
+  const name = String(formData.get('name') ?? '').trim()
+  if (!name) return { error: '단체 명칭을 입력해 주세요.' }
+  if (name.length > 60) return { error: '단체 명칭이 너무 깁니다. (60자 이하)' }
+
+  const affiliation = String(formData.get('affiliation') ?? '').trim()
+  if (affiliation.length > 60) return { error: '소속이 너무 깁니다. (60자 이하)' }
+
+  const adminClient = createAdminClient()
+  const { data: troupe } = await adminClient
+    .from('troupes')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (!troupe) return { error: '단체를 찾을 수 없습니다.' }
+
+  // 썸네일은 새로 올렸을 때만 교체. 안 올리면 기존 로고 유지
+  const uploaded = await uploadTroupeLogo(adminClient, formData.get('logo'))
+  if ('error' in uploaded) return { error: uploaded.error }
+
+  const { error } = await adminClient
+    .from('troupes')
+    .update({
+      name,
+      affiliation: affiliation || null,
+      ...(uploaded.url ? { logo_url: uploaded.url } : {}),
+    })
+    .eq('slug', slug)
+  if (error) return { error: error.message }
+
+  if (uploaded.url) await removeTroupeLogoObject(adminClient, troupe.logo_url)
+
+  // 명칭이 바뀌면 문서 제목도 같이 맞춘다. **주소(slug)는 그대로** —
+  // documents.slug 는 PK 이고 revisions 등이 FK 로 물려 있어 주소 변경은 문서 이전 작업이 따로 필요하다.
+  if (name !== troupe.name) {
+    const { error: docError } = await adminClient
+      .from('documents')
+      .update({ title: name })
+      .eq('slug', slug)
+    if (docError) return { error: `단체는 수정됐지만 문서 제목 갱신에 실패했습니다: ${docError.message}` }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/')
+  revalidatePath(`/w/${slug}`)
+  revalidateTag(`document:${slug}`, 'max')
+  return { error: '', success: `${name} 정보를 수정했습니다.` }
+}
+
 export async function deleteTroupe(slug: string): Promise<AdminActionState> {
   if (!(await checkAdminSession())) return { error: '관리자 인증이 필요합니다.' }
 
@@ -352,11 +423,7 @@ export async function deleteTroupe(slug: string): Promise<AdminActionState> {
   const { error } = await adminClient.from('troupes').delete().eq('slug', slug)
   if (error) return { error: error.message }
 
-  // 업로드했던 로고만 정리. public/logos/ 에 커밋된 기존 로고(상대 경로)는 건드리지 않는다.
-  const objectPath = troupe?.logo_url?.split(`/${TROUPE_LOGO_BUCKET}/`)[1]
-  if (troupe?.logo_url?.startsWith('http') && objectPath) {
-    await adminClient.storage.from(TROUPE_LOGO_BUCKET).remove([objectPath])
-  }
+  await removeTroupeLogoObject(adminClient, troupe?.logo_url ?? null)
 
   // 위키 문서는 남긴다 — 내용이 쌓였을 수 있고, 삭제는 기존 삭제 신청 흐름을 따른다.
   revalidatePath('/admin')
