@@ -256,12 +256,16 @@ export async function createTroupe(
   if (!(await checkAdminSession())) return { error: '관리자 인증이 필요합니다.' }
 
   const name = String(formData.get('name') ?? '').trim()
-  if (!name) return { error: '단체 이름을 입력해 주세요.' }
-  if (name.length > 60) return { error: '단체 이름이 너무 깁니다. (60자 이하)' }
+  if (!name) return { error: '단체 명칭을 입력해 주세요.' }
+  if (name.length > 60) return { error: '단체 명칭이 너무 깁니다. (60자 이하)' }
   // slug 가 곧 문서 주소라 경로 구분자가 들어가면 /w/[...slug] 가 깨진다
-  if (name.includes('/')) return { error: '단체 이름에 / 는 쓸 수 없습니다.' }
+  if (name.includes('/')) return { error: '단체 명칭에 / 는 쓸 수 없습니다.' }
 
-  const slug = name // 결정: slug 는 단체 이름 그대로 (기존 광운극예술연구회 방식)
+  // 소속은 표시용(선택). slug 는 명칭에서만 만든다 — 소속이 바뀌어도 문서 주소는 그대로여야 함
+  const affiliation = String(formData.get('affiliation') ?? '').trim()
+  if (affiliation.length > 60) return { error: '소속이 너무 깁니다. (60자 이하)' }
+
+  const slug = name // 결정: slug 는 단체 명칭 그대로 (기존 광운극예술연구회 방식)
   const adminClient = createAdminClient()
 
   const { data: existing } = await adminClient
@@ -305,6 +309,7 @@ export async function createTroupe(
   const { error: insertError } = await adminClient.from('troupes').insert({
     slug,
     name,
+    affiliation: affiliation || null,
     logo_url: logoUrl,
     sort_order: (last?.sort_order ?? -1) + 1,
   })

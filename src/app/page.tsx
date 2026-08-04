@@ -44,7 +44,7 @@ export default async function HomePage() {
     // 단체 목록은 /admin 에서 등록 (TASK-075) — 예전 src/data/troupes.ts 하드코딩을 대체
     supabase
       .from('troupes')
-      .select('slug, name, logo_url')
+      .select('slug, name, affiliation, logo_url')
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true }),
   ])
@@ -61,28 +61,34 @@ export default async function HomePage() {
         <h2 className="text-sm font-semibold text-wiki-text uppercase tracking-wide mb-4 pb-2 border-b border-wiki-border">
           공연단체
         </h2>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
           {(troupes ?? []).map((troupe) => (
             <Link
               key={troupe.slug}
               href={slugToHref(troupe.slug)}
-              className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
+              className="flex flex-col items-center gap-2.5 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
             >
               {troupe.logo_url ? (
                 <Image
                   src={troupe.logo_url}
                   alt={troupe.name}
-                  width={56}
-                  height={56}
-                  className="rounded-lg object-cover w-14 h-14"
+                  width={88}
+                  height={88}
+                  className="rounded-lg object-cover w-22 h-22"
                 />
               ) : (
-                <div className="w-14 h-14 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent-text text-xl font-bold">
+                <div className="w-22 h-22 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent-text text-3xl font-bold">
                   {troupe.name[0]}
                 </div>
               )}
-              <span className="text-xs text-wiki-text group-hover:text-wiki-accent-text transition-colors text-center leading-tight break-keep">
-                {troupe.name}
+              {/* 소속 + 명칭 2줄 표기 (소속이 없으면 명칭 한 줄) */}
+              <span className="flex flex-col items-center gap-0.5 text-center leading-tight break-keep">
+                {troupe.affiliation && (
+                  <span className="text-[11px] text-wiki-text-muted">{troupe.affiliation}</span>
+                )}
+                <span className="text-sm text-wiki-text group-hover:text-wiki-accent-text transition-colors">
+                  {troupe.name}
+                </span>
               </span>
             </Link>
           ))}

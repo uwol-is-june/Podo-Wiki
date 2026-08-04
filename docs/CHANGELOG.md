@@ -90,6 +90,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `mobile/src/app/w/[slug].tsx` headerRight의 목차·역사를 반투명 배경 알약형 칩으로(패딩·터치영역·간격·수직정렬 정돈), `headerTitleStyle` fontSize 16. 에뮬레이터에서 칩 렌더·목차 시트 열림 확인 (**앱 반영은 다음 앱 빌드/출시부터**)
 
 ### Added
+- [TASK-076] 단체를 소속 + 명칭 두 줄로 표기 + 홈 로고 확대 (2026-08-04)
+  - TASK-075 직후 사용자 요청: 이름 한 칸으로는 "충북대학교 극예술연구회 시네씨아"처럼 소속과 명칭이 한 줄에 뭉침. 소속(광운대학교) / 명칭(광운극예술연구회)으로 나눠 두 줄로 보이게 함
+  - `troupes.affiliation` 컬럼 추가(nullable — 대학·회사에 속하지 않은 단체는 명칭 한 줄만 표기). **slug 는 여전히 명칭에서만 만든다** — 소속이 바뀌어도 문서 주소가 흔들리면 안 되므로 소속은 표시 전용
+  - 홈 로고가 작다는 지적 반영: 웹 56 → 88px(`w-22`, Tailwind v4 동적 spacing으로 생성되는 것 확인), 앱 44 → 68px. 커진 카드에 맞춰 웹 데스크톱 그리드를 6 → 5열로 줄이고 명칭 글자도 한 단계 키움
+  - 관리자 폼은 `소속(선택)` + `명칭` 두 칸. 소속 안내에 "주소에 들어가지 않는다"를 명시
+  - 검증: 로컬 프로덕션 빌드에서 광운(2줄) · 충북대 항목(소속 없어 1줄)이 의도대로 렌더되고 업로드된 Storage 로고가 next/image 최적화(200 image/jpeg)를 통과하는 것 확인. 양쪽 tsc·lint 통과 (**앱 반영은 다음 앱 빌드/출시부터**)
 - [TASK-075] 관리자 페이지에서 공연단체 추가 (2026-08-04)
   - 그동안 단체를 하나 늘리려면 `src/data/troupes.ts`와 손으로 복사해둔 사본 `mobile/src/data/troupes.ts`를 같이 고치고 로고 PNG를 `public/logos/`에 커밋한 뒤 웹 배포 + 앱 스토어 심사를 거쳐야 했음. `/admin` → **단체 관리** 탭에서 이름·썸네일만 넣으면 등록되도록 바꿈
   - 새 `troupes` 테이블(`supabase/migrations/20260804000000_troupes.sql`) — 공개 SELECT RLS(웹 SSR·앱 anon 클라이언트가 읽음), 쓰기 정책 없이 admin은 service_role 로 우회하는 기존 패턴. 하드코딩 파일 2개는 삭제하고 웹 홈·앱 홈 모두 DB 조회로 교체

@@ -25,8 +25,26 @@ export default function AdminTroupeTable({ troupes }: Props) {
     <div className="flex flex-col gap-6">
       <form ref={formRef} action={formAction} className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
+          <label htmlFor="troupe-affiliation" className="text-sm font-medium text-wiki-text">
+            소속 <span className="text-wiki-text-muted font-normal">(선택)</span>
+          </label>
+          <input
+            id="troupe-affiliation"
+            name="affiliation"
+            type="text"
+            disabled={isPending}
+            maxLength={60}
+            placeholder="예) 광운대학교"
+            className="h-10 px-3 rounded border border-wiki-border bg-wiki-bg text-wiki-text placeholder:text-wiki-text-muted focus:outline-none focus:border-wiki-accent transition-colors text-sm"
+          />
+          <p className="text-xs text-wiki-text-muted">
+            명칭 위에 작게 표시됩니다. 비워 두면 명칭만 한 줄로 나옵니다.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1">
           <label htmlFor="troupe-name" className="text-sm font-medium text-wiki-text">
-            단체 이름
+            명칭
           </label>
           <input
             id="troupe-name"
@@ -39,7 +57,7 @@ export default function AdminTroupeTable({ troupes }: Props) {
             className="h-10 px-3 rounded border border-wiki-border bg-wiki-bg text-wiki-text placeholder:text-wiki-text-muted focus:outline-none focus:border-wiki-accent transition-colors text-sm"
           />
           <p className="text-xs text-wiki-text-muted">
-            입력한 이름이 그대로 문서 주소가 되고, 제목만 있는 빈 문서가 함께 만들어집니다.
+            명칭이 그대로 문서 주소가 되고, 제목만 있는 빈 문서가 함께 만들어집니다. (소속은 주소에 들어가지 않습니다)
           </p>
         </div>
 
@@ -138,6 +156,9 @@ function TroupeRow({ troupe }: { troupe: Troupe }) {
         )}
       </td>
       <td className="py-3 pr-4">
+        {troupe.affiliation && (
+          <div className="text-xs text-wiki-text-muted leading-tight">{troupe.affiliation}</div>
+        )}
         <a href={slugToHref(troupe.slug)} className="text-wiki-accent-text hover:underline">
           {troupe.name}
         </a>

@@ -82,6 +82,8 @@ export type Database = {
         Row: {
           slug: string;
           name: string;
+          // 소속 (예: '광운대학교'). 없는 단체도 있어서 nullable — 이때는 명칭만 한 줄로 표기
+          affiliation: string | null;
           // 절대 URL(웹 관리자가 업로드한 Storage 파일) 또는 '/logos/…'(웹 public/ 에 있는 기존 로고)
           logo_url: string | null;
           sort_order: number;
@@ -90,12 +92,14 @@ export type Database = {
         Insert: {
           slug: string;
           name: string;
+          affiliation?: string | null;
           logo_url?: string | null;
           sort_order?: number;
           created_at?: string;
         };
         Update: {
           name?: string;
+          affiliation?: string | null;
           logo_url?: string | null;
           sort_order?: number;
         };

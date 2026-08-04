@@ -73,9 +73,20 @@ export default function HomeScreen() {
                   </Text>
                 </View>
               )}
-              <Text style={[styles.troupeName, { color: theme.text }]} numberOfLines={1}>
-                {troupe.name}
-              </Text>
+              {/* 소속 + 명칭 2줄 표기 (소속이 없으면 명칭 한 줄) */}
+              <View style={styles.troupeLabel}>
+                {troupe.affiliation ? (
+                  <Text
+                    style={[styles.troupeAffiliation, { color: theme.textMuted }]}
+                    numberOfLines={1}
+                  >
+                    {troupe.affiliation}
+                  </Text>
+                ) : null}
+                <Text style={[styles.troupeName, { color: theme.text }]} numberOfLines={2}>
+                  {troupe.name}
+                </Text>
+              </View>
             </Pressable>
           ))}
           <Pressable style={[styles.troupeCard, { borderColor: theme.border }]} onPress={openRandom}>
@@ -170,16 +181,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  troupeLogo: { width: 44, height: 44, borderRadius: 8 },
+  troupeLogo: { width: 68, height: 68, borderRadius: 10 },
   troupeInitial: {
-    width: 44,
-    height: 44,
-    borderRadius: 8,
+    width: 68,
+    height: 68,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  troupeInitialText: { fontSize: 18, fontWeight: '700' },
-  troupeName: { fontSize: 12, paddingHorizontal: 6 },
+  troupeInitialText: { fontSize: 26, fontWeight: '700' },
+  troupeLabel: { alignItems: 'center', gap: 1, paddingHorizontal: 6 },
+  troupeAffiliation: { fontSize: 10 },
+  troupeName: { fontSize: 12.5, textAlign: 'center' },
   card: { borderWidth: 1, borderRadius: 10, marginBottom: 16, overflow: 'hidden' },
   cardLoading: { paddingVertical: 24 },
   emptyText: { fontSize: 13, textAlign: 'center', paddingVertical: 24 },
