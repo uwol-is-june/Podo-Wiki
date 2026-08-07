@@ -19,6 +19,10 @@
   --wiki-header-bg: #6a39c0;
   --wiki-header-text: #ffffff;
   --wiki-shimmer: rgba(255, 255, 255, 0.7);
+  /* 단체 로고 받침. 흰 배경으로 만들어진 로고가 많아서, 어두운 배경에 그대로 올리면
+     로고가 아니라 '흰 네모'로 보인다. 밝은 받침을 깔아 의도된 타일처럼 보이게 한다.
+     라이트에선 카드(surface)와 같은 흰색이라 눈에 띄지 않음 */
+  --wiki-logo-plate: #ffffff;
 }
 
 .dark {
@@ -39,6 +43,8 @@
   --wiki-header-bg: #1e1530;
   --wiki-header-text: #e5dff5;
   --wiki-shimmer: rgba(255, 255, 255, 0.07);
+  /* 다크에선 순백 대신 라이트모드 배경색을 써서 살짝 눌러준다 (흰 로고와도 자연스럽게 이어짐) */
+  --wiki-logo-plate: #f7f5fc;
 }
 
 @theme inline {
@@ -53,6 +59,7 @@
   --color-wiki-border: var(--wiki-border);
   --color-wiki-header-bg: var(--wiki-header-bg);
   --color-wiki-header-text: var(--wiki-header-text);
+  --color-wiki-logo-plate: var(--wiki-logo-plate);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

@@ -69,13 +69,16 @@ export default async function HomePage() {
               className="flex flex-col items-center gap-2.5 p-3 rounded-lg hover:bg-wiki-bg transition-colors group"
             >
               {troupe.logo_url ? (
-                <Image
-                  src={troupe.logo_url}
-                  alt={troupe.name}
-                  width={88}
-                  height={88}
-                  className="rounded-lg object-contain w-22 h-22"
-                />
+                // 로고 받침 — 업로드 때 여백을 잘라내(TASK-078) 그림이 칸을 꽉 채우므로 안쪽 여백도 함께 준다
+                <div className="w-22 h-22 rounded-lg bg-wiki-logo-plate p-2 flex items-center justify-center">
+                  <Image
+                    src={troupe.logo_url}
+                    alt={troupe.name}
+                    width={88}
+                    height={88}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               ) : (
                 <div className="w-22 h-22 rounded-lg bg-wiki-accent/10 flex items-center justify-center text-wiki-accent-text text-3xl font-bold">
                   {troupe.name[0]}

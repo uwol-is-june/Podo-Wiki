@@ -234,13 +234,15 @@ function TroupeRow({ troupe }: { troupe: Troupe }) {
     <tr className="border-b border-wiki-border last:border-0">
       <td className="py-3 pr-4">
         {troupe.logo_url ? (
-          <Image
-            src={troupe.logo_url}
-            alt={troupe.name}
-            width={40}
-            height={40}
-            className="rounded object-contain w-10 h-10"
-          />
+          <div className="w-10 h-10 rounded bg-wiki-logo-plate p-1 flex items-center justify-center">
+            <Image
+              src={troupe.logo_url}
+              alt={troupe.name}
+              width={40}
+              height={40}
+              className="w-full h-full object-contain"
+            />
+          </div>
         ) : (
           <div className="w-10 h-10 rounded bg-wiki-accent/10 flex items-center justify-center text-wiki-accent-text font-bold">
             {troupe.name[0]}
