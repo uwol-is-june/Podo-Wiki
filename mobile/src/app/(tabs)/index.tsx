@@ -61,11 +61,14 @@ export default function HomeScreen() {
               onPress={() => router.push({ pathname: '/w/[slug]', params: { slug: troupe.slug } })}
             >
               {troupeLogoUri(troupe.logo_url) ? (
-                <Image
-                  source={{ uri: troupeLogoUri(troupe.logo_url)! }}
-                  style={styles.troupeLogo}
-                  contentFit="contain"
-                />
+                // 로고 받침 — 업로드 때 여백을 잘라내(TASK-078) 그림이 칸을 꽉 채우므로 안쪽 여백도 함께 준다
+                <View style={[styles.troupeLogoPlate, { backgroundColor: theme.logoPlate }]}>
+                  <Image
+                    source={{ uri: troupeLogoUri(troupe.logo_url)! }}
+                    style={styles.troupeLogo}
+                    contentFit="contain"
+                  />
+                </View>
               ) : (
                 <View style={[styles.troupeInitial, { backgroundColor: theme.accent }]}>
                   <Text style={[styles.troupeInitialText, { color: theme.onAccent }]}>
@@ -181,7 +184,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  troupeLogo: { width: 68, height: 68, borderRadius: 10 },
+  // 웹 홈(88px 칸에 8px)과 같은 비율의 안쪽 여백
+  troupeLogoPlate: { width: 68, height: 68, borderRadius: 10, padding: 6 },
+  troupeLogo: { width: '100%', height: '100%' },
   troupeInitial: {
     width: 68,
     height: 68,

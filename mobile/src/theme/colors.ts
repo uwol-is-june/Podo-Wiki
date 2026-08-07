@@ -15,6 +15,8 @@ export interface WikiTheme {
   border: string
   headerBg: string
   headerText: string
+  /** 단체 로고 받침 — 흰 배경 로고가 다크에서 '흰 네모'로 튀지 않게 깔아주는 밝은 판 */
+  logoPlate: string
 }
 
 // Copied from src/app/globals.css (--wiki-*) — keep in sync
@@ -31,6 +33,8 @@ export const WikiColors: { light: WikiTheme; dark: WikiTheme } = {
     border: '#ddd5f0',
     headerBg: '#6a39c0',
     headerText: '#ffffff',
+    // 카드(surface)와 같은 흰색이라 라이트에선 받침이 눈에 띄지 않는다
+    logoPlate: '#ffffff',
   },
   dark: {
     bg: '#130d1f',
@@ -46,6 +50,8 @@ export const WikiColors: { light: WikiTheme; dark: WikiTheme } = {
     border: '#352558',
     headerBg: '#1e1530',
     headerText: '#e5dff5',
+    // 순백 대신 라이트모드 배경색을 써서 살짝 눌러준다 (흰 배경 로고와 자연스럽게 이어짐)
+    logoPlate: '#f7f5fc',
   },
 }
 
