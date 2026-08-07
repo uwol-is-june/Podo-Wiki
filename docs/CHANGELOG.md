@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- 앱 1.1.1 빌드·제출 — 단체 목록 DB 전환을 스토어에 반영 (2026-08-05)
+- 앱 1.1.1 양대 스토어 출시 — 단체 목록 DB 전환 반영 (2026-08-05 제출 → 08-07 통과)
   - 계기: 사용자 제보 "앱에선 광운극예술연구회밖에 안 뜬다". 원인은 **출시 시점 어긋남** — 1.1.0은 8/3 출시인데 단체 목록을 DB에서 읽도록 바꾼 T-075·076은 8/4 작업이라, 스토어에 걸린 앱에는 `mobile/src/data/troupes.ts`의 하드코딩 목록(광운 1개)만 들어 있었음. DB·RLS·웹은 모두 정상이었음
   - 담긴 것: T-075·076(단체 DB 전환) + T-069(북마크 저장 실패·경합 — 1.1.0에 못 실었던 건) + T-068(아이콘 리본 통일) + T-070(목차 이동) + T-071(FAB 깜빡임)
   - `mobile/app.json` version 1.1.0 → 1.1.1. iOS build 6 / Android vc 8 (versionCode는 EAS가 자동 증가)
   - 검증: 모바일 `tsc --noEmit` 통과 + 에뮬레이터(Android 16) 릴리스 APK로 전 화면 확인, `FATAL EXCEPTION` 0건. T-068이 `@expo/vector-icons` 네이티브 의존성을 새로 들여와서(1.0.0 전면 크래시와 같은 부류) 특히 중점 확인함. 홈 단체 2개 표시·문서 WebView·목차 이동·북마크 재시작 유지까지 실제 터치로 검증
-  - iOS는 `eas submit`으로 ASC 업로드 완료(심사 제출은 수동), Android는 서비스 계정 키가 없어 AAB 수동 업로드 대기
+  - iOS는 `eas submit`으로 ASC 업로드(심사 제출은 수동), Android는 서비스 계정 키가 없어 AAB 수동 업로드. **8/7 양대 통과**
   - **이번이 하드코딩 → DB 전환에 걸린 마지막 출시**. 이후로는 `/admin`에서 단체를 추가하면 앱 재배포 없이 반영됨
 - [TASK-079] 새로 올린 단체 로고가 홈에서 아예 안 뜨던 문제 (2026-08-04)
   - TASK-078 배포 후 재업로드한 로고가 표시되지 않음. `next/image` 가 400(`INVALID_IMAGE_OPTIMIZE_REQUEST`)을 냈고 서버 로그는 "The requested resource isn't a valid image … received null"
