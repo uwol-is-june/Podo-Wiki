@@ -5,12 +5,12 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
 
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
+import { Text } from '@/components/text'
 import { useBookmarks, useRemoveBookmark } from '@/hooks/use-bookmarks'
 import { formatDateTime } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'

@@ -6,13 +6,13 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
   useColorScheme,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { Text } from '@/components/text'
 import { supabase } from '@/lib/supabase'
 import { wikiTheme } from '@/theme/colors'
 

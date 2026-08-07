@@ -6,13 +6,13 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
 
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
 import { FeatureRequestSheet } from '@/components/feature-request-sheet'
+import { Text } from '@/components/text'
 import { getRandomSlug } from '@/lib/api'
 import { CONTACT_EMAIL, SITE_URL } from '@/lib/constants'
 import { wikiTheme } from '@/theme/colors'

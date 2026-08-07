@@ -6,12 +6,12 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
 
 import { ErrorState } from '@/components/error-state'
+import { Text } from '@/components/text'
 import { editorLabel, formatDateTime, getHistory } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
 

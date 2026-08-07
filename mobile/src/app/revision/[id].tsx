@@ -4,12 +4,12 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
 
 import { ErrorState } from '@/components/error-state'
+import { Text } from '@/components/text'
 import { WikiWebView } from '@/components/wiki-webview'
 import { editorLabel, formatDateTime, getRevision } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'

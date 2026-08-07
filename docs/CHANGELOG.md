@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [TASK-080] 한글이 어절 중간에서 줄바꿈되던 문제 — 웹·앱 공통 (2026-08-07)
+  - 사용자 제보: 앱 홈 단체 그리드에서 "극예술연구회 시네씨아"가 "극예술연구 / 회 시네씨아"처럼 끊김. 한글은 기본 줄바꿈 규칙상 글자 단위로 끊기기 때문
+  - **웹**: `src/app/globals.css`의 `body`에 `word-break: keep-all` + `overflow-wrap: anywhere`를 전역으로. 그전엔 `break-keep`이 홈 단체 그리드 한 곳에만 손으로 붙어 있어서 FAQ·검색 결과·문서 본문 등 나머지는 그대로 글자 단위로 끊기고 있었음. 중복이 된 `page.tsx`의 `break-keep`은 제거
+  - `break-word`가 아니라 `anywhere`를 쓴 이유: `break-word`는 min-content 폭이 '어절 통째'로 커져서 긴 단어가 든 표 셀·flex 항목이 컨테이너를 밀어냄. `anywhere`는 keep-all 이전과 같은 min-content(한 글자)를 유지해 기존 레이아웃 폭이 그대로다. 코드(`pre/code/kbd/samp`)는 어절 개념이 없어 `word-break: normal`로 되돌림
+  - **앱**: `mobile/src/components/text.tsx` 공용 Text 래퍼를 새로 만들어 iOS `lineBreakStrategyIOS="hangul-word"` / Android `textBreakStrategy="highQuality"`를 기본값으로 넣고, RN `Text`를 직접 쓰던 16개 파일(화면 10 + 컴포넌트 6)의 import를 전부 교체. 개별 화면에 흩뿌리지 않아 앞으로 추가되는 화면도 자동 적용
+  - WebView 마크다운(`mobile/src/lib/markdown/template.ts`)은 이미 `keep-all`이었고, 웹과 같은 정책이 되도록 `overflow-wrap`만 `anywhere`로 맞춤
+  - 검증: 웹 `next build` + `eslint`(기존 11건 외 신규 0건), 모바일 `tsc --noEmit` + `expo lint` 통과. iOS의 `hangul-word`는 시뮬레이터 실행이 필요해 다음 앱 빌드에서 눈으로 확인할 것
+  - **릴리즈**: 웹은 머지 즉시 반영. 앱 쪽은 다음 스토어 빌드에 실려야 사용자에게 도달함
 - 앱 1.1.1 양대 스토어 출시 — 단체 목록 DB 전환 반영 (2026-08-05 제출 → 08-07 통과)
   - 계기: 사용자 제보 "앱에선 광운극예술연구회밖에 안 뜬다". 원인은 **출시 시점 어긋남** — 1.1.0은 8/3 출시인데 단체 목록을 DB에서 읽도록 바꾼 T-075·076은 8/4 작업이라, 스토어에 걸린 앱에는 `mobile/src/data/troupes.ts`의 하드코딩 목록(광운 1개)만 들어 있었음. DB·RLS·웹은 모두 정상이었음
   - 담긴 것: T-075·076(단체 DB 전환) + T-069(북마크 저장 실패·경합 — 1.1.0에 못 실었던 건) + T-068(아이콘 리본 통일) + T-070(목차 이동) + T-071(FAB 깜빡임)

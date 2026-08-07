@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, useColorScheme } from 'react-native'
+import { Pressable, StyleSheet, useColorScheme } from 'react-native'
 
+import { Text } from '@/components/text'
 import { wikiTheme } from '@/theme/colors'
 
 type Props = {

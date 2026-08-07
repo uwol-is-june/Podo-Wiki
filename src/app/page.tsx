@@ -82,7 +82,7 @@ export default async function HomePage() {
                 </div>
               )}
               {/* 소속 + 명칭 2줄 표기 (소속이 없으면 명칭 한 줄) */}
-              <span className="flex flex-col items-center gap-0.5 text-center leading-tight break-keep">
+              <span className="flex flex-col items-center gap-0.5 text-center leading-tight">
                 {troupe.affiliation && (
                   <span className="text-[11px] text-wiki-text-muted">{troupe.affiliation}</span>
                 )}

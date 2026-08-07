@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
-import { Platform, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { Platform, StyleSheet, View, useColorScheme } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { Text } from '@/components/text'
 import { wikiTheme } from '@/theme/colors'
 
 // 네이티브 탭 바가 콘텐츠 위에 겹치는 만큼 리스트 하단에 줄 여백

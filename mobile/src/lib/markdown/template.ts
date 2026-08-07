@@ -30,8 +30,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.65;
+  /* 웹 globals.css body와 같은 정책 (TASK-080) — 한쪽만 고치면 어긋남 */
   word-break: keep-all;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 h1, h2, h3 { scroll-margin-top: 12px; }
 h1 {

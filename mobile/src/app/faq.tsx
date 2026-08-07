@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { ActivityIndicator, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { ActivityIndicator, StyleSheet, View, useColorScheme } from 'react-native'
 
 import { ErrorState } from '@/components/error-state'
+import { Text } from '@/components/text'
 import { WikiWebView } from '@/components/wiki-webview'
 import { getFaqItems } from '@/lib/api'
 import { renderFaqBodyHtml } from '@/lib/markdown/renderHtml'

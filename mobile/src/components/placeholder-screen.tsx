@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { StyleSheet, View, useColorScheme } from 'react-native'
 
+import { Text } from '@/components/text'
 import { wikiTheme } from '@/theme/colors'
 
 // 이후 태스크에서 실제 화면으로 교체되는 임시 화면

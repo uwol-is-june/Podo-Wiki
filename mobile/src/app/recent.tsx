@@ -6,12 +6,12 @@ import {
   Pressable,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
 
 import { ErrorState } from '@/components/error-state'
+import { Text } from '@/components/text'
 import { PAGE_SIZE, editorLabel, formatDateTime, getRecentRevisions } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
 

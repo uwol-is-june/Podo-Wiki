@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { Pressable, StyleSheet, View, useColorScheme } from 'react-native'
 
+import { Text } from '@/components/text'
 import { wikiTheme } from '@/theme/colors'
 
 // 쿼리 실패 공통 표시 (네트워크 오류 등) + 다시 시도

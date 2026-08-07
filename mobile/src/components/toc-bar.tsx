@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, View, useColorScheme } from 'react-native'
 
+import { Text } from '@/components/text'
 import type { Heading } from '@/lib/wiki/headings'
 import { wikiTheme } from '@/theme/colors'
 

@@ -7,13 +7,13 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
 
 import { ErrorState } from '@/components/error-state'
 import { BOTTOM_TAB_INSET, TabScreen } from '@/components/tab-screen'
+import { Text } from '@/components/text'
 import { editorLabel, formatDateTime, getHomeData, getRandomSlug, troupeLogoUri } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
 

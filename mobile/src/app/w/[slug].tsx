@@ -7,7 +7,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
@@ -15,6 +14,7 @@ import type WebView from 'react-native-webview'
 
 import { ErrorState } from '@/components/error-state'
 import { ScrollTopFab } from '@/components/scroll-top-fab'
+import { Text } from '@/components/text'
 import { TocBar } from '@/components/toc-bar'
 import { WikiWebView } from '@/components/wiki-webview'
 import { useBookmarkToggle, useSyncBookmarkTitle } from '@/hooks/use-bookmarks'

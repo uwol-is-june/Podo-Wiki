@@ -7,7 +7,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native'
@@ -15,6 +14,7 @@ import {
 const MONO = Platform.select({ ios: 'Menlo', default: 'monospace' })
 
 import { ErrorState } from '@/components/error-state'
+import { Text } from '@/components/text'
 import { editorLabel, formatDateTime, getRevisionPair } from '@/lib/api'
 import { wikiTheme } from '@/theme/colors'
 

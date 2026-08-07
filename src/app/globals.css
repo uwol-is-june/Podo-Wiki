@@ -60,6 +60,22 @@
 body {
   background-color: var(--wiki-bg);
   color: var(--wiki-text);
+  /* 한글 줄바꿈은 어절 단위로 (TASK-080). keep-all이 없으면 "극예술연구회 시네씨아"가
+     "극예술연구 / 회 시네씨아"처럼 어절 중간에서 끊긴다.
+     칸보다 긴 어절(긴 URL·slug 등)은 anywhere가 받아서 끊어준다. break-word가 아니라
+     anywhere인 이유: break-word는 min-content 폭이 '어절 통째'로 커져서 flex/표 안의
+     긴 단어가 컨테이너를 밀어낸다. anywhere는 keep-all 이전과 같은 min-content(한 글자)를
+     유지하므로 기존 레이아웃 폭이 그대로다 */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 코드는 어절 개념이 없으니 기본 줄바꿈으로 되돌린다 */
+pre,
+code,
+kbd,
+samp {
+  word-break: normal;
 }
 
 /* 얇은 스크롤바 — 목차 등 사이드 패널에서 내용을 가리지 않도록 */
