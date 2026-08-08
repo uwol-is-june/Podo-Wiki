@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- 앱 1.1.2 양대 스토어 제출 (2026-08-08) — 심사 대기 중
+  - 담긴 것: T-080(한글 어절 줄바꿈) + T-081·082(흰 배경 로고 받침). 표시만 바뀐 유지보수 릴리스
+  - `mobile/app.json` version 1.1.1 → 1.1.2. iOS build 7 / Android vc 9 (versionCode는 EAS가 자동 증가)
+  - 검증: 에뮬레이터(Android 16) 릴리스 APK로 다크모드 전 화면 확인, `FATAL EXCEPTION` 0건. iOS는 실기기 확인 못 하고 제출 — `hangul-word`는 OS 기본 동작이라 위험이 낮다고 보고 넘어감
+  - 통과하면 [docs/APP-RELEASES.md](APP-RELEASES.md)의 상태를 "심사 중" → "출시됨"으로 바꿀 것
 - [TASK-082] 흰 배경 로고 받침을 앱에도 적용 (2026-08-07)
   - TASK-081에서 웹에 넣은 받침을 앱 홈 단체 그리드에 그대로 옮김. 웹에서 다크모드로 확인해 값이 좋다는 판단이 나온 뒤 진행
   - `mobile/src/theme/colors.ts`에 `logoPlate` 추가 — 라이트 `#ffffff` / 다크 `#f7f5fc`로 웹 `--wiki-logo-plate`와 동일한 값. 이 파일은 웹 팔레트를 손으로 복사해두는 곳이라 한쪽만 고치면 어긋남

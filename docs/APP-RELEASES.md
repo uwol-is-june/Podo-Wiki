@@ -8,13 +8,15 @@
 
 | 플랫폼  | 스토어 버전 | 상태             |
 | ------- | ----------- | ---------------- |
-| iOS     | 1.1.1       | ✅ 출시됨 (8/7) · 1.1.2 빌드 완료, **제출 전** |
-| Android | 1.1.1       | ✅ 출시됨 (8/7) · 1.1.2 빌드 완료, **제출 전** |
+| iOS     | 1.1.2       | ⏳ 심사 중 (8/8 제출) |
+| Android | 1.1.2       | ⏳ 심사 중 (8/8 제출) |
 
-- **1.1.2 (2026-08-08 빌드, 아직 제출 안 함)**: 한글 어절 줄바꿈(T-080) + 흰 배경 로고 받침(T-081·082)
-  - iOS build 7 / Android vc 9. [Android AAB](https://expo.dev/artifacts/eas/23-1nuODY1Yibulqj95xayoUdSaa9TjgZ1MwX_FxnfQ.aab) · [빌드 목록][builds]
+- **1.1.2 내용**: 표시만 고친 유지보수 릴리스. 8/8 양대 제출. iOS build 7 / Android vc 9
+  - T-080 한글이 어절 중간에서 줄바꿈되던 문제 — Android는 RN에 해당 prop이 없어 U+2060(WORD JOINER)로 처리, iOS는 `lineBreakStrategyIOS="hangul-word"`
+  - T-081·082 흰 배경 로고가 다크모드에서 '흰 네모'로 보이던 문제 — 밝은 받침을 깔아 타일처럼 보이게 (웹 먼저 적용 후 앱에 같은 값 복사)
   - 에뮬레이터(Android 16) 릴리스 APK 검증 완료 — 홈 단체명 `극예술연구회 / 시네씨아` 어절 단위 줄바꿈, 로고 받침 정상, 문서 WebView·목차·FAQ·검색·북마크 정상, `FATAL EXCEPTION` 0건
-  - **남은 일**: iOS `npx eas-cli submit -p ios --latest` → ASC 심사 제출 / Android AAB 수동 업로드 → 프로덕션 출시
+  - [Android AAB](https://expo.dev/artifacts/eas/23-1nuODY1Yibulqj95xayoUdSaa9TjgZ1MwX_FxnfQ.aab) · [빌드 목록][builds]
+  - iOS 수출 규정(암호화) 항목은 `app.json`의 `ITSAppUsesNonExemptEncryption: false`로 계속 자동 처리됨 — 빌드 업로드 전에는 ASC가 안내 문구를 띄우지만 올리고 나면 사라짐
 
 - **1.1.1 내용**: 1.1.0 출시 뒤 쌓인 앱 변경을 반영하는 유지보수 릴리스. 8/5 제출 → 8/7 양대 통과. iOS build 6 / Android vc 8
   - **T-075·076 단체 목록을 DB에서 읽기** — 1.1.0 앱에는 `mobile/src/data/troupes.ts`에 광운극예술연구회 하나만 하드코딩돼 있어, `/admin`으로 추가한 시네씨아가 앱에 안 보였음. **이번 출시 이후로는 단체 추가가 앱 재배포 없이 반영됨** (이 전환에 걸린 마지막 출시)
@@ -37,6 +39,7 @@
 
 | 버전  | 플랫폼  | 제출일     | 내용                                       |
 | ----- | ------- | ---------- | ------------------------------------------ |
+| 1.1.2 | 양대    | 2026-08-08 | 한글 어절 줄바꿈(T-080) + 흰 배경 로고 받침(T-081·082). iOS build 7 / Android vc 9, 심사 중 |
 | 1.1.1 | 양대    | 2026-08-05 | 단체 목록 DB 전환(T-075·076) + 북마크 저장 경합(T-069) + 아이콘 통일(T-068) + 목차 이동(T-070) + FAB 깜빡임(T-071). iOS build 6 / Android vc 8, 8/7 통과 |
 | 1.1.0 | 양대    | 2026-08-02 | 다크모드 대비 개선(T-062·063) + 북마크 탭·문서 화면 개편(T-065) + 본문·표 크기 조정(T-067). iOS build 5 / Android vc 7, 8/3 통과 |
 | 1.0.3 | 양대    | 2026-07-25 | 커스텀 도메인(wiki.podo-store.com) + 헤더 칩(T-058) + 기능요청 폼(T-059). iOS build 4 / Android vc 6 |
