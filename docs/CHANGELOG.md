@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - TASK-081에서 웹에 넣은 받침을 앱 홈 단체 그리드에 그대로 옮김. 웹에서 다크모드로 확인해 값이 좋다는 판단이 나온 뒤 진행
   - `mobile/src/theme/colors.ts`에 `logoPlate` 추가 — 라이트 `#ffffff` / 다크 `#f7f5fc`로 웹 `--wiki-logo-plate`와 동일한 값. 이 파일은 웹 팔레트를 손으로 복사해두는 곳이라 한쪽만 고치면 어긋남
   - 68px 로고 칸을 받침 `View`로 감싸고 `padding: 6`(웹의 88px 칸에 8px과 같은 비율), 이미지는 `width/height: '100%'` + `contentFit="contain"`
-  - 검증: `tsc --noEmit` + `expo lint` 통과. **실기기·시뮬레이터 확인은 아직** — 다음 앱 빌드 때 다크모드 홈에서 눈으로 볼 것
+  - 검증: `tsc --noEmit` + `expo lint` 통과 + 에뮬레이터(Android 16) 릴리스 APK 다크모드 확인 — 두 로고 모두 밝은 타일로 보이고 흰 네모가 튀는 느낌 없음
   - **릴리즈**: 스토어 심사를 거쳐야 사용자에게 도달함. 아직 미출시 (TASK-080의 줄바꿈 수정과 함께 다음 빌드에 실릴 예정)
 - [TASK-081] 흰 배경 로고가 다크모드에서 '흰 네모'로 보이던 문제 — 웹 먼저 적용 (2026-08-07)
   - 사용자 제보: "로고들이 흰색 배경인 게 있는데 다크모드에선 뜬금없이 흰 네모가 있는 것처럼 보인다"
@@ -25,9 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 사용자 제보: 앱 홈 단체 그리드에서 "극예술연구회 시네씨아"가 "극예술연구 / 회 시네씨아"처럼 끊김. 한글은 기본 줄바꿈 규칙상 글자 단위로 끊기기 때문
   - **웹**: `src/app/globals.css`의 `body`에 `word-break: keep-all` + `overflow-wrap: anywhere`를 전역으로. 그전엔 `break-keep`이 홈 단체 그리드 한 곳에만 손으로 붙어 있어서 FAQ·검색 결과·문서 본문 등 나머지는 그대로 글자 단위로 끊기고 있었음. 중복이 된 `page.tsx`의 `break-keep`은 제거
   - `break-word`가 아니라 `anywhere`를 쓴 이유: `break-word`는 min-content 폭이 '어절 통째'로 커져서 긴 단어가 든 표 셀·flex 항목이 컨테이너를 밀어냄. `anywhere`는 keep-all 이전과 같은 min-content(한 글자)를 유지해 기존 레이아웃 폭이 그대로다. 코드(`pre/code/kbd/samp`)는 어절 개념이 없어 `word-break: normal`로 되돌림
-  - **앱**: `mobile/src/components/text.tsx` 공용 Text 래퍼를 새로 만들어 iOS `lineBreakStrategyIOS="hangul-word"` / Android `textBreakStrategy="highQuality"`를 기본값으로 넣고, RN `Text`를 직접 쓰던 16개 파일(화면 10 + 컴포넌트 6)의 import를 전부 교체. 개별 화면에 흩뿌리지 않아 앞으로 추가되는 화면도 자동 적용
+  - **앱**: `mobile/src/components/text.tsx` 공용 Text 래퍼를 새로 만들어 줄바꿈 정책을 한곳에 모으고, RN `Text`를 직접 쓰던 16개 파일(화면 10 + 컴포넌트 6)의 import를 전부 교체. 개별 화면에 흩뿌리지 않아 앞으로 추가되는 화면도 자동 적용
+  - **Android는 prop으로 안 됐음** — 처음엔 `textBreakStrategy="highQuality"`면 될 거라 봤는데 에뮬레이터에서 그대로 `극예술연구회 시네 / 씨아`로 끊겼다. 한글 어절 단위 줄바꿈을 하는 건 `android:lineBreakWordStyle="phrase"`(API 33+)인데 **RN 0.86 `Text`에는 이 prop이 없다**(`TextProps.js`에 `textBreakStrategy` · `android_hyphenationFrequency` · `lineBreakStrategyIOS`뿐). 그래서 Android에서만 한글 글자 사이에 U+2060(WORD JOINER)을 끼워 어절 안쪽 줄바꿈을 막는 방식으로 처리. 한글끼리 인접할 때만 넣어서 영문·이메일·`문서/하위` 경로의 기존 줄바꿈 지점은 안 건드리고, 20자가 넘는 덩어리는 아예 못 끊겨 넘치는 걸 막으려고 예외로 둠. iOS는 `lineBreakStrategyIOS="hangul-word"`로 OS가 처리
   - WebView 마크다운(`mobile/src/lib/markdown/template.ts`)은 이미 `keep-all`이었고, 웹과 같은 정책이 되도록 `overflow-wrap`만 `anywhere`로 맞춤
-  - 검증: 웹 `next build` + `eslint`(기존 11건 외 신규 0건), 모바일 `tsc --noEmit` + `expo lint` 통과. iOS의 `hangul-word`는 시뮬레이터 실행이 필요해 다음 앱 빌드에서 눈으로 확인할 것
+  - 검증: 웹 `next build` + `eslint`(기존 11건 외 신규 0건), 모바일 `tsc --noEmit` + `expo lint` 통과. **에뮬레이터(Android 16) 릴리스 APK로 다크모드 확인** — 홈 단체명이 `극예술연구회 / 시네씨아`로 어절 단위 줄바꿈, 문서 WebView·목차 펼침/이동·FAQ·더보기·검색·북마크 정상, `FATAL EXCEPTION` 0건. iOS의 `hangul-word`는 실기기 확인 못 함(에뮬레이터가 Android뿐)
   - **릴리즈**: 웹은 머지 즉시 반영. 앱 쪽은 다음 스토어 빌드에 실려야 사용자에게 도달함
 - 앱 1.1.1 양대 스토어 출시 — 단체 목록 DB 전환 반영 (2026-08-05 제출 → 08-07 통과)
   - 계기: 사용자 제보 "앱에선 광운극예술연구회밖에 안 뜬다". 원인은 **출시 시점 어긋남** — 1.1.0은 8/3 출시인데 단체 목록을 DB에서 읽도록 바꾼 T-075·076은 8/4 작업이라, 스토어에 걸린 앱에는 `mobile/src/data/troupes.ts`의 하드코딩 목록(광운 1개)만 들어 있었음. DB·RLS·웹은 모두 정상이었음
